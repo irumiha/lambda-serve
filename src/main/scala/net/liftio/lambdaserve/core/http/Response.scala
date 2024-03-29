@@ -27,7 +27,11 @@ object Response:
 
   def Ok(body: String, charset: Charset, headers: Map[String, Seq[String]]): Response =
     val bodyArray    = body.getBytes(charset)
-    val finalHeaders = headers + ("Content-Type" -> Seq(s"text/plain; charset=${charset.name}"))
+    val finalHeaders =
+      if ! headers.contains(HttpHeader.ContentType.name) then
+        headers + ("Content-Type" -> Seq(s"text/plain; charset=${charset.name}"))
+      else
+        headers
 
     Response(
       ResponseHeader(HttpStatus.OK, finalHeaders),
