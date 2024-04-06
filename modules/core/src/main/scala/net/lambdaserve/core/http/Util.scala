@@ -1,5 +1,4 @@
-package net.liftio
-package lambdaserve.core.http
+package net.lambdaserve.core.http
 
 object Util:
 

@@ -1,28 +1,27 @@
-package net.liftio
-package lambdaserve.core
+package net.lambdaserve.server.jetty
 
-import http as lhttp
-
+import net.lambdaserve.core.Router
+import net.lambdaserve.core.http.{Request, RequestHeader, Response}
 import org.eclipse.jetty.http.HttpHeader
-import org.eclipse.jetty.server.{Handler as JSHandler, Request as JSRequest, Response as JSResponse}
+import org.eclipse.jetty.server as jetty
 import org.eclipse.jetty.util.Callback
 
 import scala.jdk.CollectionConverters.*
 
-class HttpHandler(router: Router) extends JSHandler.Abstract():
+class HttpHandler(router: Router) extends jetty.Handler.Abstract():
 
-  override def handle(in: JSRequest, out: JSResponse, callback: Callback): Boolean =
-    val requestHeader = lhttp.RequestHeader(
+  override def handle(in: jetty.Request, out: jetty.Response, callback: Callback): Boolean =
+    val requestHeader = RequestHeaderExtractor(
       scheme = in.getHttpURI.getScheme,
       method = in.getMethod,
       path = in.getHttpURI.getPath,
       headers = in.getHeaders,
       queryString = Option(in.getHttpURI.getQuery)
     )
-    val request = lhttp.Request(requestHeader, JSRequest.asInputStream(in))
+    val request = Request(requestHeader, jetty.Request.asInputStream(in))
 
-    val response: lhttp.Response = router.matchRoute(request) match
-      case None               => lhttp.Response.NotFound
+    val response: Response = router.matchRoute(request) match
+      case None               => Response.NotFound
       case Some(routeHandler) => routeHandler(request)
 
     out.setStatus(response.header.status.code)
@@ -34,7 +33,7 @@ class HttpHandler(router: Router) extends JSHandler.Abstract():
       responseHeaders.put(headerName, headerValue.asJava)
     }
 
-    val os = JSResponse.asBufferedOutputStream(in, out)
+    val os = jetty.Response.asBufferedOutputStream(in, out)
     response.body.transferTo(os)
     os.close()
     callback.succeeded()

@@ -1,16 +1,9 @@
-package net.liftio
-package lambdaserve.core.http
+package net.lambdaserve.core.http
 
-import lambdaserve.core.http.Util.{HttpHeader, HttpStatus}
+import Util.HttpHeader.ContentType
+import Util.{HttpHeader, HttpStatus}
 
-import com.github.plokhotnyuk.jsoniter_scala.core.{
-  JsonValueCodec,
-  writeToByteBufferReentrant,
-  writeToString,
-  writeToStringReentrant
-}
-
-import java.io.{ByteArrayInputStream, InputStream, StringReader}
+import java.io.{ByteArrayInputStream, InputStream}
 import java.nio.charset.Charset
 
 case class ResponseHeader(status: HttpStatus, headers: Map[String, Seq[String]])
@@ -28,7 +21,7 @@ object Response:
   def Ok(body: String, charset: Charset, headers: Map[String, Seq[String]]): Response =
     val bodyArray    = body.getBytes(charset)
     val finalHeaders =
-      if ! headers.contains(HttpHeader.ContentType.name) then
+      if ! headers.contains(ContentType.name) then
         headers + ("Content-Type" -> Seq(s"text/plain; charset=${charset.name}"))
       else
         headers
@@ -40,20 +33,6 @@ object Response:
     )
 
   def Ok(body: String): Response = Ok(body, Charset.defaultCharset(), Map())
-
-  def OkJson[R: JsonValueCodec](value: R): Response =
-    Ok(
-      writeToStringReentrant(value),
-      Charset.defaultCharset(),
-      Map(HttpHeader.ContentType.name -> Seq("application/json"))
-    )
-
-  def OkJson[R: JsonValueCodec](value: R, headers: Map[String, Seq[String]]): Response =
-    Ok(
-      writeToStringReentrant(value),
-      Charset.defaultCharset(),
-      headers + (HttpHeader.ContentType.name -> Seq("application/json"))
-    )
 
   def NotFound: Response =
     Response(

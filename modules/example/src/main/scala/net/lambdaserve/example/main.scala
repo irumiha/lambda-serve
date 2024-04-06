@@ -1,11 +1,11 @@
-package net.liftio
-package lambdaserve
+package net.lambdaserve.example
 
 import com.github.plokhotnyuk.jsoniter_scala.core.*
 import com.github.plokhotnyuk.jsoniter_scala.macros.*
-import core.{Router, Server}
-import core.Route.GET
-import core.http.Response.*
+import net.lambdaserve.core.Route.GET
+import net.lambdaserve.core.Router
+import net.lambdaserve.json.jsoniter.JsonResponse.OkJson
+import net.lambdaserve.server.jetty.Server
 
 import java.time.LocalDateTime
 import scala.io.StdIn
@@ -14,7 +14,8 @@ import scala.io.StdIn
 def main(): Unit =
   case class Message(name: String, currentTime: LocalDateTime)
   object Message:
-    given codec: JsonValueCodec[Message] = JsonCodecMaker.make
+    given codec: JsonValueCodec[Message] =
+      JsonCodecMaker.make(CodecMakerConfig.withFieldNameMapper(JsonCodecMaker.enforce_snake_case))
 
   val router = Router(GET("/hello") { request =>
     val name = request.query.get("name").flatMap(_.headOption)

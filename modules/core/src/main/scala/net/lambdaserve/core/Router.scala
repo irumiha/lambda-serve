@@ -1,5 +1,4 @@
-package net.liftio
-package lambdaserve.core
+package net.lambdaserve.core
 
 import http.Util.HttpMethod
 import http.{Request, Response}

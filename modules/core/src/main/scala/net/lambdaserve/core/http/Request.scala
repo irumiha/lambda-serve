@@ -1,15 +1,10 @@
-package net.liftio
-package lambdaserve.core.http
+package net.lambdaserve.core.http
 
-import lambdaserve.core.http.Util.HttpMethod
-
-import com.github.plokhotnyuk.jsoniter_scala.core.{JsonValueCodec, readFromStream}
-import org.eclipse.jetty.http.HttpFields
+import net.lambdaserve.core.http.Util.HttpMethod
 
 import java.io.InputStream
 import java.net.URLDecoder
 import scala.io.Source
-import scala.jdk.CollectionConverters.*
 import scala.util.matching.Regex
 
 case class RequestHeader(
@@ -24,7 +19,7 @@ case class RequestHeader(
 )
 
 object RequestHeader:
-  private def parseQuery(query: String): Map[String, Seq[String]] =
+  def parseQuery(query: String): Map[String, Seq[String]] =
     if query == null || query.isBlank then Map.empty
     else
       query
@@ -32,33 +27,6 @@ object RequestHeader:
         .map(_.split("="))
         .groupBy(_(0))
         .map { case (k, v) => k -> v.map(_(1)).toSeq }
-
-  def apply(
-    scheme: String,
-    method: String,
-    path: String,
-    headers: HttpFields,
-    queryString: Option[String]
-  ): RequestHeader =
-    val requestQuery    = queryString.fold(Map.empty[String, Seq[String]])(parseQuery)
-    val contentType     = headers.getFields("Content-Type").asScala.headOption.map(_.getValue)
-    val contentLength   = headers.getFields("Content-Length").asScala.headOption.map(_.getLongValue)
-    val contentEncoding = headers.getFields("Content-Encoding").asScala.headOption.map(_.getValue)
-
-    val headersMap = headers.listIterator().asScala.map{h =>
-      (h.getName, h.getValueList.asScala.toSeq)
-    }.toMap
-
-    new RequestHeader(
-      scheme,
-      HttpMethod.valueOf(method),
-      path,
-      headersMap,
-      requestQuery,
-      contentType,
-      contentLength,
-      contentEncoding
-    )
 
 case class Request(header: RequestHeader, requestContent: InputStream):
   export header.*
@@ -104,8 +72,6 @@ case class Request(header: RequestHeader, requestContent: InputStream):
     bodyCharset.fold(Source.fromInputStream(requestContent).mkString) { charset =>
       Source.fromInputStream(requestContent, charset).mkString
     }
-
-  def jsonBody[B: JsonValueCodec]: B = readFromStream[B](requestContent)
 
   def formBody: Map[String, Seq[String]] = header.contentType match
     case Some("application/x-www-form-urlencoded") =>
