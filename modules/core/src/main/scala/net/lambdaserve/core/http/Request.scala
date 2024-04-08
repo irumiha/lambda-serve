@@ -19,26 +19,26 @@ case class RequestHeader(
 )
 
 object RequestHeader:
-  def parseQuery(query: String): Map[String, Seq[String]] =
+  def parseQuery(query: String): Map[String, IndexedSeq[String]] =
     if query == null || query.isBlank then Map.empty
     else
       query
         .split("&")
         .map(_.split("="))
         .groupBy(_(0))
-        .map { case (k, v) => k -> v.map(_(1)).toSeq }
+        .map { case (k, v) => k -> v.map(_(1)).toIndexedSeq }
 
 case class Request(header: RequestHeader, requestContent: InputStream):
   export header.*
 
-  private def parseFormBody(body: InputStream, charset: String): Map[String, Seq[String]] =
+  private def parseFormBody(body: InputStream, charset: String): Map[String, IndexedSeq[String]] =
     val stringBody = Source.fromInputStream(body, charset).mkString
     URLDecoder
       .decode(stringBody, "UTF-8")
       .split("&")
       .map(_.split("="))
       .groupBy(_(0))
-      .map { case (k, v) => k -> v.map(_(1)).toSeq }
+      .map { case (k, v) => k -> v.map(_(1)).toIndexedSeq }
 
   private def parseMultipartFormData(input: InputStream, boundary: String): Map[String, Seq[Part]] =
     val inputString        = Source.fromInputStream(input).mkString
