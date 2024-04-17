@@ -11,6 +11,7 @@ case class RequestHeader(
   scheme: String,
   method: HttpMethod,
   path: String,
+  pathParams: Map[String, Seq[String]] = Map(),
   headers: Map[String, Seq[String]],
   query: Map[String, Seq[String]],
   contentType: Option[String],
@@ -31,7 +32,10 @@ object RequestHeader:
 case class Request(header: RequestHeader, requestContent: InputStream):
   export header.*
 
-  private def parseFormBody(body: InputStream, charset: String): Map[String, IndexedSeq[String]] =
+  private def parseFormBody(
+    body: InputStream,
+    charset: String
+  ): Map[String, IndexedSeq[String]] =
     val stringBody = Source.fromInputStream(body, charset).mkString
     URLDecoder
       .decode(stringBody, "UTF-8")
@@ -40,7 +44,10 @@ case class Request(header: RequestHeader, requestContent: InputStream):
       .groupBy(_(0))
       .map { case (k, v) => k -> v.map(_(1)).toIndexedSeq }
 
-  private def parseMultipartFormData(input: InputStream, boundary: String): Map[String, Seq[Part]] =
+  private def parseMultipartFormData(
+    input: InputStream,
+    boundary: String
+  ): Map[String, Seq[Part]] =
     val inputString        = Source.fromInputStream(input).mkString
     val partPattern: Regex = s"--$boundary\r\n(.*?)\r\n\r\n(.*?)--$boundary".r
 
@@ -69,8 +76,9 @@ case class Request(header: RequestHeader, requestContent: InputStream):
     case _                                 => None
 
   def stringBody: String =
-    bodyCharset.fold(Source.fromInputStream(requestContent).mkString) { charset =>
-      Source.fromInputStream(requestContent, charset).mkString
+    bodyCharset.fold(Source.fromInputStream(requestContent).mkString) {
+      charset =>
+        Source.fromInputStream(requestContent, charset).mkString
     }
 
   def formBody: Map[String, Seq[String]] = header.contentType match

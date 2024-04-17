@@ -3,31 +3,55 @@ package net.lambdaserve.form.mapping
 import magnolia1.*
 
 trait FormMapped[T]:
-  def mapForm(m: Map[String, IndexedSeq[String]], prefix: String = "", offset: Int = 0): T
+  def mapForm(
+    m: Map[String, IndexedSeq[String]],
+    prefix: String = "",
+    offset: Int = 0
+  ): T
 
-object FormMapped extends Derivation[FormMapped] with BaseInstances with ContainerInstances:
+object FormMapped
+    extends Derivation[FormMapped]
+    with BaseInstances
+    with ContainerInstances:
   def extractString(
     m: Map[String, IndexedSeq[String]],
     prefix: String,
     offset: Int = 0
   ): String =
     val entries =
-      m.getOrElse(prefix, throw IllegalArgumentException(s"Field not found at path $prefix"))
+      m.getOrElse(
+        prefix,
+        throw IllegalArgumentException(s"Field not found at path $prefix")
+      )
     if entries.length <= offset then
-      throw new IllegalArgumentException(s"Index out of bounds at path $prefix, offset $offset")
+      throw new IllegalArgumentException(
+        s"Index out of bounds at path $prefix, offset $offset"
+      )
     entries(offset)
 
-  override def split[T](ctx: SealedTrait[FormMapped.Typeclass, T]): FormMapped.Typeclass[T] =
+  override def split[T](
+    ctx: SealedTrait[FormMapped.Typeclass, T]
+  ): FormMapped.Typeclass[T] =
     new FormMapped[T]:
-      override def mapForm(m: Map[String, IndexedSeq[String]], prefix: String, offset: Int): T =
+      override def mapForm(
+        m: Map[String, IndexedSeq[String]],
+        prefix: String,
+        offset: Int
+      ): T =
         val stringValue = extractString(m, prefix)
         val subtype     = ctx.subtypes.find(_.typeInfo.short == stringValue).get
 
         subtype.typeclass.mapForm(m, prefix, offset)
 
-  override def join[T](ctx: CaseClass[FormMapped.Typeclass, T]): FormMapped.Typeclass[T] =
+  override def join[T](
+    ctx: CaseClass[FormMapped.Typeclass, T]
+  ): FormMapped.Typeclass[T] =
     new FormMapped[T]:
-      override def mapForm(m: Map[String, IndexedSeq[String]], prefix: String, offset: Int): T =
+      override def mapForm(
+        m: Map[String, IndexedSeq[String]],
+        prefix: String,
+        offset: Int
+      ): T =
         val allParams = ctx.parameters.map { param =>
           val currentPrefix =
             if prefix.isEmpty then param.label
@@ -70,7 +94,9 @@ def main(args: String*): Unit =
   object MyForm:
     given formMapper: FormMapped[MyForm] = FormMapped.derived
 
-  def printForm[F](formData: Map[String, IndexedSeq[String]])(using f: FormMapped[MyForm]): Unit =
+  def printForm[F](formData: Map[String, IndexedSeq[String]])(using
+    f: FormMapped[MyForm]
+  ): Unit =
     val mapped = f.mapForm(formData)
     println(mapped)
 

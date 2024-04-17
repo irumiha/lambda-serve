@@ -18,13 +18,18 @@ object Response:
   def Ok(body: InputStream, headers: Map[String, Seq[String]]): Response =
     Response(ResponseHeader(HttpStatus.OK, headers), body)
 
-  def Ok(body: String, charset: Charset, headers: Map[String, Seq[String]]): Response =
-    val bodyArray    = body.getBytes(charset)
+  def Ok(
+    body: String,
+    charset: Charset,
+    headers: Map[String, Seq[String]]
+  ): Response =
+    val bodyArray = body.getBytes(charset)
     val finalHeaders =
-      if ! headers.contains(ContentType.name) then
-        headers + ("Content-Type" -> Seq(s"text/plain; charset=${charset.name}"))
-      else
-        headers
+      if !headers.contains(ContentType.name) then
+        headers + ("Content-Type" -> Seq(
+          s"text/plain; charset=${charset.name}"
+        ))
+      else headers
 
     Response(
       ResponseHeader(HttpStatus.OK, finalHeaders),

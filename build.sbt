@@ -34,6 +34,7 @@ lazy val serverJetty = (project in file("modules/server-jetty"))
   .dependsOn(core)
 
 lazy val example = (project in file("modules/example"))
+  .enablePlugins(JavaAppPackaging)
   .settings(
     name := "lambdaserve-example",
     libraryDependencies ++= Seq(
@@ -42,6 +43,5 @@ lazy val example = (project in file("modules/example"))
   )
   .dependsOn(core, serverJetty, jsonJsoniter)
 
-lazy val root = (project in file("."))
-  .enablePlugins(JavaAppPackaging)
+lazy val `lambda-serve` = (project in file("."))
   .aggregate(core,serverJetty,jsonJsoniter,formMapping)

@@ -15,9 +15,11 @@ def main(): Unit =
   case class Message(name: String, currentTime: LocalDateTime)
   object Message:
     given codec: JsonValueCodec[Message] =
-      JsonCodecMaker.make(CodecMakerConfig.withFieldNameMapper(JsonCodecMaker.enforce_snake_case))
+      JsonCodecMaker.make(
+        CodecMakerConfig.withFieldNameMapper(JsonCodecMaker.enforce_snake_case)
+      )
 
-  val router = Router(GET("/hello") { request =>
+  val router = Router(GET("/hello".r) { request =>
     val name = request.query.get("name").flatMap(_.headOption)
 
     OkJson(Message(name.getOrElse("Unknown"), LocalDateTime.now()))

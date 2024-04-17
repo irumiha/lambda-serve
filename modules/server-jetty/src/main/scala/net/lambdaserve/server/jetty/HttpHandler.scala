@@ -10,7 +10,11 @@ import scala.jdk.CollectionConverters.*
 
 class HttpHandler(router: Router) extends jetty.Handler.Abstract():
 
-  override def handle(in: jetty.Request, out: jetty.Response, callback: Callback): Boolean =
+  override def handle(
+    in: jetty.Request,
+    out: jetty.Response,
+    callback: Callback
+  ): Boolean =
     val requestHeader = RequestHeaderExtractor(
       scheme = in.getHttpURI.getScheme,
       method = in.getMethod,
@@ -22,7 +26,7 @@ class HttpHandler(router: Router) extends jetty.Handler.Abstract():
 
     val response: Response = router.matchRoute(request) match
       case None               => Response.NotFound
-      case Some(routeHandler) => routeHandler(request)
+      case Some(req, routeHandler) => routeHandler(req)
 
     out.setStatus(response.header.status.code)
 
