@@ -1,22 +1,20 @@
 package net.lambdaserve.core.http
 
-import Util.HttpHeader.ContentType
-import Util.{HttpHeader, HttpStatus}
+import net.lambdaserve.core.http.Util.HttpHeader.ContentType
+import net.lambdaserve.core.http.Util.{HttpHeader, HttpStatus}
 
-import java.io.{ByteArrayInputStream, InputStream}
+import java.io.OutputStream
 import java.nio.charset.Charset
 
 case class ResponseHeader(status: HttpStatus, headers: Map[String, Seq[String]])
 
 case class Response(
   header: ResponseHeader,
-  body: InputStream,
+  bodyWriter: OutputStream => Unit,
   length: Option[Long] = None
 )
 
 object Response:
-  def Ok(body: InputStream, headers: Map[String, Seq[String]]): Response =
-    Response(ResponseHeader(HttpStatus.OK, headers), body)
 
   def Ok(
     body: String,
@@ -33,7 +31,7 @@ object Response:
 
     Response(
       ResponseHeader(HttpStatus.OK, finalHeaders),
-      new ByteArrayInputStream(bodyArray),
+      os => os.write(bodyArray),
       Some(bodyArray.length)
     )
 
@@ -42,27 +40,27 @@ object Response:
   def NotFound: Response =
     Response(
       ResponseHeader(HttpStatus.NotFound, Map.empty),
-      InputStream.nullInputStream(),
+      os => {},
       Some(-1)
     )
 
   def BadRequest: Response =
     Response(
       ResponseHeader(HttpStatus.BadRequest, Map.empty),
-      InputStream.nullInputStream(),
+      os => {},
       Some(-1)
     )
 
   def Redirect(location: String): Response =
     Response(
       ResponseHeader(HttpStatus.Found, Map("Location" -> Seq(location))),
-      InputStream.nullInputStream(),
+      os => {},
       Some(-1)
     )
 
   def SeeAlso(location: String): Response =
     Response(
       ResponseHeader(HttpStatus.SeeOther, Map("Location" -> Seq(location))),
-      InputStream.nullInputStream(),
+      os => {},
       Some(-1)
     )

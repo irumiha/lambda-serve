@@ -4,6 +4,7 @@ import net.lambdaserve.core.http.Util.HttpMethod
 
 import java.io.InputStream
 import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 import scala.io.Source
 import scala.util.matching.Regex
 
@@ -38,7 +39,7 @@ case class Request(header: RequestHeader, requestContent: InputStream):
   ): Map[String, IndexedSeq[String]] =
     val stringBody = Source.fromInputStream(body, charset).mkString
     URLDecoder
-      .decode(stringBody, "UTF-8")
+      .decode(stringBody, StandardCharsets.UTF_8.name())
       .split("&")
       .map(_.split("="))
       .groupBy(_(0))
@@ -75,20 +76,20 @@ case class Request(header: RequestHeader, requestContent: InputStream):
     case Some(s"${_}; charset=${charset}") => Some(charset)
     case _                                 => None
 
-  def stringBody: String =
+  def string: String =
     bodyCharset.fold(Source.fromInputStream(requestContent).mkString) {
       charset =>
         Source.fromInputStream(requestContent, charset).mkString
     }
 
-  def formBody: Map[String, Seq[String]] = header.contentType match
+  def form: Map[String, IndexedSeq[String]] = header.contentType match
     case Some("application/x-www-form-urlencoded") =>
-      parseFormBody(requestContent, "UTF-8")
+      parseFormBody(requestContent, StandardCharsets.UTF_8.name())
     case _ => Map.empty
 
   case class Part(headers: Map[String, String], body: String)
 
-  def multipartBody: Map[String, Seq[Part]] = header.contentType match
+  def multipart: Map[String, Seq[Part]] = header.contentType match
     case Some(s"multipart/form-data; boundary=${boundary}") =>
       parseMultipartFormData(requestContent, boundary)
     case _ => Map.empty

@@ -1,28 +1,18 @@
 package net.lambdaserve.json.jsoniter
-import com.github.plokhotnyuk.jsoniter_scala.core.{
-  JsonValueCodec,
-  writeToStringReentrant
-}
-import net.lambdaserve.core.http.Response
-import net.lambdaserve.core.http.Response.Ok
-import net.lambdaserve.core.http.Util.HttpHeader
-
-import java.nio.charset.Charset
+import com.github.plokhotnyuk.jsoniter_scala.core.{JsonValueCodec, writeToStreamReentrant}
+import net.lambdaserve.core.http.Util.{HttpHeader, HttpStatus}
+import net.lambdaserve.core.http.{Response, ResponseHeader}
 
 object JsonResponse:
-  def OkJson[R: JsonValueCodec](value: R): Response =
-    Ok(
-      writeToStringReentrant(value),
-      Charset.defaultCharset(),
-      Map(HttpHeader.ContentType.name -> Seq("application/json"))
-    )
+  def Ok[R: JsonValueCodec](value: R): Response =
+    Ok(value, Map.empty)
 
-  def OkJson[R: JsonValueCodec](
+  def Ok[R: JsonValueCodec](
     value: R,
     headers: Map[String, Seq[String]]
   ): Response =
-    Ok(
-      writeToStringReentrant(value),
-      Charset.defaultCharset(),
-      headers + (HttpHeader.ContentType.name -> Seq("application/json"))
+    Response(
+      ResponseHeader(HttpStatus.OK, headers + (HttpHeader.ContentType.name -> Seq("application/json"))),
+      os => writeToStreamReentrant(value, os),
+      None
     )

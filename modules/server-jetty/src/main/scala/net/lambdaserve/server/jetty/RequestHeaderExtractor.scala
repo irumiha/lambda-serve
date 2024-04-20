@@ -16,11 +16,14 @@ object RequestHeaderExtractor:
     queryString: Option[String]
   ): RequestHeader =
     val requestQuery =
-      queryString.fold(Map.empty[String, Seq[String]])(parseQuery)
+      queryString.fold(Map.empty[String, IndexedSeq[String]])(parseQuery)
+
     val contentType =
       headers.getFields("Content-Type").asScala.headOption.map(_.getValue)
+
     val contentLength =
       headers.getFields("Content-Length").asScala.headOption.map(_.getLongValue)
+
     val contentEncoding =
       headers.getFields("Content-Encoding").asScala.headOption.map(_.getValue)
 
@@ -33,13 +36,13 @@ object RequestHeaderExtractor:
       .toMap
 
     new RequestHeader(
-      scheme,
-      HttpMethod.valueOf(method),
-      path,
-      Map(),
-      headersMap,
-      requestQuery,
-      contentType,
-      contentLength,
-      contentEncoding
+      scheme = scheme,
+      method = HttpMethod.valueOf(method),
+      path = path,
+      pathParams = Map(),
+      headers = headersMap,
+      query = requestQuery,
+      contentType = contentType,
+      contentLength = contentLength,
+      contentEncoding = contentEncoding
     )

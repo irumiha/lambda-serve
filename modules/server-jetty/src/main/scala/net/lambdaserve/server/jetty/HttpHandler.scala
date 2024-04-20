@@ -25,7 +25,7 @@ class HttpHandler(router: Router) extends jetty.Handler.Abstract():
     val request = Request(requestHeader, jetty.Request.asInputStream(in))
 
     val response: Response = router.matchRoute(request) match
-      case None               => Response.NotFound
+      case None                    => Response.NotFound
       case Some(req, routeHandler) => routeHandler(req)
 
     out.setStatus(response.header.status.code)
@@ -38,7 +38,7 @@ class HttpHandler(router: Router) extends jetty.Handler.Abstract():
     }
 
     val os = jetty.Response.asBufferedOutputStream(in, out)
-    response.body.transferTo(os)
+    response.bodyWriter(os)
     os.close()
     callback.succeeded()
 

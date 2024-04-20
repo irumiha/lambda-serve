@@ -17,7 +17,7 @@ case class Route(method: HttpMethod, path: Regex, handler: RouteHandler):
       .findPrefixMatchOf(request.path)
       .map: matched =>
         val pathParamValues =
-          pathParamNames.map(name => name -> Seq(matched.group(name))).toMap
+          pathParamNames.map(name => name -> IndexedSeq(matched.group(name))).toMap
 
         if pathParamValues.nonEmpty then
           request
@@ -56,10 +56,11 @@ class Router(val routes: Route*):
 
   def matchRoute(request: Request): Option[(Request, RouteHandler)] =
     var found: Option[(Request, RouteHandler)] = None
-    val i                      = 0
+    var i                                      = 0
 
     while i < routes.length && found.isEmpty do
       val route = routes(i)
       found = route.matchRequest(request).map(r => (r, route.handler))
+      i += 1
 
     found
