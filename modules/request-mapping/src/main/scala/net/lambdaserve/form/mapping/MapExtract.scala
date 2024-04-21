@@ -2,15 +2,15 @@ package net.lambdaserve.form.mapping
 
 import magnolia1.*
 
-trait FormMapped[T]:
+trait MapExtract[T]:
   def mapForm(
     m: Map[String, IndexedSeq[String]],
     prefix: String = "",
     offset: Int = 0
   ): T
 
-object FormMapped
-    extends Derivation[FormMapped]
+object MapExtract
+    extends AutoDerivation[MapExtract]
     with BaseInstances
     with ContainerInstances:
   def extractString(
@@ -30,9 +30,9 @@ object FormMapped
     entries(offset)
 
   override def split[T](
-    ctx: SealedTrait[FormMapped.Typeclass, T]
-  ): FormMapped.Typeclass[T] =
-    new FormMapped[T]:
+    ctx: SealedTrait[MapExtract.Typeclass, T]
+  ): MapExtract.Typeclass[T] =
+    new MapExtract[T]:
       override def mapForm(
         m: Map[String, IndexedSeq[String]],
         prefix: String,
@@ -44,9 +44,9 @@ object FormMapped
         subtype.typeclass.mapForm(m, prefix, offset)
 
   override def join[T](
-    ctx: CaseClass[FormMapped.Typeclass, T]
-  ): FormMapped.Typeclass[T] =
-    new FormMapped[T]:
+    ctx: CaseClass[MapExtract.Typeclass, T]
+  ): MapExtract.Typeclass[T] =
+    new MapExtract[T]:
       override def mapForm(
         m: Map[String, IndexedSeq[String]],
         prefix: String,
@@ -77,12 +77,7 @@ def main(args: String*): Unit =
     case Nov
     case Dec
 
-  object Months:
-    given formMapper: FormMapped[Months] = FormMapped.derived
-
   case class Pet(name: String, breed: String)
-  object Pet:
-    given formMapper: FormMapped[Pet] = FormMapped.derived
 
   case class MyForm(
     firstName: String,
@@ -90,12 +85,10 @@ def main(args: String*): Unit =
     points: List[Int],
     bornIn: Months,
     pet: List[Pet]
-  )
-  object MyForm:
-    given formMapper: FormMapped[MyForm] = FormMapped.derived
+  ) derives MapExtract
 
   def printForm[F](formData: Map[String, IndexedSeq[String]])(using
-    f: FormMapped[MyForm]
+    f: MapExtract[MyForm]
   ): Unit =
     val mapped = f.mapForm(formData)
     println(mapped)

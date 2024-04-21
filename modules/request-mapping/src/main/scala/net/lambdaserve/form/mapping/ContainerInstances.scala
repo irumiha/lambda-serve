@@ -1,7 +1,7 @@
 package net.lambdaserve.form.mapping
 
 trait ContainerInstances:
-  given seq[T](using sfm: FormMapped[T]): FormMapped[Seq[T]] with
+  given seq[T](using sfm: MapExtract[T]): MapExtract[Seq[T]] with
     override def mapForm(
       m: Map[String, IndexedSeq[String]],
       prefix: String,
@@ -15,7 +15,7 @@ trait ContainerInstances:
         case _ =>
           throw IllegalArgumentException(s"Field not found at path $prefix")
 
-  given list[T](using sfm: FormMapped[Seq[T]]): FormMapped[List[T]] with
+  given list[T](using sfm: MapExtract[Seq[T]]): MapExtract[List[T]] with
     override def mapForm(
       m: Map[String, IndexedSeq[String]],
       prefix: String,
@@ -23,7 +23,7 @@ trait ContainerInstances:
     ): List[T] =
       sfm.mapForm(m, prefix, offset).toList
 
-  given vec[T](using sfm: FormMapped[Seq[T]]): FormMapped[Vector[T]] with
+  given vec[T](using sfm: MapExtract[Seq[T]]): MapExtract[Vector[T]] with
     override def mapForm(
       m: Map[String, IndexedSeq[String]],
       prefix: String,
@@ -31,7 +31,7 @@ trait ContainerInstances:
     ): Vector[T] =
       sfm.mapForm(m, prefix, offset).toVector
 
-  given option[T](using sfm: FormMapped[T]): FormMapped[Option[T]] with
+  given option[T](using sfm: MapExtract[T]): MapExtract[Option[T]] with
     override def mapForm(
       m: Map[String, IndexedSeq[String]],
       prefix: String,

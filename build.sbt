@@ -6,9 +6,9 @@ lazy val core = (project in file("modules/core"))
     name := "lambdaserve-core"
   )
 
-lazy val formMapping = (project in file("modules/form-mapping"))
+lazy val requestMapping = (project in file("modules/request-mapping"))
   .settings(
-    name := "lambdaserve-form-mapping",
+    name := "lambdaserve-request-mapping",
     libraryDependencies ++= Seq(
       "com.softwaremill.magnolia1_3" %% "magnolia" % "1.3.4"
     )
@@ -44,4 +44,4 @@ lazy val example = (project in file("modules/example"))
   .dependsOn(core, serverJetty, jsonJsoniter)
 
 lazy val `lambda-serve` = (project in file("."))
-  .aggregate(core,serverJetty,jsonJsoniter,formMapping)
+  .aggregate(core,serverJetty,jsonJsoniter,requestMapping)

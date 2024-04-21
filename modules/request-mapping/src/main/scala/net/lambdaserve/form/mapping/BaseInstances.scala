@@ -1,58 +1,68 @@
 package net.lambdaserve.form.mapping
 
+import java.util.UUID
+
 trait BaseInstances:
-  given FormMapped[Short] with
+  given MapExtract[Short] with
     override def mapForm(
       m: Map[String, IndexedSeq[String]],
       prefix: String,
       offset: Int
     ): Short =
-      FormMapped.extractString(m, prefix, offset).toShort
+      MapExtract.extractString(m, prefix, offset).toShort
 
-  given FormMapped[Int] with
+  given MapExtract[Int] with
     override def mapForm(
       m: Map[String, IndexedSeq[String]],
       prefix: String,
       offset: Int
     ): Int =
-      FormMapped.extractString(m, prefix, offset).toInt
+      MapExtract.extractString(m, prefix, offset).toInt
 
-  given FormMapped[Float] with
+  given MapExtract[Float] with
     override def mapForm(
       m: Map[String, IndexedSeq[String]],
       prefix: String,
       offset: Int
     ): Float =
-      FormMapped.extractString(m, prefix, offset).toFloat
+      MapExtract.extractString(m, prefix, offset).toFloat
 
-  given FormMapped[Double] with
+  given MapExtract[Double] with
     override def mapForm(
       m: Map[String, IndexedSeq[String]],
       prefix: String,
       offset: Int
     ): Double =
-      FormMapped.extractString(m, prefix, offset).toDouble
+      MapExtract.extractString(m, prefix, offset).toDouble
 
-  given FormMapped[BigDecimal] with
+  given MapExtract[BigDecimal] with
     override def mapForm(
       m: Map[String, IndexedSeq[String]],
       prefix: String,
       offset: Int
     ): BigDecimal =
-      BigDecimal(FormMapped.extractString(m, prefix, offset))
+      BigDecimal(MapExtract.extractString(m, prefix, offset))
 
-  given FormMapped[Boolean] with
+  given MapExtract[Boolean] with
     override def mapForm(
       m: Map[String, IndexedSeq[String]],
       prefix: String,
       offset: Int
     ): Boolean =
-      FormMapped.extractString(m, prefix, offset).toBoolean
+      MapExtract.extractString(m, prefix, offset).toBoolean
 
-  given FormMapped[String] with
+  given MapExtract[String] with
     override def mapForm(
       m: Map[String, IndexedSeq[String]],
       prefix: String,
       offset: Int
     ): String =
-      FormMapped.extractString(m, prefix, offset)
+      MapExtract.extractString(m, prefix, offset)
+
+  given MapExtract[UUID] with
+    override def mapForm(
+      m: Map[String, IndexedSeq[String]],
+      prefix: String,
+      offset: Int
+    ): UUID =
+      UUID.fromString(MapExtract.extractString(m, prefix, offset))
