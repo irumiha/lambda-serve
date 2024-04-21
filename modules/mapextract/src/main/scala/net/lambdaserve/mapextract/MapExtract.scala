@@ -3,7 +3,7 @@ package net.lambdaserve.mapextract
 import magnolia1.*
 
 trait MapExtract[T]:
-  def mapForm(
+  def projectMap(
     m: Map[String, IndexedSeq[String]],
     prefix: String = "",
     offset: Int = 0
@@ -33,7 +33,7 @@ object MapExtract
     ctx: SealedTrait[MapExtract.Typeclass, T]
   ): MapExtract.Typeclass[T] =
     new MapExtract[T]:
-      override def mapForm(
+      override def projectMap(
         m: Map[String, IndexedSeq[String]],
         prefix: String,
         offset: Int
@@ -41,13 +41,13 @@ object MapExtract
         val stringValue = extractString(m, prefix)
         val subtype     = ctx.subtypes.find(_.typeInfo.short == stringValue).get
 
-        subtype.typeclass.mapForm(m, prefix, offset)
+        subtype.typeclass.projectMap(m, prefix, offset)
 
   override def join[T](
     ctx: CaseClass[MapExtract.Typeclass, T]
   ): MapExtract.Typeclass[T] =
     new MapExtract[T]:
-      override def mapForm(
+      override def projectMap(
         m: Map[String, IndexedSeq[String]],
         prefix: String,
         offset: Int
@@ -56,7 +56,7 @@ object MapExtract
           val currentPrefix =
             if prefix.isEmpty then param.label
             else s"$prefix.${param.label}"
-          param.typeclass.mapForm(m, currentPrefix, offset)
+          param.typeclass.projectMap(m, currentPrefix, offset)
         }
 
         ctx.rawConstruct(allParams)
@@ -90,7 +90,7 @@ def main(args: String*): Unit =
   def printForm[F](formData: Map[String, IndexedSeq[String]])(using
     f: MapExtract[MyForm]
   ): Unit =
-    val mapped = f.mapForm(formData)
+    val mapped = f.projectMap(formData)
     println(mapped)
 
   printForm(

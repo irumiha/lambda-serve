@@ -2,7 +2,6 @@ package net.lambdaserve.core
 
 import http.Util.HttpMethod
 import http.{Request, Response}
-import net.lambdaserve.core.http.Util.HttpMethod.GET
 
 import scala.util.matching.Regex
 import scala.jdk.CollectionConverters.given

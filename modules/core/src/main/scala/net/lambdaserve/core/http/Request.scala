@@ -12,9 +12,9 @@ case class RequestHeader(
   scheme: String,
   method: HttpMethod,
   path: String,
-  pathParams: Map[String, Seq[String]] = Map(),
-  headers: Map[String, Seq[String]],
-  query: Map[String, Seq[String]],
+  pathParams: Map[String, IndexedSeq[String]] = Map(),
+  headers: Map[String, IndexedSeq[String]],
+  query: Map[String, IndexedSeq[String]],
   contentType: Option[String],
   contentLength: Option[Long],
   contentEncoding: Option[String]

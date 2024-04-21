@@ -5,7 +5,7 @@ import java.time.{Instant, LocalDate, LocalDateTime, ZonedDateTime}
 trait TimeInstances:
 
   given MapExtract[LocalDateTime] with
-    override def mapForm(
+    override def projectMap(
       m: Map[String, IndexedSeq[String]],
       prefix: String,
       offset: Int
@@ -13,7 +13,7 @@ trait TimeInstances:
       LocalDateTime.parse(MapExtract.extractString(m, prefix, offset))
 
   given MapExtract[ZonedDateTime] with
-    override def mapForm(
+    override def projectMap(
       m: Map[String, IndexedSeq[String]],
       prefix: String,
       offset: Int
@@ -21,7 +21,7 @@ trait TimeInstances:
       ZonedDateTime.parse(MapExtract.extractString(m, prefix, offset))
 
   given MapExtract[Instant] with
-    override def mapForm(
+    override def projectMap(
       m: Map[String, IndexedSeq[String]],
       prefix: String,
       offset: Int
@@ -29,7 +29,7 @@ trait TimeInstances:
       Instant.parse(MapExtract.extractString(m, prefix, offset))
 
   given MapExtract[LocalDate] with
-    override def mapForm(
+    override def projectMap(
       m: Map[String, IndexedSeq[String]],
       prefix: String,
       offset: Int

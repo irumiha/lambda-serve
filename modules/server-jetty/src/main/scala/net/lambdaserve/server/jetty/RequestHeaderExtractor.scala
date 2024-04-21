@@ -31,7 +31,7 @@ object RequestHeaderExtractor:
       .listIterator()
       .asScala
       .map { h =>
-        (h.getName, h.getValueList.asScala.toSeq)
+        (h.getName, h.getValueList.asScala.toIndexedSeq)
       }
       .toMap
 

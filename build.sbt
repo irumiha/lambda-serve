@@ -24,6 +24,18 @@ lazy val jsonJsoniter = (project in file("modules/json-jsoniter"))
   )
   .dependsOn(core)
 
+lazy val requestmapped = (project in file("modules/requestmapped"))
+  .settings(
+    name := "lambdaserve-requestmapped",
+  )
+  .dependsOn(core, mapextract)
+
+lazy val requestmappedJson = (project in file("modules/requestmapped-json"))
+  .settings(
+    name := "lambdaserve-requestmapped-json",
+  )
+  .dependsOn(core, mapextract, jsonJsoniter)
+
 lazy val serverJetty = (project in file("modules/server-jetty"))
   .settings(
     name := "lambdaserve-server-jetty",
@@ -41,7 +53,7 @@ lazy val example = (project in file("modules/example"))
       "com.outr" %% "scribe-slf4j2" % "3.13.2",
     )
   )
-  .dependsOn(core, serverJetty, jsonJsoniter)
+  .dependsOn(core, serverJetty, jsonJsoniter, mapextract, requestmappedJson)
 
 lazy val `lambda-serve` = (project in file("."))
-  .aggregate(core,serverJetty,jsonJsoniter,mapextract)
+  .aggregate(core,serverJetty,jsonJsoniter,mapextract,requestmapped, requestmappedJson)
