@@ -1,4 +1,4 @@
-package net.lambdaserve.form.mapping
+package net.lambdaserve.mapextract
 
 trait ContainerInstances:
   given seq[T](using sfm: MapExtract[T]): MapExtract[Seq[T]] with

@@ -1,4 +1,4 @@
-package net.lambdaserve.form.mapping
+package net.lambdaserve.mapextract
 
 import java.time.{Instant, LocalDate, LocalDateTime, ZonedDateTime}
 
