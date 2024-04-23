@@ -1,5 +1,6 @@
 package net.lambdaserve.core.http
 
+import net.lambdaserve.core.codec.JsonEncoder
 import net.lambdaserve.core.http.Util.HttpHeader.ContentType
 import net.lambdaserve.core.http.Util.{HttpHeader, HttpStatus}
 
@@ -15,6 +16,7 @@ case class Response(
 )
 
 object Response:
+  private val applicationJsonHeader = Map(HttpHeader.ContentType.name -> Seq("application/json"))
 
   def Ok(
     body: String,
@@ -36,6 +38,20 @@ object Response:
     )
 
   def Ok(body: String): Response = Ok(body, Charset.defaultCharset(), Map())
+
+  def Ok[R](entity: R)(using enc: JsonEncoder[R]): Response =
+    Response(
+      ResponseHeader(HttpStatus.OK, applicationJsonHeader),
+      enc.bodyWriter(entity),
+      None
+    )
+
+  def Ok[R](entity: R, headers: Map[String, Seq[String]])(using enc: JsonEncoder[R]): Response =
+    Response(
+      ResponseHeader(HttpStatus.OK, applicationJsonHeader ++ headers),
+      enc.bodyWriter(entity),
+      None
+    )
 
   def NotFound: Response =
     Response(

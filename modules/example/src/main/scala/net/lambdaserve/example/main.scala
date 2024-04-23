@@ -4,10 +4,12 @@ import com.github.plokhotnyuk.jsoniter_scala.core.*
 import com.github.plokhotnyuk.jsoniter_scala.macros.*
 import net.lambdaserve.core.Route.{GET, POST}
 import net.lambdaserve.core.Router
-import net.lambdaserve.json.jsoniter.JsonResponse.Ok
+import net.lambdaserve.core.http.Response
 import net.lambdaserve.mapextract.MapExtract
-import net.lambdaserve.requestmapped.json.*
+import net.lambdaserve.requestmapped.*
 import net.lambdaserve.server.jetty.Server
+import net.lambdaserve.json.jsoniter.JsoniterEncoder.given
+import net.lambdaserve.json.jsoniter.JsoniterDecoder.given
 
 import java.time.LocalDateTime
 import java.util.UUID
@@ -36,15 +38,15 @@ def main(): Unit =
     GET("/hello".r) { request =>
       val name = request.query.get("name").flatMap(_.headOption)
 
-      Ok(Message(name.getOrElse("Unknown"), LocalDateTime.now()))
+      Response.Ok(Message(name.getOrElse("Unknown"), LocalDateTime.now()))
     },
     GET("/something/(?<thisname>\\w+)".r) { request =>
       val name = request.pathParams.get("thisname").flatMap(_.headOption)
 
-      Ok(Message(name.getOrElse("Unknown"), LocalDateTime.now()))
+      Response.Ok(Message(name.getOrElse("Unknown"), LocalDateTime.now()))
     },
-    POST("/requestmapped/(?<id>\\w+-\\w+-\\w+-\\w+-\\w+)$".r)(mapped { (command: JsonCommand) =>
-      Ok(Message(command.name, LocalDateTime.now()))
+    POST("/requestmapped/(?<id>\\w+-\\w+-\\w+-\\w+-\\w+)$".r)( mapped { (command: JsonCommand) =>
+      Response.Ok(Message(command.name, LocalDateTime.now()))
     })
   )
 

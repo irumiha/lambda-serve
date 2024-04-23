@@ -1,14 +1,10 @@
 package net.lambdaserve.requestmapped
 
+import net.lambdaserve.core.codec.JsonDecoder
 import net.lambdaserve.core.http.{Request, Response}
 import net.lambdaserve.mapextract.MapExtract
 
 def joinMaps(r: Request) = r.pathParams ++ r.header.query ++ r.form ++ r.headers
-
-def mapped[T](h: T => Response)(using m: MapExtract[T]): Request => Response =
-  request =>
-    val handlerParam = m.projectMap(joinMaps(request))
-    h(handlerParam)
 
 def mapped[T](h: (T, Request) => Response)(using
   m: MapExtract[T]
@@ -58,3 +54,11 @@ def mapped[T1, T2, T3](h: (T1, T2, T3, Request) => Response)(using
     val p2         = m2.projectMap(joinedMaps)
     val p3         = m3.projectMap(joinedMaps)
     h(p1, p2, p3, request)
+
+def mapped[T](h: T => Response)(using m: MapExtract[T] | JsonDecoder[T]): Request => Response =
+  request =>
+    val handlerParam = m match
+      case me: MapExtract[T] => me.projectMap(joinMaps(request))
+      case jvc: JsonDecoder[T] =>
+        jvc.readBody(request)
+    h(handlerParam)
