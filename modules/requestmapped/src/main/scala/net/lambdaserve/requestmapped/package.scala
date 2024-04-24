@@ -55,10 +55,11 @@ def mapped[T1, T2, T3](h: (T1, T2, T3, Request) => Response)(using
     val p3         = m3.projectMap(joinedMaps)
     h(p1, p2, p3, request)
 
-def mapped[T](h: T => Response)(using m: MapExtract[T] | EntityDecoder[T]): Request => Response =
+def mapped[T](h: T => Response)(using
+  m: MapExtract[T] | EntityDecoder[T]
+): Request => Response =
   request =>
     val handlerParam = m match
-      case me: MapExtract[T] => me.projectMap(joinMaps(request))
-      case jvc: EntityDecoder[T] =>
-        jvc.readBody(request)
+      case me: MapExtract[T]     => me.projectMap(joinMaps(request))
+      case jvc: EntityDecoder[T] => jvc.readBody(request)
     h(handlerParam)

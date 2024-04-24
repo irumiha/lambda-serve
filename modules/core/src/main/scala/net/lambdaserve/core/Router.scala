@@ -68,3 +68,7 @@ class Router(val routes: Route*):
       i += 1
 
     found
+
+object Router:
+  def combine(routers: Router*): Router =
+    Router(routers.flatMap(_.routes)*)
