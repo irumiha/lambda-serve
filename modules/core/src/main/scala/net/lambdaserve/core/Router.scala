@@ -8,7 +8,7 @@ import scala.jdk.CollectionConverters.given
 
 type RouteHandler = Request => Response
 case class Route(method: HttpMethod, path: Regex, handler: RouteHandler):
-  val pathParamNames: Vector[String] =
+  private val pathParamNames: Vector[String] =
     path.pattern.namedGroups().asScala.keys.toVector
 
   def matchRequest(request: Request): Option[Request] =
