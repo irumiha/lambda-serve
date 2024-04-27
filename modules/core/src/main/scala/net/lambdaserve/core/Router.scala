@@ -6,7 +6,6 @@ import http.{Request, Response}
 import scala.util.matching.Regex
 import scala.jdk.CollectionConverters.given
 
-type RouteHandler = Request => Response
 case class Route(method: HttpMethod, path: Regex, handler: RouteHandler):
   private val pathParamNames: Vector[String] =
     path.pattern.namedGroups().asScala.keys.toVector

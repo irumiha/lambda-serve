@@ -13,10 +13,13 @@ case class Response(
   header: ResponseHeader,
   bodyWriter: OutputStream => Unit,
   length: Option[Long] = None
-)
+):
+  export header.*
 
 object Response:
-  private val applicationJsonHeader = Map(HttpHeader.ContentType.name -> Seq("application/json"))
+  private val applicationJsonHeader = Map(
+    HttpHeader.ContentType.name -> Seq("application/json")
+  )
 
   def Ok(
     body: String,
@@ -46,7 +49,9 @@ object Response:
       None
     )
 
-  def Ok[R](entity: R, headers: Map[String, Seq[String]])(using enc: EntityEncoder[R]): Response =
+  def Ok[R](entity: R, headers: Map[String, Seq[String]])(using
+    enc: EntityEncoder[R]
+  ): Response =
     Response(
       ResponseHeader(HttpStatus.OK, applicationJsonHeader ++ headers),
       enc.bodyWriter(entity),
@@ -54,11 +59,7 @@ object Response:
     )
 
   def NotFound: Response =
-    Response(
-      ResponseHeader(HttpStatus.NotFound, Map.empty),
-      os => {},
-      Some(-1)
-    )
+    Response(ResponseHeader(HttpStatus.NotFound, Map.empty), os => {}, Some(-1))
 
   def BadRequest: Response =
     Response(

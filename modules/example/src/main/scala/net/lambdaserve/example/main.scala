@@ -14,6 +14,20 @@ import java.time.LocalDateTime
 import java.util.UUID
 import scala.io.StdIn
 
+class HouseController:
+  case class HouseCommand(id: String, name: String) derives MapExtract
+
+  def doWithHouse(houseCommand: HouseCommand): Response =
+    Response.Ok(s"House ${houseCommand.name} with id ${houseCommand.id}")
+
+  def getHouse(id: String): Response =
+    Response.Ok(s"House with id $id")
+
+  val router: Router = Router(
+    POST("/house".r)(mapped(doWithHouse)),
+    GET("/house/(?<id>\\w+)".r)(mapped(getHouse))
+  )
+
 @main
 def main(): Unit =
   case class Message(name: String, currentTime: LocalDateTime)
@@ -32,7 +46,7 @@ def main(): Unit =
         CodecMakerConfig.withFieldNameMapper(JsonCodecMaker.enforce_snake_case)
       )
 
-  val router = Router(
+  val topRouter = Router(
     GET("/hello".r): request =>
       val name = request.query.get("name").flatMap(_.headOption)
       Response.Ok(Message(name.getOrElse("Unknown"), LocalDateTime.now()))
@@ -45,6 +59,8 @@ def main(): Unit =
       mapped: (command: JsonCommand) =>
         Response.Ok(Message(command.name, LocalDateTime.now()))
   )
+
+  val router = Router.combine(topRouter, HouseController().router)
 
   val s = Server.makeServer("localhost", 8080, router)
 

@@ -26,7 +26,7 @@ class HttpHandler(router: Router) extends jetty.Handler.Abstract():
 
     val response: Response = router.matchRoute(request) match
       case None                    => Response.NotFound
-      case Some(req, routeHandler) => routeHandler(req)
+      case Some(req, routeHandler) => routeHandler.handle(req)
 
     out.setStatus(response.header.status.code)
 

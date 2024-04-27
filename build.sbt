@@ -1,5 +1,6 @@
 ThisBuild / version := "0.1.0-SNAPSHOT"
 ThisBuild / scalaVersion := "3.3.3"
+ThisBuild / organization := "net.lambdaserve"
 
 lazy val core = (project in file("modules/core"))
   .settings(
@@ -10,7 +11,7 @@ lazy val mapextract = (project in file("modules/mapextract"))
   .settings(
     name := "lambdaserve-mapextract",
     libraryDependencies ++= Seq(
-      "com.softwaremill.magnolia1_3" %% "magnolia" % "1.3.4"
+      "com.softwaremill.magnolia1_3" %% "magnolia" % "1.3.5"
     )
   )
 
@@ -49,5 +50,6 @@ lazy val example = (project in file("modules/example"))
   )
   .dependsOn(core, serverJetty, jsonJsoniter, requestmapped)
 
-lazy val `lambda-serve` = (project in file("."))
+lazy val `lambdaserve-all` = (project in file("."))
   .aggregate(core,serverJetty,jsonJsoniter,mapextract,requestmapped)
+  .dependsOn(core,serverJetty,jsonJsoniter,mapextract,requestmapped)

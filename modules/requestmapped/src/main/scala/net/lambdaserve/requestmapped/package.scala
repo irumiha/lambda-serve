@@ -1,5 +1,6 @@
 package net.lambdaserve.requestmapped
 
+import net.lambdaserve.core.RouteHandler
 import net.lambdaserve.core.codec.EntityDecoder
 import net.lambdaserve.core.http.{Request, Response}
 import net.lambdaserve.mapextract.MapExtract
@@ -10,7 +11,7 @@ type Combined[R] = MapExtract[R] | EntityDecoder[R]
 
 def mapped[T](h: T => Response)(using
   m: Combined[T]
-): Request => Response =
+): RouteHandler =
   request =>
     val handlerParam = m match
       case me: MapExtract[T]     => me.projectMap(joinMaps(request))
@@ -19,7 +20,7 @@ def mapped[T](h: T => Response)(using
 
 def mapped[T](h: (T, Request) => Response)(using
   m: Combined[T]
-): Request => Response =
+): RouteHandler =
   request =>
     val handlerParam = m match
       case me: MapExtract[T]     => me.projectMap(joinMaps(request))
@@ -28,7 +29,7 @@ def mapped[T](h: (T, Request) => Response)(using
 
 def mapped[T1, T2](
   h: (T1, T2) => Response
-)(using m1: Combined[T1], m2: Combined[T2]): Request => Response =
+)(using m1: Combined[T1], m2: Combined[T2]): RouteHandler =
   request =>
     val joinedMaps = joinMaps(request)
     
@@ -44,7 +45,7 @@ def mapped[T1, T2](
 
 def mapped[T1, T2](
   h: (T1, T2, Request) => Response
-)(using m1: Combined[T1], m2: Combined[T2]): Request => Response =
+)(using m1: Combined[T1], m2: Combined[T2]): RouteHandler =
   request =>
     val joinedMaps = joinMaps(request)
     
@@ -62,7 +63,7 @@ def mapped[T1, T2, T3](h: (T1, T2, T3) => Response)(using
  m1: Combined[T1], 
  m2: Combined[T2], 
  m3: Combined[T3]
-): Request => Response =
+): RouteHandler =
   request =>
     val joinedMaps = joinMaps(request)
     
@@ -84,7 +85,7 @@ def mapped[T1, T2, T3](h: (T1, T2, T3, Request) => Response)(using
  m1: Combined[T1], 
  m2: Combined[T2], 
  m3: Combined[T3]
-): Request => Response =
+): RouteHandler =
   request =>
     val joinedMaps = joinMaps(request)
     val p1 = m1 match
