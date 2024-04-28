@@ -1,10 +1,11 @@
 package net.lambdaserve.core
 
-import http.Util.HttpMethod
-import http.{Request, Response}
+import net.lambdaserve.core.http.Request
+import net.lambdaserve.core.http.Util.HttpMethod
 
-import scala.util.matching.Regex
+import scala.annotation.targetName
 import scala.jdk.CollectionConverters.given
+import scala.util.matching.Regex
 
 case class Route(method: HttpMethod, path: Regex, handler: RouteHandler):
   private val pathParamNames: Vector[String] =
@@ -52,7 +53,7 @@ object Route:
   def CONNECT(path: Regex)(handler: RouteHandler): Route =
     Route(HttpMethod.CONNECT, path, handler)
 
-class Router(val routes: Route*):
+case class Router(routes: Seq[Route], prefix: String = ""):
 
   def matchRoute(request: Request): Option[(Request, RouteHandler)] =
     var found: Option[(Request, RouteHandler)] = None
@@ -62,7 +63,14 @@ class Router(val routes: Route*):
       val route = routes(i)
       found =
         if route.method == request.method then
-          route.matchRequest(request).map(r => (r, route.handler))
+          if prefix.nonEmpty && !request.path.startsWith(prefix) then None
+          else if prefix.nonEmpty then
+            route.matchRequest(
+              request.copy(header =
+                request.header.copy(path = request.path.drop(prefix.length))
+              )
+            ).map(r => (r, route.handler))
+          else route.matchRequest(request).map(r => (r, route.handler))
         else None
       i += 1
 
@@ -70,4 +78,14 @@ class Router(val routes: Route*):
 
 object Router:
   def combine(routers: Router*): Router =
-    Router(routers.flatMap(_.routes)*)
+    Router(routes = routers.flatMap(_.routes))
+
+  @targetName("combineWithPrefix")
+  def combine(routerMounts: (String, Router)*): Router =
+    Router(
+      routes = routerMounts.flatMap { (prefix, router) =>
+        router.routes.map { route =>
+          route.copy(path = s"^$prefix${route.path}".r)
+        }
+      }
+    )
