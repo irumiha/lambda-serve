@@ -1,6 +1,7 @@
 package net.lambdaserve.server.jetty
 
 import net.lambdaserve.core.Router
+import net.lambdaserve.core.filters.{Filter, FilterEngine}
 import net.lambdaserve.core.http.{Request, RequestHeader, Response}
 import org.eclipse.jetty.http.HttpHeader
 import org.eclipse.jetty.server as jetty
@@ -8,7 +9,7 @@ import org.eclipse.jetty.util.Callback
 
 import scala.jdk.CollectionConverters.*
 
-class HttpHandler(router: Router) extends jetty.Handler.Abstract():
+class HttpHandler(filterEngine: FilterEngine) extends jetty.Handler.Abstract():
 
   override def handle(
     in: jetty.Request,
@@ -23,11 +24,9 @@ class HttpHandler(router: Router) extends jetty.Handler.Abstract():
       queryString = Option(in.getHttpURI.getQuery)
     )
     val request = Request(requestHeader, jetty.Request.asInputStream(in))
-
-    val response: Response = router.matchRoute(request) match
-      case None                    => Response.NotFound
-      case Some(req, routeHandler) => routeHandler.handle(req)
-
+  
+    val response = filterEngine.processRequest(request)
+    
     out.setStatus(response.header.status.code)
 
     val responseHeaders = out.getHeaders

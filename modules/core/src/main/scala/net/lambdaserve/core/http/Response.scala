@@ -12,7 +12,8 @@ case class ResponseHeader(status: HttpStatus, headers: Map[String, Seq[String]])
 case class Response(
   header: ResponseHeader,
   bodyWriter: OutputStream => Unit,
-  length: Option[Long] = None
+  length: Option[Long] = None,
+  error: Option[Throwable] = None
 ):
   export header.*
 

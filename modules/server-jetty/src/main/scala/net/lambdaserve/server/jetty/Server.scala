@@ -1,13 +1,17 @@
 package net.lambdaserve.server.jetty
 
+import net.lambdaserve.core.filters.{Filter, FilterEngine, RouteHandlerFilter}
 import net.lambdaserve.core.{Router, Server}
 import org.eclipse.jetty.server as jetty
 import org.eclipse.jetty.util.thread.QueuedThreadPool
 
-import java.util.concurrent.Executors
-
 object Server extends Server[jetty.Server]:
-  def makeServer(host: String, port: Int, router: Router): jetty.Server =
+  def makeServer(
+    host: String,
+    port: Int,
+    router: Router,
+    filters: IndexedSeq[Filter]
+  ): jetty.Server =
     val threadPool = QueuedThreadPool()
     threadPool.setName("server")
 //    threadPool.setVirtualThreadsExecutor(
@@ -21,7 +25,9 @@ object Server extends Server[jetty.Server]:
     connector.setPort(port)
 
     server.addConnector(connector)
-    server.setHandler(new HttpHandler(router))
+    server.setHandler(HttpHandler(FilterEngine(
+      filters :+ RouteHandlerFilter(router)
+    )))
     server.start()
 
     server
