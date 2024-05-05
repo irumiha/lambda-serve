@@ -60,7 +60,7 @@ def main(): Unit =
         val name = request.query.get("name").flatMap(_.headOption)
         Response.Ok(Message(name.getOrElse("Unknown"), LocalDateTime.now()))
       ,
-      GET("/something/(?<thisname>\\w+)".r): request =>
+      GET("/something/(?<thisname>\\w+)/?".r): request =>
         val name = request.pathParams.get("thisname").flatMap(_.headOption)
         Response.Ok(Message(name.getOrElse("Unknown"), LocalDateTime.now()))
       ,
