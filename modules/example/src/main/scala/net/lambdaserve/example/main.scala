@@ -73,7 +73,7 @@ def main(): Unit =
   val router =
     Router.combine("" -> topRouter, "/api/houses" -> HouseController().router)
 
-  val s = Server.makeServer("localhost", 8080, router, IndexedSeq())
+  val s = Server.makeServer("localhost", 8080, router)
 
   StdIn.readLine("Awaiting exit...")
   s.stop()

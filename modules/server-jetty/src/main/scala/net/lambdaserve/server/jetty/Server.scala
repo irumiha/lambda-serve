@@ -10,7 +10,7 @@ object Server extends Server[jetty.Server]:
     host: String,
     port: Int,
     router: Router,
-    filters: IndexedSeq[Filter]
+    filters: IndexedSeq[Filter] = IndexedSeq()
   ): jetty.Server =
     val threadPool = QueuedThreadPool()
     threadPool.setName("server")
