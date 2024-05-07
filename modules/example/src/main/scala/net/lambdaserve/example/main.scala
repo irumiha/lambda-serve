@@ -2,13 +2,11 @@ package net.lambdaserve.example
 
 import com.github.plokhotnyuk.jsoniter_scala.core.*
 import com.github.plokhotnyuk.jsoniter_scala.macros.*
-import net.lambdaserve.core.Router
+import net.lambdaserve.core.{Route, Router}
 import net.lambdaserve.core.http.Response
 import net.lambdaserve.json.jsoniter.JsoniterCodec.given
 import net.lambdaserve.mapextract.MapExtract
 import net.lambdaserve.requestmapped.*
-import net.lambdaserve.requestmapped.AutoMappedRoute
-import net.lambdaserve.core.Route
 import net.lambdaserve.server.jetty.Server
 
 import java.time.LocalDateTime
@@ -16,7 +14,6 @@ import java.util.UUID
 import scala.io.StdIn
 
 class HouseController:
-  import AutoMappedRoute.*
   case class HouseCommand(id: String, name: String) derives MapExtract
   case class HouseGetCommand(id: String) derives MapExtract
 
@@ -29,8 +26,8 @@ class HouseController:
   val router: Router =
     Router(
       Seq(
-        POST("/".r)(doWithHouse),
-        GET("/(?<id>\\w+)".r)(getHouse)
+        Route.POST("/".r)(doWithHouse.mapped),
+        Route.GET("/(?<id>\\w+)".r)(getHouse.mapped)
       )
     )
 
@@ -53,20 +50,19 @@ def main(): Unit =
       JsonCodecMaker.make(
         CodecMakerConfig.withFieldNameMapper(JsonCodecMaker.enforce_snake_case)
       )
-  import Route.*
   val topRouter = Router(
     Seq(
-      GET("/hello".r): request =>
-        val name = request.query.get("name").flatMap(_.headOption)
+      Route.GET("/hello".r): request =>
+        val name = request.query().get("name").flatMap(_.headOption)
         Response.Ok(Message(name.getOrElse("Unknown"), LocalDateTime.now()))
       ,
-      GET("/something/(?<thisname>\\w+)/?".r): request =>
-        val name = request.pathParams.get("thisname").flatMap(_.headOption)
+      Route.GET("/something/(?<thisname>\\w+)/?".r): request =>
+        val name = request.pathParams().get("thisname").flatMap(_.headOption)
         Response.Ok(Message(name.getOrElse("Unknown"), LocalDateTime.now()))
       ,
-      POST("/requestmapped".r):
-        mapped: (command: JsonCommand) =>
-          Response.Ok(Message(command.name, LocalDateTime.now()))
+      Route.POST("/requestmapped".r)({ (command: JsonCommand) =>
+        Response.Ok(Message(command.name, LocalDateTime.now()))
+      }.mapped)
     )
   )
 

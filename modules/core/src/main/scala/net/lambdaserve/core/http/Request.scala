@@ -8,16 +8,18 @@ import java.nio.charset.StandardCharsets
 import scala.io.Source
 import scala.util.matching.Regex
 
+def defaultMap(): Map[String, IndexedSeq[String]] = Map.empty
+
 case class RequestHeader(
-  scheme: String,
-  method: HttpMethod,
-  path: String,
-  pathParams: Map[String, IndexedSeq[String]] = Map(),
-  headers: Map[String, IndexedSeq[String]],
-  query: Map[String, IndexedSeq[String]],
-  contentType: Option[String],
-  contentLength: Option[Long],
-  contentEncoding: Option[String]
+  scheme: String = "https",
+  method: HttpMethod = HttpMethod.GET,
+  path: String = "/",
+  pathParams: () => Map[String, IndexedSeq[String]] = defaultMap,
+  headers: () => Map[String, IndexedSeq[String]] = defaultMap,
+  query: () => Map[String, IndexedSeq[String]] = defaultMap,
+  contentType: () => Option[String],
+  contentLength: Option[Long] = None,
+  contentEncoding: Option[String] = None
 )
 
 object RequestHeader:
@@ -82,14 +84,14 @@ case class Request(header: RequestHeader, requestContent: InputStream):
         Source.fromInputStream(requestContent, charset).mkString
     }
 
-  def form: Map[String, IndexedSeq[String]] = header.contentType match
+  def form: Map[String, IndexedSeq[String]] = header.contentType() match
     case Some("application/x-www-form-urlencoded") =>
       parseFormBody(requestContent, StandardCharsets.UTF_8.name())
     case _ => Map.empty
 
   case class Part(headers: Map[String, String], body: String)
 
-  def multipart: Map[String, Seq[Part]] = header.contentType match
+  def multipart: Map[String, Seq[Part]] = header.contentType() match
     case Some(s"multipart/form-data; boundary=${boundary}") =>
       parseMultipartFormData(requestContent, boundary)
     case _ => Map.empty

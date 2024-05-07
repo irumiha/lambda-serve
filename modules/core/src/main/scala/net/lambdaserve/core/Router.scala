@@ -22,7 +22,7 @@ case class Route(method: HttpMethod, path: Regex, handler: RouteHandler):
 
         if pathParamValues.nonEmpty then
           request
-            .copy(header = request.header.copy(pathParams = pathParamValues))
+            .copy(header = request.header.copy(pathParams = () => pathParamValues))
         else request
 
 object Route:
