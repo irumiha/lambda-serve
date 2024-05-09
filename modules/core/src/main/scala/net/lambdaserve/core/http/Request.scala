@@ -17,7 +17,7 @@ case class RequestHeader(
   pathParams: () => Map[String, IndexedSeq[String]] = defaultMap,
   headers: () => Map[String, IndexedSeq[String]] = defaultMap,
   query: () => Map[String, IndexedSeq[String]] = defaultMap,
-  contentType: () => Option[String],
+  contentType: () => Option[String] = () => None,
   contentLength: Option[Long] = None,
   contentEncoding: Option[String] = None
 )

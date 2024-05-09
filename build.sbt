@@ -2,15 +2,20 @@ ThisBuild / version := "0.1.0-SNAPSHOT"
 ThisBuild / scalaVersion := "3.3.3"
 ThisBuild / organization := "net.lambdaserve"
 
+val commonDeps = Seq(
+  "org.scalameta" %% "munit" % "0.7.29" % Test
+)
+
 lazy val core = (project in file("modules/core"))
   .settings(
-    name := "lambdaserve-core"
+    name := "lambdaserve-core",
+    libraryDependencies ++= commonDeps
   )
 
 lazy val mapextract = (project in file("modules/mapextract"))
   .settings(
     name := "lambdaserve-mapextract",
-    libraryDependencies ++= Seq(
+    libraryDependencies ++= commonDeps ++ Seq(
       "com.softwaremill.magnolia1_3" %% "magnolia" % "1.3.5"
     )
   )
@@ -18,7 +23,7 @@ lazy val mapextract = (project in file("modules/mapextract"))
 lazy val jsonJsoniter = (project in file("modules/json-jsoniter"))
   .settings(
     name := "lambdaserve-json-jsoniter",
-    libraryDependencies ++= Seq(
+    libraryDependencies ++= commonDeps ++ Seq(
       "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.28.4",
       "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.28.4" 
     )
@@ -28,13 +33,14 @@ lazy val jsonJsoniter = (project in file("modules/json-jsoniter"))
 lazy val requestmapped = (project in file("modules/requestmapped"))
   .settings(
     name := "lambdaserve-requestmapped",
+    libraryDependencies ++= commonDeps
   )
   .dependsOn(core, mapextract)
 
 lazy val serverJetty = (project in file("modules/server-jetty"))
   .settings(
     name := "lambdaserve-server-jetty",
-    libraryDependencies ++= Seq(
+    libraryDependencies ++= commonDeps ++ Seq(
       "org.eclipse.jetty" % "jetty-server" % "12.0.8",
     )
   )

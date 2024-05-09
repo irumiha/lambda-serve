@@ -48,5 +48,5 @@ build/
 .bsp/
 .bloop/
 .metals/
+.ammonite/
 metals.sbt
-
