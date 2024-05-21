@@ -12,18 +12,19 @@ case class Route(method: HttpMethod, path: Regex, handler: RouteHandler):
     path.pattern.namedGroups().asScala.keys.toVector
 
   def matchRequest(request: Request): Option[Request] =
-    path
-      .findPrefixMatchOf(request.path)
-      .map: matched =>
-        val pathParamValues =
-          pathParamNames
-            .map(name => name -> IndexedSeq(matched.group(name)))
-            .toMap
+    val pathMatch = path.pattern.matcher(request.path)
 
-        if pathParamValues.nonEmpty then
-          request
-            .copy(header = request.header.copy(pathParams = () => pathParamValues))
-        else request
+    if pathMatch.matches() then
+      val pathParamValues =
+        pathParamNames
+          .map(name => name -> IndexedSeq(pathMatch.group(name)))
+          .toMap
+      if pathParamValues.nonEmpty then
+        Some(request.copy(header =
+          request.header.copy(pathParams = () => pathParamValues)
+        ))
+      else Some(request)
+    else None
 
 object Route:
   def GET(path: Regex)(handler: RouteHandler): Route =
@@ -53,7 +54,7 @@ object Route:
   def CONNECT(path: Regex)(handler: RouteHandler): Route =
     Route(HttpMethod.CONNECT, path, handler)
 
-case class Router(routes: Seq[Route], prefix: String = ""):
+case class Router(routes: Seq[Route]):
 
   def matchRoute(request: Request): Option[(Request, RouteHandler)] =
     var found: Option[(Request, RouteHandler)] = None
@@ -63,29 +64,18 @@ case class Router(routes: Seq[Route], prefix: String = ""):
       val route = routes(i)
       found =
         if route.method == request.method then
-          if prefix.nonEmpty && !request.path.startsWith(prefix) then None
-          else if prefix.nonEmpty then
-            route.matchRequest(
-              request.copy(header =
-                request.header.copy(path = request.path.drop(prefix.length))
-              )
-            ).map(r => (r, route.handler))
-          else route.matchRequest(request).map(r => (r, route.handler))
+          route.matchRequest(request).map(r => (r, route.handler))
         else None
       i += 1
 
     found
 
 object Router:
-  def combine(routers: Router*): Router =
-    Router(routes = routers.flatMap(_.routes))
 
   @targetName("combineWithPrefix")
   def combine(routerMounts: (String, Router)*): Router =
-    Router(
-      routes = routerMounts.flatMap { (prefix, router) =>
-        router.routes.map { route =>
-          route.copy(path = s"^$prefix${route.path}".r)
-        }
+    Router(routes = routerMounts.flatMap { (prefix, router) =>
+      router.routes.map { route =>
+        route.copy(path = s"$prefix${route.path}".r)
       }
-    )
+    })

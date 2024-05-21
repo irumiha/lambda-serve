@@ -1,8 +1,9 @@
 package net.lambdaserve.core.http
 
+import net.lambdaserve.core.codec.EntityEncoder
 import net.lambdaserve.core.http.Util.HttpMethod
 
-import java.io.InputStream
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream, PipedInputStream, PipedOutputStream, StringReader}
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 import scala.io.Source
@@ -95,3 +96,74 @@ case class Request(header: RequestHeader, requestContent: InputStream):
     case Some(s"multipart/form-data; boundary=${boundary}") =>
       parseMultipartFormData(requestContent, boundary)
     case _ => Map.empty
+
+  def withHeaders(newHeaders: Map[String, IndexedSeq[String]]): Request =
+    this.copy(header = this.header.copy(headers = () => this.header.headers() ++ newHeaders))
+
+  def withHeader(header: String, value: IndexedSeq[String]): Request =
+    this.copy(header = this.header.copy(headers = () => this.header.headers() ++ Map(header -> value)))
+
+  def withHeader(header: String, value: String): Request =
+    withHeader(header, IndexedSeq(value))
+
+  def withQueryParam(name: String, value: IndexedSeq[String]): Request =
+    this.copy(header = this.header.copy(query = () => this.header.query() ++ Map(name -> value)))
+
+  def withQueryParam(name: String, value: String): Request =
+    withQueryParam(name, IndexedSeq(value))
+
+  def withQuery(newQuery: Map[String, IndexedSeq[String]]): Request =
+    this.copy(header = this.header.copy(query = () => this.header.query() ++ newQuery))
+
+object Request:
+  private def requestWithBody(method: HttpMethod, body: InputStream, path: String): Request =
+    Request(
+      RequestHeader(
+        method = method,
+        scheme = "http",
+        path = path
+      ),
+      requestContent = body
+    )
+
+  def GET(path: String): Request =
+    requestWithBody(HttpMethod.GET, InputStream.nullInputStream(), path)
+
+  def POST(body: InputStream, path: String): Request =
+    requestWithBody(HttpMethod.POST, body, path)
+
+  def POST(body: String, path: String): Request =
+    POST(ByteArrayInputStream(body.getBytes), path)
+
+  def POST[B: EntityEncoder](body: B, path: String): Request =
+    val ec = summon[EntityEncoder[B]]
+    val baos = ByteArrayOutputStream()
+    ec.bodyWriter(body)(baos)
+
+    POST(new ByteArrayInputStream(baos.toByteArray), path)
+
+  def PUT(body: InputStream, path: String): Request =
+    requestWithBody(HttpMethod.PUT, body, path)
+
+  def PUT(body: String, path: String): Request =
+    PUT(ByteArrayInputStream(body.getBytes), path)
+
+  def PUT[B: EntityEncoder](body: B, path: String): Request =
+    val ec = summon[EntityEncoder[B]]
+    val baos = ByteArrayOutputStream()
+    ec.bodyWriter(body)(baos)
+
+    PUT(new ByteArrayInputStream(baos.toByteArray), path)
+
+  def PATCH(body: InputStream, path: String): Request =
+    requestWithBody(HttpMethod.PATCH, body, path)
+
+  def PATCH(body: String, path: String): Request =
+    PATCH(ByteArrayInputStream(body.getBytes), path)
+
+  def PATCH[B: EntityEncoder](body: B, path: String): Request =
+    val ec = summon[EntityEncoder[B]]
+    val baos = ByteArrayOutputStream()
+    ec.bodyWriter(body)(baos)
+
+    PATCH(new ByteArrayInputStream(baos.toByteArray), path)
