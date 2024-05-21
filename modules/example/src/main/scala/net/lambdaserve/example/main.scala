@@ -2,8 +2,9 @@ package net.lambdaserve.example
 
 import com.github.plokhotnyuk.jsoniter_scala.core.*
 import com.github.plokhotnyuk.jsoniter_scala.macros.*
-import net.lambdaserve.core.{Route, Router}
 import net.lambdaserve.core.http.Response
+import net.lambdaserve.core.http.Util.HttpMethod
+import net.lambdaserve.core.{Route, Router}
 import net.lambdaserve.json.jsoniter.JsoniterCodec.given
 import net.lambdaserve.mapextract.MapExtract
 import net.lambdaserve.requestmapped.*
@@ -24,11 +25,10 @@ class HouseController:
     Response.Ok(s"House with id ${cmd.id}")
 
   val router: Router =
-    Router(
-      Seq(
-        Route.POST("/".r)(doWithHouse.mapped),
-        Route.GET("/(?<id>\\w+)".r)(getHouse.mapped)
-      )
+    import HttpMethod.*
+    Router.dsl(
+      POST -> raw"/".r           -> doWithHouse.mapped,
+      GET  -> raw"/(?<id>\w+)".r -> getHouse.mapped
     )
 
 @main
@@ -52,15 +52,15 @@ def main(): Unit =
       )
   val topRouter = Router(
     Seq(
-      Route.GET("/hello".r): request =>
+      Route.GET(raw"/hello".r): request =>
         val name = request.query().get("name").flatMap(_.headOption)
         Response.Ok(Message(name.getOrElse("Unknown"), LocalDateTime.now()))
       ,
-      Route.GET("/something/(?<thisname>\\w+)/?".r): request =>
+      Route.GET(raw"/something/(?<thisname>\w+)/?".r): request =>
         val name = request.pathParams().get("thisname").flatMap(_.headOption)
         Response.Ok(Message(name.getOrElse("Unknown"), LocalDateTime.now()))
       ,
-      Route.POST("/requestmapped".r)({ (command: JsonCommand) =>
+      Route.POST(raw"/requestmapped".r)({ (command: JsonCommand) =>
         Response.Ok(Message(command.name, LocalDateTime.now()))
       }.mapped)
     )
