@@ -50,21 +50,21 @@ def main(): Unit =
       JsonCodecMaker.make(
         CodecMakerConfig.withFieldNameMapper(JsonCodecMaker.enforce_snake_case)
       )
-  val topRouter = Router(
-    Seq(
-      Route.GET(raw"/hello".r): request =>
+  val topRouter =
+    import HttpMethod.*
+    Router.dsl(
+      GET -> raw"/hello".r -> { request =>
         val name = request.query().get("name").flatMap(_.headOption)
         Response.Ok(Message(name.getOrElse("Unknown"), LocalDateTime.now()))
-      ,
-      Route.GET(raw"/something/(?<thisname>\w+)/?".r): request =>
+      },
+      GET -> raw"/something/(?<thisname>\w+)/?".r -> { request =>
         val name = request.pathParams().get("thisname").flatMap(_.headOption)
         Response.Ok(Message(name.getOrElse("Unknown"), LocalDateTime.now()))
-      ,
-      Route.POST(raw"/requestmapped".r)({ (command: JsonCommand) =>
+      },
+      POST -> raw"/requestmapped".r -> { (command: JsonCommand) =>
         Response.Ok(Message(command.name, LocalDateTime.now()))
-      }.mapped)
+      }.mapped
     )
-  )
 
   val router =
     Router.combine("" -> topRouter, "/api/houses" -> HouseController().router)
