@@ -8,10 +8,20 @@ import net.lambdaserve.mapextract.MapExtract
 type Combined[R] = MapExtract[R] | EntityDecoder[R]
 
 extension (request: Request)
-  inline def mapTo[T: MapExtract]: T =
+  inline def mapFromRequest[T: MapExtract]: T =
     val m = summon[MapExtract[T]]
+    m.projectMaps(
+      Seq(
+        request.pathParams(),
+        request.query(),
+        request.form,
+        request.headers()
+      )
+    )
 
-    ???
+  inline def bodyAs[T: EntityDecoder]: T =
+    val d = summon[EntityDecoder[T]]
+    d.readBody(request)
 
 def map1[T](request: Request, m: Combined[T]) =
   val handlerParam = m match

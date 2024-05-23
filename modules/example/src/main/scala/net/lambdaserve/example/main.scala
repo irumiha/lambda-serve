@@ -1,14 +1,20 @@
 package net.lambdaserve.example
 
-import com.github.plokhotnyuk.jsoniter_scala.core.*
-import com.github.plokhotnyuk.jsoniter_scala.macros.*
-import net.lambdaserve.core.http.Response
+import com.github.plokhotnyuk.jsoniter_scala.core.JsonValueCodec
+import com.github.plokhotnyuk.jsoniter_scala.macros.{
+  CodecMakerConfig,
+  JsonCodecMaker
+}
+import net.lambdaserve.core.Router
 import net.lambdaserve.core.http.Util.HttpMethod
-import net.lambdaserve.core.{Route, Router}
+import net.lambdaserve.core.http.{Request, Response}
 import net.lambdaserve.json.jsoniter.JsoniterCodec.given
 import net.lambdaserve.mapextract.MapExtract
 import net.lambdaserve.requestmapped.*
 import net.lambdaserve.server.jetty.Server
+import net.lambdaserve.views.scalatags.ScalatagsEncoder.tagEncoder
+import scalatags.Text.all.*
+import scalatags.Text.tags2
 
 import java.time.LocalDateTime
 import java.util.UUID
@@ -24,11 +30,20 @@ class HouseController:
   def getHouse(cmd: HouseGetCommand): Response =
     Response.Ok(s"House with id ${cmd.id}")
 
+  def houseUI(req: Request): Response =
+    Response.Ok(
+      html(
+        head(tags2.title("Just a page!")),
+        body(div(h1("The great page title"), p("My little paragraph")))
+      )
+    )
+
   val router: Router =
     import HttpMethod.*
     Router.dsl(
       POST -> raw"/".r           -> doWithHouse.mapped,
-      GET  -> raw"/(?<id>\w+)".r -> getHouse.mapped
+      GET  -> raw"/(?<id>\w+)".r -> getHouse.mapped,
+      GET  -> raw"/house-ui".r   -> houseUI
     )
 
 @main
@@ -40,8 +55,6 @@ def main(): Unit =
         CodecMakerConfig.withFieldNameMapper(JsonCodecMaker.enforce_snake_case)
       )
 
-  case class DemoCommand(id: UUID, name: String) derives MapExtract
-
   case class JsonCommand(id: UUID, name: String):
     assert(name.nonEmpty, "name must not be empty")
 
@@ -50,6 +63,7 @@ def main(): Unit =
       JsonCodecMaker.make(
         CodecMakerConfig.withFieldNameMapper(JsonCodecMaker.enforce_snake_case)
       )
+
   val topRouter =
     import HttpMethod.*
     Router.dsl(

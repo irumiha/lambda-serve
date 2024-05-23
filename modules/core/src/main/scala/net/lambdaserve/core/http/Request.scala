@@ -1,7 +1,7 @@
 package net.lambdaserve.core.http
 
 import net.lambdaserve.core.codec.EntityEncoder
-import net.lambdaserve.core.http.Util.HttpMethod
+import net.lambdaserve.core.http.Util.{HttpHeader, HttpMethod}
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream, PipedInputStream, PipedOutputStream, StringReader}
 import java.net.URLDecoder
@@ -141,6 +141,7 @@ object Request:
     ec.bodyWriter(body)(baos)
 
     POST(new ByteArrayInputStream(baos.toByteArray), path)
+      .withHeader(HttpHeader.ContentType.name, ec.contentTypeHeader)
 
   def PUT(body: InputStream, path: String): Request =
     requestWithBody(HttpMethod.PUT, body, path)
@@ -154,6 +155,7 @@ object Request:
     ec.bodyWriter(body)(baos)
 
     PUT(new ByteArrayInputStream(baos.toByteArray), path)
+      .withHeader(HttpHeader.ContentType.name, ec.contentTypeHeader)
 
   def PATCH(body: InputStream, path: String): Request =
     requestWithBody(HttpMethod.PATCH, body, path)
@@ -167,3 +169,4 @@ object Request:
     ec.bodyWriter(body)(baos)
 
     PATCH(new ByteArrayInputStream(baos.toByteArray), path)
+      .withHeader(HttpHeader.ContentType.name, ec.contentTypeHeader)
