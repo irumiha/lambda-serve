@@ -16,7 +16,7 @@ trait MapExtract[T]:
   ): T
 
 object MapExtract
-    extends AutoDerivation[MapExtract]
+    extends Derivation[MapExtract]
     with BaseInstances
     with ContainerInstances:
   def extractString(
@@ -70,7 +70,7 @@ object MapExtract
 
 @main
 def main(args: String*): Unit =
-  enum Months:
+  enum Months derives MapExtract:
     case Jan
     case Feb
     case Mar
@@ -84,7 +84,7 @@ def main(args: String*): Unit =
     case Nov
     case Dec
 
-  case class Pet(name: String, breed: String)
+  case class Pet(name: String, breed: String) derives MapExtract
 
   case class MyForm(
     firstName: String,
