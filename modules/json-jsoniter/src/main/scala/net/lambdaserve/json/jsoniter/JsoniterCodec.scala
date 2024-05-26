@@ -9,7 +9,7 @@ object JsoniterCodec:
     def bodyWriter(responseEntity: R): OutputStream => Unit =
       os => writeToStream(responseEntity, os)
 
-    override def contentTypeHeader: String = "application/json"
+    override val contentTypeHeader: String = "application/json"
 
   given [R](using c: JsonValueCodec[R]): EntityDecoder[R] with
     def readBody(request: Request): R = readFromStream[R](request.requestContent)

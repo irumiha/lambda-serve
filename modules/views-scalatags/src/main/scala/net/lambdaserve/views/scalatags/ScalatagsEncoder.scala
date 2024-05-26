@@ -4,11 +4,16 @@ import scalatags.text.Frag
 
 import java.io.OutputStream
 
-object ScalatagsEncoder:
+trait ScalatagsEncoder:
+  private val documentPreamble: Array[Byte] = "<!DOCTYPE html>\n".getBytes()
+  val contentType = "text/html; charset=UTF-8"
+
   given tagEncoder[T <: Frag]: EntityEncoder[T] with
     def bodyWriter(responseEntity: T): OutputStream => Unit =
       os =>
-        val finalHtml = "<!DOCTYPE html>\n" + responseEntity.render
-        os.write(finalHtml.getBytes)
+        os.write(documentPreamble)
+        responseEntity.writeBytesTo(os)
 
-    override def contentTypeHeader: String = "text/html"
+    override val contentTypeHeader: String = contentType
+
+object ScalatagsEncoder extends ScalatagsEncoder
