@@ -1,10 +1,7 @@
 package net.lambdaserve.example
 
 import com.github.plokhotnyuk.jsoniter_scala.core.JsonValueCodec
-import com.github.plokhotnyuk.jsoniter_scala.macros.{
-  CodecMakerConfig,
-  JsonCodecMaker
-}
+import com.github.plokhotnyuk.jsoniter_scala.macros.{CodecMakerConfig, JsonCodecMaker}
 import net.lambdaserve.core.Router
 import net.lambdaserve.core.http.Util.HttpMethod
 import net.lambdaserve.core.http.{Request, Response}
@@ -12,10 +9,10 @@ import net.lambdaserve.json.jsoniter.JsoniterCodec.given
 import net.lambdaserve.mapextract.MapExtract
 import net.lambdaserve.requestmapped.*
 import net.lambdaserve.server.jetty.Server
-import net.lambdaserve.views.scalatags.ScalatagsEncoder.tagEncoder
-import scalatags.Text.all.*
-import scalatags.Text.tags2
+import tyrian.*
+import tyrian.Html.*
 
+import java.nio.charset.StandardCharsets
 import java.time.LocalDateTime
 import java.util.UUID
 import scala.io.StdIn
@@ -31,11 +28,14 @@ class HouseController:
     Response.Ok(s"House with id ${cmd.id}")
 
   def houseUI(req: Request): Response =
+    val b: Html[Nothing] = html(
+      head(title("Just a page!")),
+      body(div(h1("The great page title"), p("My little paragraph")))
+    )
     Response.Ok(
-      html(
-        head(tags2.title("Just a page!")),
-        body(div(h1("The great page title"), p("My little paragraph")))
-      )
+      "<!DOCTYPE html>\n" + b.toString(),
+      StandardCharsets.UTF_8,
+      Map("Content-Type" -> Seq("text/html; charset=utf-8"))
     )
 
   val router: Router =
@@ -45,6 +45,7 @@ class HouseController:
       GET  -> raw"/(?<id>\w+)".r -> getHouse.mapped,
       GET  -> raw"/house-ui".r   -> houseUI
     )
+end HouseController
 
 @main
 def main(): Unit =

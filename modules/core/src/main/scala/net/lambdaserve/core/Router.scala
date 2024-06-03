@@ -1,6 +1,5 @@
 package net.lambdaserve.core
 
-import com.sun.net.httpserver.HttpHandlers
 import net.lambdaserve.core.http.Request
 import net.lambdaserve.core.http.Util.HttpMethod
 

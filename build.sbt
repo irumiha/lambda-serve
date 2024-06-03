@@ -19,8 +19,8 @@ lazy val jsonJsoniter = (project in file("modules/json-jsoniter"))
   .settings(
     name := "lambdaserve-json-jsoniter",
     libraryDependencies ++= commonDeps ++ Seq(
-      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.28.4",
-      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.28.5"
+      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.30.1",
+      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.30.1"
     )
   )
   .dependsOn(core)
@@ -30,6 +30,14 @@ lazy val viewsScalatags = (project in file("modules/views-scalatags"))
     name := "lambdaserve-views-scalatags",
     libraryDependencies ++= commonDeps ++ Seq(
       "com.lihaoyi" %% "scalatags" % "0.13.1"
+    )
+  ).dependsOn(core)
+
+lazy val viewsTyrian = (project in file("modules/views-tyrian-tags"))
+  .settings(
+    name := "lambdaserve-views-tyrian-tags",
+    libraryDependencies ++= commonDeps ++ Seq(
+      "io.indigoengine" %% "tyrian" % "0.10.0"
     )
   ).dependsOn(core)
 
@@ -55,7 +63,7 @@ lazy val example = (project in file("modules/example"))
     name := "lambdaserve-example",
     libraryDependencies ++= Seq("com.outr" %% "scribe-slf4j2" % "3.13.3")
   )
-  .dependsOn(core, serverJetty, jsonJsoniter, requestmapped, viewsScalatags)
+  .dependsOn(core, serverJetty, jsonJsoniter, requestmapped, viewsTyrian)
 
 lazy val `lambdaserve-all` = (project in file("."))
   .aggregate(
@@ -64,13 +72,13 @@ lazy val `lambdaserve-all` = (project in file("."))
     jsonJsoniter,
     mapextract,
     requestmapped,
-    viewsScalatags
+    viewsScalatags,
+    viewsTyrian
   )
   .dependsOn(
     core,
     serverJetty,
     jsonJsoniter,
     mapextract,
-    requestmapped,
-    viewsScalatags
+    requestmapped
   )

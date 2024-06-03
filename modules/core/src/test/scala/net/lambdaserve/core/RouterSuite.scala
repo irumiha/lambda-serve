@@ -3,6 +3,8 @@ package net.lambdaserve.core
 import net.lambdaserve.core.http.*
 import net.lambdaserve.core.http.Util.HttpMethod.GET
 
+import java.io.ByteArrayOutputStream
+
 class RouterSuite extends munit.FunSuite:
   def defaultHandler(request: Request): Response = Response.Ok("Done")
 
@@ -40,4 +42,23 @@ class RouterSuite extends munit.FunSuite:
 
     assert(matched1.isDefined)
     assert(matched2.isDefined)
+  }
+
+  test("route with path params") {
+    val route = Route(GET, raw"/(?<paramname>.*?)/?".r, { request =>
+      val paramValue = request.pathParams()("paramname").headOption.getOrElse("")
+
+      Response.Ok(paramValue)
+    })
+
+    val router = Router(Seq(route))
+    val request = Request.GET("/something")
+    val matched = router.matchRoute(request)
+
+    assert(matched.isDefined)
+    val baos = ByteArrayOutputStream()
+    val (matchedRequest, handler) = matched.get
+    handler.handle(matchedRequest).bodyWriter(baos)
+    val out = baos.toString()
+    assert(out == "something")
   }
