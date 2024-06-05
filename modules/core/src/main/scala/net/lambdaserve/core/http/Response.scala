@@ -18,10 +18,6 @@ case class Response(
   export header.*
 
 object Response:
-  private val applicationJsonHeader = Map(
-    HttpHeader.ContentType.name -> Seq("application/json")
-  )
-
   def Ok(
     body: String,
     charset: Charset,
@@ -44,8 +40,9 @@ object Response:
   def Ok(body: String): Response = Ok(body, Charset.defaultCharset(), Map())
 
   def Ok[R](entity: R)(using enc: EntityEncoder[R]): Response =
+    val contentType = Map(HttpHeader.ContentType.name -> Seq(enc.contentTypeHeader))
     Response(
-      ResponseHeader(HttpStatus.OK, applicationJsonHeader),
+      ResponseHeader(HttpStatus.OK, contentType),
       enc.bodyWriter(entity),
       None
     )
@@ -53,8 +50,9 @@ object Response:
   def Ok[R](entity: R, headers: Map[String, Seq[String]])(using
     enc: EntityEncoder[R]
   ): Response =
+    val contentType = Map(HttpHeader.ContentType.name -> Seq(enc.contentTypeHeader))
     Response(
-      ResponseHeader(HttpStatus.OK, applicationJsonHeader ++ headers),
+      ResponseHeader(HttpStatus.OK, contentType ++ headers),
       enc.bodyWriter(entity),
       None
     )

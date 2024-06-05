@@ -7,22 +7,29 @@ trait MapExtract[T]:
     m: Map[String, IndexedSeq[String]],
     prefix: String = "",
     offset: Int = 0
+  ): T = projectMaps(Seq(m), prefix, offset)
+
+  def projectMaps(
+    ms: Seq[Map[String, IndexedSeq[String]]],
+    prefix: String = "",
+    offset: Int = 0
   ): T
 
 object MapExtract
-    extends AutoDerivation[MapExtract]
+    extends Derivation[MapExtract]
     with BaseInstances
     with ContainerInstances:
   def extractString(
-    m: Map[String, IndexedSeq[String]],
+    ms: Seq[Map[String, IndexedSeq[String]]],
     prefix: String,
     offset: Int = 0
   ): String =
     val entries =
-      m.getOrElse(
-        prefix,
-        throw IllegalArgumentException(s"Field not found at path $prefix")
-      )
+      ms.find(_.contains(prefix))
+        .map(_.apply(prefix))
+        .getOrElse(
+          throw IllegalArgumentException(s"Field not found at path $prefix")
+        )
     if entries.length <= offset then
       throw new IllegalArgumentException(
         s"Index out of bounds at path $prefix, offset $offset"
@@ -33,22 +40,22 @@ object MapExtract
     ctx: SealedTrait[MapExtract.Typeclass, T]
   ): MapExtract.Typeclass[T] =
     new MapExtract[T]:
-      override def projectMap(
-        m: Map[String, IndexedSeq[String]],
+      override def projectMaps(
+        ms: Seq[Map[String, IndexedSeq[String]]],
         prefix: String,
         offset: Int
       ): T =
-        val stringValue = extractString(m, prefix)
-        val subtype     = ctx.subtypes.find(_.typeInfo.short == stringValue).get
+        val stringValue = extractString(ms, prefix)
+        val subtype     = ctx.subtypes.find(it => it.typeInfo.short == stringValue).get
 
-        subtype.typeclass.projectMap(m, prefix, offset)
+        subtype.typeclass.projectMaps(ms, prefix, offset)
 
   override def join[T](
     ctx: CaseClass[MapExtract.Typeclass, T]
   ): MapExtract.Typeclass[T] =
     new MapExtract[T]:
-      override def projectMap(
-        m: Map[String, IndexedSeq[String]],
+      override def projectMaps(
+        ms: Seq[Map[String, IndexedSeq[String]]],
         prefix: String,
         offset: Int
       ): T =
@@ -56,14 +63,14 @@ object MapExtract
           val currentPrefix =
             if prefix.isEmpty then param.label
             else s"$prefix.${param.label}"
-          param.typeclass.projectMap(m, currentPrefix, offset)
+          param.typeclass.projectMaps(ms, currentPrefix, offset)
         }
 
         ctx.rawConstruct(allParams)
 
 @main
 def main(args: String*): Unit =
-  enum Months:
+  enum Months derives MapExtract:
     case Jan
     case Feb
     case Mar
@@ -77,7 +84,7 @@ def main(args: String*): Unit =
     case Nov
     case Dec
 
-  case class Pet(name: String, breed: String)
+  case class Pet(name: String, breed: String) derives MapExtract
 
   case class MyForm(
     firstName: String,
