@@ -23,7 +23,7 @@ case class Router(routes: Seq[Route]):
 
 object Router:
 
-  def dsl(routes: ((HttpMethod, Regex), RouteHandler)*): Router =
+  def make(routes: ((HttpMethod, Regex), RouteHandler)*): Router =
     Router(routes.map{
       case ((m, r), rh) => Route(m,r,rh)
     })

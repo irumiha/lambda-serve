@@ -7,12 +7,12 @@ import net.lambdaserve.core.http.Util.HttpMethod
 import net.lambdaserve.core.http.{Request, Response}
 import net.lambdaserve.json.jsoniter.JsoniterCodec.given
 import net.lambdaserve.mapextract.MapExtract
-import net.lambdaserve.requestmapped.*
+import net.lambdaserve.requestmapped.mapped
 import net.lambdaserve.server.jetty.Server
+import net.lambdaserve.views.tyrian.TyrianEncoder.given
 import tyrian.*
 import tyrian.Html.*
 
-import java.nio.charset.StandardCharsets
 import java.time.LocalDateTime
 import java.util.UUID
 import scala.io.StdIn
@@ -28,19 +28,16 @@ class HouseController:
     Response.Ok(s"House with id ${cmd.id}")
 
   def houseUI(req: Request): Response =
-    val b: Html[Nothing] = html(
-      head(title("Just a page!")),
-      body(div(h1("The great page title"), p("My little paragraph")))
-    )
     Response.Ok(
-      "<!DOCTYPE html>\n" + b.toString(),
-      StandardCharsets.UTF_8,
-      Map("Content-Type" -> Seq("text/html; charset=utf-8"))
+      html(
+        head(title("Just a page!")),
+        body(div(h1("The great page title"), p("My little paragraph")))
+      )
     )
 
   val router: Router =
     import HttpMethod.*
-    Router.dsl(
+    Router.make(
       POST -> raw"/".r           -> doWithHouse.mapped,
       GET  -> raw"/(?<id>\w+)".r -> getHouse.mapped,
       GET  -> raw"/house-ui".r   -> houseUI
@@ -67,7 +64,7 @@ def main(): Unit =
 
   val topRouter =
     import HttpMethod.*
-    Router.dsl(
+    Router.make(
       GET -> raw"/hello".r -> { request =>
         val name = request.query().get("name").flatMap(_.headOption)
         Response.Ok(Message(name.getOrElse("Unknown"), LocalDateTime.now()))
@@ -81,6 +78,7 @@ def main(): Unit =
       }.mapped
     )
 
+  //
   val router =
     Router.combine("" -> topRouter, "/api/houses" -> HouseController().router)
 
