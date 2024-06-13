@@ -3,7 +3,6 @@ package net.lambdaserve.core
 import net.lambdaserve.core.http.Request
 import net.lambdaserve.core.http.Util.HttpMethod
 
-import scala.annotation.targetName
 import scala.util.matching.Regex
 
 case class Router(routes: Seq[Route]):
@@ -29,7 +28,6 @@ object Router:
       case ((m, r), rh) => Route(m,r,rh)
     })
 
-  @targetName("combineWithPrefix")
   def combine(routerMounts: (String, Router)*): Router =
     Router(routes = routerMounts.flatMap { (prefix, router) =>
       router.routes.map { route =>

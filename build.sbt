@@ -57,15 +57,32 @@ lazy val serverJetty = (project in file("modules/server-jetty"))
   )
   .dependsOn(core)
 
+lazy val all = (project in file("modules/all"))
+  .settings(
+    name := "lambdaserve-all"
+  )
+  .dependsOn(
+    core,
+    serverJetty,
+    jsonJsoniter,
+    mapextract,
+    requestmapped,
+    viewsTyrian
+  )
+
 lazy val example = (project in file("modules/example"))
   .enablePlugins(JavaAppPackaging)
   .settings(
     name := "lambdaserve-example",
     libraryDependencies ++= Seq("com.outr" %% "scribe-slf4j2" % "3.13.3")
   )
-  .dependsOn(core, serverJetty, jsonJsoniter, requestmapped, viewsTyrian)
+  .dependsOn(all)
 
-lazy val `lambdaserve-all` = (project in file("."))
+lazy val `lambda-serve` = (project in file("."))
+  .settings(
+    publish / skip := true,
+    publishLocal / skip := true
+  )
   .aggregate(
     core,
     serverJetty,
@@ -73,12 +90,6 @@ lazy val `lambdaserve-all` = (project in file("."))
     mapextract,
     requestmapped,
     viewsScalatags,
-    viewsTyrian
-  )
-  .dependsOn(
-    core,
-    serverJetty,
-    jsonJsoniter,
-    mapextract,
-    requestmapped
+    viewsTyrian,
+    all
   )
