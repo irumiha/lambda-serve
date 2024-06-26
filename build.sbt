@@ -52,7 +52,7 @@ lazy val serverJetty = (project in file("modules/server-jetty"))
   .settings(
     name := "lambdaserve-server-jetty",
     libraryDependencies ++= commonDeps ++ Seq(
-      "org.eclipse.jetty" % "jetty-server" % "12.0.9"
+      "org.eclipse.jetty" % "jetty-server" % "12.0.10"
     )
   )
   .dependsOn(core)
@@ -74,7 +74,7 @@ lazy val example = (project in file("modules/example"))
   .enablePlugins(JavaAppPackaging)
   .settings(
     name := "lambdaserve-example",
-    libraryDependencies ++= Seq("com.outr" %% "scribe-slf4j2" % "3.13.3")
+    libraryDependencies ++= Seq("com.outr" %% "scribe-slf4j2" % "3.15.0")
   )
   .dependsOn(all)
 
