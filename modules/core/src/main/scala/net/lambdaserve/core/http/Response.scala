@@ -7,15 +7,13 @@ import net.lambdaserve.core.http.Util.{HttpHeader, HttpStatus}
 import java.io.OutputStream
 import java.nio.charset.Charset
 
-case class ResponseHeader(status: HttpStatus, headers: Map[String, Seq[String]])
-
 case class Response(
-  header: ResponseHeader,
+  status: HttpStatus,
+  headers: Map[String, Seq[String]],
   bodyWriter: OutputStream => Unit,
   length: Option[Long] = None,
   error: Option[Throwable] = None
-):
-  export header.*
+)
 
 object Response:
   def Ok(
@@ -32,7 +30,8 @@ object Response:
       else headers
 
     Response(
-      ResponseHeader(HttpStatus.OK, finalHeaders),
+      HttpStatus.OK,
+      finalHeaders,
       os => os.write(bodyArray),
       Some(bodyArray.length)
     )
@@ -40,43 +39,42 @@ object Response:
   def Ok(body: String): Response = Ok(body, Charset.defaultCharset(), Map())
 
   def Ok[R](entity: R)(using enc: EntityEncoder[R]): Response =
-    val contentType = Map(HttpHeader.ContentType.name -> Seq(enc.contentTypeHeader))
-    Response(
-      ResponseHeader(HttpStatus.OK, contentType),
-      enc.bodyWriter(entity),
-      None
+    val contentType = Map(
+      HttpHeader.ContentType.name -> Seq(enc.contentTypeHeader)
     )
+    Response(HttpStatus.OK, contentType, enc.bodyWriter(entity), None)
 
   def Ok[R](entity: R, headers: Map[String, Seq[String]])(using
     enc: EntityEncoder[R]
   ): Response =
-    val contentType = Map(HttpHeader.ContentType.name -> Seq(enc.contentTypeHeader))
+    val contentType = Map(
+      HttpHeader.ContentType.name -> Seq(enc.contentTypeHeader)
+    )
     Response(
-      ResponseHeader(HttpStatus.OK, contentType ++ headers),
+      HttpStatus.OK,
+      contentType ++ headers,
       enc.bodyWriter(entity),
       None
     )
 
   def NotFound: Response =
-    Response(ResponseHeader(HttpStatus.NotFound, Map.empty), os => {}, Some(-1))
+    Response(HttpStatus.NotFound, Map.empty, os => {}, Some(-1))
 
   def BadRequest: Response =
-    Response(
-      ResponseHeader(HttpStatus.BadRequest, Map.empty),
-      os => {},
-      Some(-1)
-    )
+    Response(HttpStatus.BadRequest, Map.empty, os => {}, Some(-1))
 
   def Redirect(location: String): Response =
     Response(
-      ResponseHeader(HttpStatus.Found, Map("Location" -> Seq(location))),
+      HttpStatus.Found,
+      Map("Location" -> Seq(location)),
       os => {},
       Some(-1)
     )
 
   def SeeAlso(location: String): Response =
     Response(
-      ResponseHeader(HttpStatus.SeeOther, Map("Location" -> Seq(location))),
+      HttpStatus.SeeOther,
+      Map("Location" -> Seq(location)),
       os => {},
       Some(-1)
     )

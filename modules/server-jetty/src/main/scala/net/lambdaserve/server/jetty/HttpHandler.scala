@@ -1,8 +1,7 @@
 package net.lambdaserve.server.jetty
 
-import net.lambdaserve.core.Router
-import net.lambdaserve.core.filters.{Filter, FilterEngine}
-import net.lambdaserve.core.http.{Request, RequestHeader, Response}
+import net.lambdaserve.core.filters.FilterEngine
+import net.lambdaserve.core.http.Request
 import org.eclipse.jetty.http.HttpHeader
 import org.eclipse.jetty.server as jetty
 import org.eclipse.jetty.util.Callback
@@ -27,12 +26,12 @@ class HttpHandler(filterEngine: FilterEngine) extends jetty.Handler.Abstract():
   
     val response = filterEngine.processRequest(request)
     
-    out.setStatus(response.header.status.code)
+    out.setStatus(response.status.code)
 
     val responseHeaders = out.getHeaders
     response.length.foreach(responseHeaders.put(HttpHeader.CONTENT_LENGTH, _))
 
-    response.header.headers.foreach { case (headerName, headerValue) =>
+    response.headers.foreach { case (headerName, headerValue) =>
       responseHeaders.put(headerName, headerValue.asJava)
     }
 
