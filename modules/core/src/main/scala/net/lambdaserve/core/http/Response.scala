@@ -19,45 +19,46 @@ case class Response(
   def addHeader(name: String, value: Seq[String]): Response =
     copy(headers = headers + (name -> value))
 
-
 object Response:
-  def Ok[R](entity: R)(using enc: EntityEncoder[R]): Response =
-    val contentType = Map(
-      HttpHeader.ContentType.name -> Seq(enc.contentTypeHeader)
-    )
-    Response(HttpStatus.OK, contentType, enc.bodyWriter(entity), None)
-
-  def Ok[R](entity: R, headers: Map[String, Seq[String]])(using
-    enc: EntityEncoder[R]
-  ): Response =
+  def apply[R](
+    status: HttpStatus,
+    headers: Map[String, Seq[String]],
+    entity: R
+  )(using enc: EntityEncoder[R]): Response =
     val contentType = Map(
       HttpHeader.ContentType.name -> Seq(enc.contentTypeHeader)
     )
     Response(
-      HttpStatus.OK,
+      status,
       contentType ++ headers,
       enc.bodyWriter(entity),
       None
     )
 
+  def Ok[R](entity: R)(using enc: EntityEncoder[R]): Response =
+    Response(HttpStatus.OK, Map.empty, entity)
+
+  def Ok[R](entity: R, headers: Map[String, Seq[String]])(using
+    enc: EntityEncoder[R]
+  ): Response =
+    Response(HttpStatus.OK, headers, entity)
+
   def NotFound: Response =
-    Response(HttpStatus.NotFound, Map.empty, os => {}, Some(-1))
+    Response(HttpStatus.NotFound, Map.empty, "")
 
   def BadRequest: Response =
-    Response(HttpStatus.BadRequest, Map.empty, os => {}, Some(-1))
+    Response(HttpStatus.BadRequest, Map.empty, "")
 
-  def Redirect(location: String): Response =
+  def Found(location: String): Response =
     Response(
       HttpStatus.Found,
-      Map("Location" -> Seq(location)),
-      os => {},
-      Some(-1)
+      Map(HttpHeader.Location.name -> Seq(location)),
+      ""
     )
 
-  def SeeAlso(location: String): Response =
+  def SeeOther(location: String): Response =
     Response(
       HttpStatus.SeeOther,
       Map("Location" -> Seq(location)),
-      os => {},
-      Some(-1)
+      ""
     )

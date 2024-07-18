@@ -86,7 +86,7 @@ case class Request(header: RequestHeader, requestContent: InputStream):
     }
 
   def form: Map[String, IndexedSeq[String]] = header.contentType match
-    case Some("application/x-www-form-urlencoded") =>
+    case Some(ct) if ct.startsWith("application/x-www-form-urlencoded") =>
       parseFormBody(requestContent, StandardCharsets.UTF_8.name())
     case _ => Map.empty
 
