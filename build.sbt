@@ -19,8 +19,8 @@ lazy val jsonJsoniter = (project in file("modules/json-jsoniter"))
   .settings(
     name := "lambdaserve-json-jsoniter",
     libraryDependencies ++= commonDeps ++ Seq(
-      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.30.1",
-      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.30.1"
+      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.30.4",
+      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.30.4"
     )
   )
   .dependsOn(core)
@@ -52,7 +52,7 @@ lazy val serverJetty = (project in file("modules/server-jetty"))
   .settings(
     name := "lambdaserve-server-jetty",
     libraryDependencies ++= commonDeps ++ Seq(
-      "org.eclipse.jetty" % "jetty-server" % "12.0.10"
+      "org.eclipse.jetty" % "jetty-server" % "12.0.11"
     )
   )
   .dependsOn(core)

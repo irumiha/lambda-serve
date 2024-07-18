@@ -15,10 +15,10 @@ case class RequestHeader(
   scheme: String = "https",
   method: HttpMethod = HttpMethod.GET,
   path: String = "/",
-  pathParams: () => Map[String, IndexedSeq[String]] = defaultMap,
-  headers: () => Map[String, IndexedSeq[String]] = defaultMap,
-  query: () => Map[String, IndexedSeq[String]] = defaultMap,
-  contentType: () => Option[String] = () => None,
+  pathParams: Map[String, IndexedSeq[String]] = Map.empty,
+  headers: Map[String, IndexedSeq[String]] = Map.empty,
+  query: Map[String, IndexedSeq[String]] = Map.empty,
+  contentType: Option[String] = None,
   contentLength: Option[Long] = None,
   contentEncoding: Option[String] = None
 )
@@ -85,35 +85,35 @@ case class Request(header: RequestHeader, requestContent: InputStream):
         Source.fromInputStream(requestContent, charset).mkString
     }
 
-  def form: Map[String, IndexedSeq[String]] = header.contentType() match
+  def form: Map[String, IndexedSeq[String]] = header.contentType match
     case Some("application/x-www-form-urlencoded") =>
       parseFormBody(requestContent, StandardCharsets.UTF_8.name())
     case _ => Map.empty
 
   case class Part(headers: Map[String, String], body: String)
 
-  def multipart: Map[String, Seq[Part]] = header.contentType() match
+  def multipart: Map[String, Seq[Part]] = header.contentType match
     case Some(s"multipart/form-data; boundary=${boundary}") =>
       parseMultipartFormData(requestContent, boundary)
     case _ => Map.empty
 
   def withHeaders(newHeaders: Map[String, IndexedSeq[String]]): Request =
-    this.copy(header = this.header.copy(headers = () => this.header.headers() ++ newHeaders))
+    this.copy(header = this.header.copy(headers = this.header.headers ++ newHeaders))
 
   def withHeader(header: String, value: IndexedSeq[String]): Request =
-    this.copy(header = this.header.copy(headers = () => this.header.headers() ++ Map(header -> value)))
+    this.copy(header = this.header.copy(headers = this.header.headers ++ Map(header -> value)))
 
   def withHeader(header: String, value: String): Request =
     withHeader(header, IndexedSeq(value))
 
   def withQueryParam(name: String, value: IndexedSeq[String]): Request =
-    this.copy(header = this.header.copy(query = () => this.header.query() ++ Map(name -> value)))
+    this.copy(header = this.header.copy(query = this.header.query ++ Map(name -> value)))
 
   def withQueryParam(name: String, value: String): Request =
     withQueryParam(name, IndexedSeq(value))
 
   def withQuery(newQuery: Map[String, IndexedSeq[String]]): Request =
-    this.copy(header = this.header.copy(query = () => this.header.query() ++ newQuery))
+    this.copy(header = this.header.copy(query = this.header.query ++ newQuery))
 
 object Request:
   private def requestWithBody(method: HttpMethod, body: InputStream, path: String): Request =

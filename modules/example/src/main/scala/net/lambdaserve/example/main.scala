@@ -4,7 +4,7 @@ import com.github.plokhotnyuk.jsoniter_scala.core.JsonValueCodec
 import com.github.plokhotnyuk.jsoniter_scala.macros.{CodecMakerConfig, JsonCodecMaker}
 import net.lambdaserve.core.Router
 import net.lambdaserve.core.http.Util.HttpMethod
-import net.lambdaserve.core.http.{Request, Response}
+import net.lambdaserve.core.http.*
 import net.lambdaserve.json.jsoniter.JsoniterCodec.given
 import net.lambdaserve.mapextract.MapExtract
 import net.lambdaserve.requestmapped.mapped
@@ -66,11 +66,11 @@ def main(): Unit =
     import HttpMethod.*
     Router.make(
       GET -> raw"/hello".r -> { request =>
-        val name = request.query().get("name").flatMap(_.headOption)
+        val name = request.query.get("name").flatMap(_.headOption)
         Response.Ok(Message(name.getOrElse("Unknown"), LocalDateTime.now()))
       },
       GET -> raw"/something/(?<thisname>\w+)/?".r -> { request =>
-        val name = request.pathParams().get("thisname").flatMap(_.headOption)
+        val name = request.pathParams.get("thisname").flatMap(_.headOption)
         Response.Ok(Message(name.getOrElse("Unknown"), LocalDateTime.now()))
       },
       POST -> raw"/requestmapped".r -> { (command: JsonCommand) =>

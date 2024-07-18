@@ -5,7 +5,6 @@ import net.lambdaserve.core.http.Util.HttpHeader.ContentType
 import net.lambdaserve.core.http.Util.{HttpHeader, HttpStatus}
 
 import java.io.OutputStream
-import java.nio.charset.Charset
 
 case class Response(
   status: HttpStatus,
@@ -13,31 +12,15 @@ case class Response(
   bodyWriter: OutputStream => Unit,
   length: Option[Long] = None,
   error: Option[Throwable] = None
-)
+):
+  def addHeader(name: String, value: String): Response =
+    copy(headers = headers + (name -> Seq(value)))
+
+  def addHeader(name: String, value: Seq[String]): Response =
+    copy(headers = headers + (name -> value))
+
 
 object Response:
-  def Ok(
-    body: String,
-    charset: Charset,
-    headers: Map[String, Seq[String]]
-  ): Response =
-    val bodyArray = body.getBytes(charset)
-    val finalHeaders =
-      if !headers.contains(ContentType.name) then
-        headers + ("Content-Type" -> Seq(
-          s"text/plain; charset=${charset.name}"
-        ))
-      else headers
-
-    Response(
-      HttpStatus.OK,
-      finalHeaders,
-      os => os.write(bodyArray),
-      Some(bodyArray.length)
-    )
-
-  def Ok(body: String): Response = Ok(body, Charset.defaultCharset(), Map())
-
   def Ok[R](entity: R)(using enc: EntityEncoder[R]): Response =
     val contentType = Map(
       HttpHeader.ContentType.name -> Seq(enc.contentTypeHeader)

@@ -17,10 +17,10 @@ object Combined:
   private def map1[T](request: Request, m: MapExtract[T]): T =
     m.projectMaps(
       Seq(
-        request.pathParams(),
-        request.query(),
+        request.pathParams,
+        request.query,
         request.form,
-        request.headers()
+        request.headers
       )
     )
 

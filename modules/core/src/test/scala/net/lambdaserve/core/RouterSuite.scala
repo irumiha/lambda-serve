@@ -46,7 +46,7 @@ class RouterSuite extends munit.FunSuite:
 
   test("route with path params") {
     val route = Route(GET, raw"/(?<paramname>.*?)/?".r, { request =>
-      val paramValue = request.pathParams()("paramname").headOption.getOrElse("")
+      val paramValue = request.pathParams("paramname").headOption.getOrElse("")
 
       Response.Ok(paramValue)
     })
