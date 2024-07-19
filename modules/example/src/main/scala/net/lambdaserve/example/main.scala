@@ -1,15 +1,12 @@
 package net.lambdaserve.example
 
 import com.github.plokhotnyuk.jsoniter_scala.core.JsonValueCodec
-import com.github.plokhotnyuk.jsoniter_scala.macros.{
-  CodecMakerConfig,
-  JsonCodecMaker
-}
+import com.github.plokhotnyuk.jsoniter_scala.macros.{CodecMakerConfig, JsonCodecMaker}
 import net.lambdaserve.core.Router
-import net.lambdaserve.core.http.Util.HttpMethod
 import net.lambdaserve.core.http.*
+import net.lambdaserve.core.http.Util.HttpMethod
 import net.lambdaserve.json.jsoniter.JsoniterCodec.given
-import net.lambdaserve.mapextract.MapExtract
+import net.lambdaserve.mapextract.{MapExtract, SourceName}
 import net.lambdaserve.requestmapped.mapped
 import net.lambdaserve.server.jetty.Server
 import net.lambdaserve.views.tyrian.TyrianEncoder.given
@@ -21,11 +18,11 @@ import java.util.UUID
 import scala.io.StdIn
 
 class HouseController:
-  case class HouseCommand(id: String, name: String) derives MapExtract
+  case class HouseCommand(id: String, name: String, @SourceName("User-Agent") userAgent: String) derives MapExtract
   case class HouseGetCommand(id: String) derives MapExtract
 
   def doWithHouse(houseCommand: HouseCommand): Response =
-    Response.Ok(s"House ${houseCommand.name} with id ${houseCommand.id}")
+    Response.Ok(s"House ${houseCommand.name} with id ${houseCommand.id}. The header was ${houseCommand.userAgent}")
 
   def getHouse(cmd: HouseGetCommand): Response =
     Response.Ok(s"House with id ${cmd.id}")

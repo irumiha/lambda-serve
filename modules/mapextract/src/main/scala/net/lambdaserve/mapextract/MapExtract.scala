@@ -2,6 +2,10 @@ package net.lambdaserve.mapextract
 
 import magnolia1.*
 
+import scala.annotation.StaticAnnotation
+
+final case class SourceName(name: String) extends StaticAnnotation
+
 trait MapExtract[T]:
   def projectMap(
     m: Map[String, IndexedSeq[String]],
@@ -60,9 +64,15 @@ object MapExtract
         offset: Int
       ): T =
         val allParams = ctx.parameters.map { param =>
+          val overrideName = param.annotations.collect {
+            case SourceName(sourceName) => sourceName
+          }.headOption
+
+          val paramName = overrideName.getOrElse(param.label)
+
           val currentPrefix =
-            if prefix.isEmpty then param.label
-            else s"$prefix.${param.label}"
+            if prefix.isEmpty then paramName
+            else s"$prefix.$paramName"
           param.typeclass.projectMaps(ms, currentPrefix, offset)
         }
 
