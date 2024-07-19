@@ -67,7 +67,8 @@ lazy val all = (project in file("modules/all"))
     jsonJsoniter,
     mapextract,
     requestmapped,
-    viewsTyrian
+    viewsTyrian,
+    viewsScalatags
   )
 
 lazy val example = (project in file("modules/example"))

@@ -9,9 +9,9 @@ import net.lambdaserve.json.jsoniter.JsoniterCodec.given
 import net.lambdaserve.mapextract.{MapExtract, SourceName}
 import net.lambdaserve.requestmapped.mapped
 import net.lambdaserve.server.jetty.Server
-import net.lambdaserve.views.tyrian.TyrianEncoder.given
-import tyrian.*
-import tyrian.Html.*
+import net.lambdaserve.views.scalatags.ScalatagsEncoder.given
+import scalatags.Text.all.*
+import scalatags.Text.tags2.title
 
 import java.time.LocalDateTime
 import java.util.UUID
