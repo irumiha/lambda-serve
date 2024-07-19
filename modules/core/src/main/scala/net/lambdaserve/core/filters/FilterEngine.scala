@@ -2,35 +2,38 @@ package net.lambdaserve.core.filters
 
 import net.lambdaserve.core.http.{Request, Response}
 
-class FilterEngine(filters: IndexedSeq[Filter]):
-  def processRequest(request: Request): Response =
-    var progressing = true
-    var currentRequest = request
+final class FilterEngine(filters: IndexedSeq[Filter]):
+  private[lambdaserve] def processRequest(request: Request): Response =
+    var progressing               = true
+    var currentRequest            = request
     var currentResponse: Response = null
 
-    var wrappers = Vector[Response => WrapperResponse]()
+    var wrappers = Vector[Response => FilterOutResponse]()
 
     var i = 0
     while progressing && i < filters.length do
       filters(i).handle(currentRequest) match
-        case FilterResponse.Continue(request) =>
+        case FilterInResponse.Continue(request) =>
           currentRequest = request
-        case FilterResponse.Stop(response) =>
+        case FilterInResponse.Stop(response) =>
           progressing = false
           currentResponse = response
-        case FilterResponse.Wrap(request, responseWrapper) =>
+        case FilterInResponse.Wrap(request, responseWrapper) =>
           currentRequest = request
           wrappers = responseWrapper +: wrappers
       i += 1
 
-    assert(currentResponse != null, "Filter pipeline never stops with a response!")
+    assert(
+      currentResponse != null,
+      "Filter pipeline never stopped with a response!"
+    )
     i = 0
     progressing = true
     while progressing && i < wrappers.length do
       wrappers(i).apply(currentResponse) match
-        case WrapperResponse.Continue(response) =>
+        case FilterOutResponse.Continue(response) =>
           currentResponse = response
-        case WrapperResponse.Stop(response) =>
+        case FilterOutResponse.Stop(response) =>
           currentResponse = response
           progressing = false
       i += 1

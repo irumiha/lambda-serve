@@ -1,7 +1,10 @@
 package net.lambdaserve.example
 
 import com.github.plokhotnyuk.jsoniter_scala.core.JsonValueCodec
-import com.github.plokhotnyuk.jsoniter_scala.macros.{CodecMakerConfig, JsonCodecMaker}
+import com.github.plokhotnyuk.jsoniter_scala.macros.{
+  CodecMakerConfig,
+  JsonCodecMaker
+}
 import net.lambdaserve.core.Router
 import net.lambdaserve.core.http.Util.HttpMethod
 import net.lambdaserve.core.http.*
@@ -44,8 +47,7 @@ class HouseController:
     )
 end HouseController
 
-@main
-def main(): Unit =
+@main def main(): Unit =
   case class Message(name: String, currentTime: LocalDateTime)
   object Message:
     given codec: JsonValueCodec[Message] =
@@ -77,8 +79,7 @@ def main(): Unit =
         Response.Ok(Message(command.name, LocalDateTime.now()))
       }.mapped
     )
-
-  //
+  
   val router =
     Router.combine("" -> topRouter, "/api/houses" -> HouseController().router)
 

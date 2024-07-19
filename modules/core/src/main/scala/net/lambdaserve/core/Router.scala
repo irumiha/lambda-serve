@@ -5,7 +5,7 @@ import net.lambdaserve.core.http.Util.HttpMethod
 
 import scala.util.matching.Regex
 
-case class Router(routes: Seq[Route]):
+final case class Router(routes: Seq[Route]):
 
   def matchRoute(request: Request): Option[(Request, RouteHandler)] =
     var found: Option[(Request, RouteHandler)] = None
@@ -15,7 +15,7 @@ case class Router(routes: Seq[Route]):
       val route = routes(i)
       found =
         if route.method == request.method then
-          route.matchRequest(request).map(r => (r, route.handler))
+          route.matchRequest(request).map(request => (request, route.handler))
         else None
       i += 1
 
