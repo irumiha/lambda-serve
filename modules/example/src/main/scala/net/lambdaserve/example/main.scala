@@ -1,7 +1,10 @@
 package net.lambdaserve.example
 
 import com.github.plokhotnyuk.jsoniter_scala.core.JsonValueCodec
-import com.github.plokhotnyuk.jsoniter_scala.macros.{CodecMakerConfig, JsonCodecMaker}
+import com.github.plokhotnyuk.jsoniter_scala.macros.{
+  CodecMakerConfig,
+  JsonCodecMaker
+}
 import net.lambdaserve.core.Router
 import net.lambdaserve.core.http.*
 import net.lambdaserve.core.http.Util.HttpMethod
@@ -10,6 +13,7 @@ import net.lambdaserve.mapextract.{MapExtract, SourceName}
 import net.lambdaserve.requestmapped.mapped
 import net.lambdaserve.server.jetty.Server
 import net.lambdaserve.views.scalatags.ScalatagsEncoder.given
+import org.eclipse.jetty.server.ServerConnector
 import scalatags.Text.all.*
 import scalatags.Text.tags2.title
 
@@ -18,11 +22,17 @@ import java.util.UUID
 import scala.io.StdIn
 
 class HouseController:
-  case class HouseCommand(id: String, name: String, @SourceName("User-Agent") userAgent: String) derives MapExtract
+  case class HouseCommand(
+    id: String,
+    name: String,
+    @SourceName("User-Agent") userAgent: String
+  ) derives MapExtract
   case class HouseGetCommand(id: String) derives MapExtract
 
   def doWithHouse(houseCommand: HouseCommand): Response =
-    Response.Ok(s"House ${houseCommand.name} with id ${houseCommand.id}. The header was ${houseCommand.userAgent}")
+    Response.Ok(
+      s"House ${houseCommand.name} with id ${houseCommand.id}. The header was ${houseCommand.userAgent}"
+    )
 
   def getHouse(cmd: HouseGetCommand): Response =
     Response.Ok(s"House with id ${cmd.id}")
@@ -76,11 +86,19 @@ end HouseController
         Response.Ok(Message(command.name, LocalDateTime.now()))
       }.mapped
     )
-  
+
   val router =
     Router.combine("" -> topRouter, "/api/houses" -> HouseController().router)
 
-  val s = Server.makeServer("localhost", 8080, router)
+  val s = Server.makeServer(
+    "localhost",
+    0,
+    router,
+    staticPaths = List("classpath:static-files"),
+    staticPrefix = Some("/static")
+  )
 
-  StdIn.readLine("Awaiting exit...")
+  StdIn.readLine(s"Listening on port ${s.getConnectors
+      .collect { case s: ServerConnector => s.getLocalPort }
+      .mkString(",")} Awaiting exit...")
   s.stop()

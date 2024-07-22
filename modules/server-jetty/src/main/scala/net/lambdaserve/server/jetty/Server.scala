@@ -50,10 +50,10 @@ object Server extends Server[jetty.Server, jetty.Handler]:
       if staticPaths.nonEmpty && staticPrefix.nonEmpty then
         val resourceHandler = ResourceHandler()
         val resourcesFromPaths = staticPaths.map { sp =>
-          if sp.startsWith("resource:") then
+          if sp.startsWith("classpath:") then
             ResourceFactory
               .of(resourceHandler)
-              .newClassLoaderResource(sp.replaceAll("resource:", ""))
+              .newClassLoaderResource(sp.replaceAll("classpath:", ""))
           else ResourceFactory.of(resourceHandler).newResource(sp)
         }
         val resources = ResourceFactory.combine(resourcesFromPaths*)
