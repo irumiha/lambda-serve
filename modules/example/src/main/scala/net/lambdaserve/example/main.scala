@@ -1,13 +1,10 @@
 package net.lambdaserve.example
 
 import com.github.plokhotnyuk.jsoniter_scala.core.JsonValueCodec
-import com.github.plokhotnyuk.jsoniter_scala.macros.{
-  CodecMakerConfig,
-  JsonCodecMaker
-}
+import com.github.plokhotnyuk.jsoniter_scala.macros.JsonCodecMaker
 import net.lambdaserve.core.Router
 import net.lambdaserve.core.http.*
-import net.lambdaserve.core.http.Util.HttpMethod
+import net.lambdaserve.core.http.Method
 import net.lambdaserve.json.jsoniter.JsoniterCodec.given
 import net.lambdaserve.mapextract.{MapExtract, SourceName}
 import net.lambdaserve.requestmapped.mapped
@@ -46,11 +43,11 @@ class HouseController:
     )
 
   val router: Router =
-    import HttpMethod.*
+    import Method.*
     Router.make(
-      POST -> raw"/".r           -> doWithHouse.mapped,
-      GET  -> raw"/(?<id>\w+)".r -> getHouse.mapped,
-      GET  -> raw"/house-ui".r   -> houseUI
+      POST -> "/".r            -> doWithHouse.mapped,
+      GET  -> "/(?<id>\\w+)".r -> getHouse.mapped,
+      GET  -> "/house-ui".r    -> houseUI
     )
 end HouseController
 
@@ -58,31 +55,27 @@ end HouseController
   case class Message(name: String, currentTime: LocalDateTime)
   object Message:
     given codec: JsonValueCodec[Message] =
-      JsonCodecMaker.make(
-        CodecMakerConfig.withFieldNameMapper(JsonCodecMaker.enforce_snake_case)
-      )
+      JsonCodecMaker.makeCirceLikeSnakeCased
 
   case class JsonCommand(id: UUID, name: String):
     assert(name.nonEmpty, "name must not be empty")
 
   object JsonCommand:
     given codec: JsonValueCodec[JsonCommand] =
-      JsonCodecMaker.make(
-        CodecMakerConfig.withFieldNameMapper(JsonCodecMaker.enforce_snake_case)
-      )
+      JsonCodecMaker.makeCirceLikeSnakeCased
 
   val topRouter =
-    import HttpMethod.*
+    import Method.*
     Router.make(
-      GET -> raw"/hello".r -> { request =>
+      GET -> "/hello".r -> { request =>
         val name = request.query.get("name").flatMap(_.headOption)
         Response.Ok(Message(name.getOrElse("Unknown"), LocalDateTime.now()))
       },
-      GET -> raw"/something/(?<thisname>\w+)/?".r -> { request =>
+      GET -> "/something/(?<thisname>\\w+)/?".r -> { request =>
         val name = request.pathParams.get("thisname").flatMap(_.headOption)
         Response.Ok(Message(name.getOrElse("Unknown"), LocalDateTime.now()))
       },
-      POST -> raw"/requestmapped".r -> { (command: JsonCommand) =>
+      POST -> "/requestmapped".r -> { (command: JsonCommand) =>
         Response.Ok(Message(command.name, LocalDateTime.now()))
       }.mapped
     )

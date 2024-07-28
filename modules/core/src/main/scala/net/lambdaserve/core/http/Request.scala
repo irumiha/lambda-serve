@@ -1,7 +1,7 @@
 package net.lambdaserve.core.http
 
 import net.lambdaserve.core.codec.EntityEncoder
-import net.lambdaserve.core.http.Util.{HttpHeader, HttpMethod}
+import net.lambdaserve.core.http.{Header, Method}
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream, PipedInputStream, PipedOutputStream, StringReader}
 import java.net.URLDecoder
@@ -13,7 +13,7 @@ def defaultMap(): Map[String, IndexedSeq[String]] = Map.empty
 
 case class RequestHeader(
   scheme: String = "https",
-  method: HttpMethod = HttpMethod.GET,
+  method: Method = Method.GET,
   path: String = "/",
   pathParams: Map[String, IndexedSeq[String]] = Map.empty,
   headers: Map[String, IndexedSeq[String]] = Map.empty,
@@ -116,7 +116,7 @@ case class Request(header: RequestHeader, requestContent: InputStream):
     this.copy(header = this.header.copy(query = this.header.query ++ newQuery))
 
 object Request:
-  private def requestWithBody(method: HttpMethod, body: InputStream, path: String): Request =
+  private def requestWithBody(method: Method, body: InputStream, path: String): Request =
     Request(
       RequestHeader(
         method = method,
@@ -127,10 +127,10 @@ object Request:
     )
 
   def GET(path: String): Request =
-    requestWithBody(HttpMethod.GET, InputStream.nullInputStream(), path)
+    requestWithBody(Method.GET, InputStream.nullInputStream(), path)
 
   def POST(body: InputStream, path: String): Request =
-    requestWithBody(HttpMethod.POST, body, path)
+    requestWithBody(Method.POST, body, path)
 
   def POST(body: String, path: String): Request =
     POST(ByteArrayInputStream(body.getBytes), path)
@@ -141,10 +141,10 @@ object Request:
     ec.bodyWriter(body)(baos)
 
     POST(new ByteArrayInputStream(baos.toByteArray), path)
-      .withHeader(HttpHeader.ContentType.name, ec.contentTypeHeader)
+      .withHeader(Header.ContentType.name, ec.contentTypeHeader)
 
   def PUT(body: InputStream, path: String): Request =
-    requestWithBody(HttpMethod.PUT, body, path)
+    requestWithBody(Method.PUT, body, path)
 
   def PUT(body: String, path: String): Request =
     PUT(ByteArrayInputStream(body.getBytes), path)
@@ -155,10 +155,10 @@ object Request:
     ec.bodyWriter(body)(baos)
 
     PUT(new ByteArrayInputStream(baos.toByteArray), path)
-      .withHeader(HttpHeader.ContentType.name, ec.contentTypeHeader)
+      .withHeader(Header.ContentType.name, ec.contentTypeHeader)
 
   def PATCH(body: InputStream, path: String): Request =
-    requestWithBody(HttpMethod.PATCH, body, path)
+    requestWithBody(Method.PATCH, body, path)
 
   def PATCH(body: String, path: String): Request =
     PATCH(ByteArrayInputStream(body.getBytes), path)
@@ -169,4 +169,4 @@ object Request:
     ec.bodyWriter(body)(baos)
 
     PATCH(new ByteArrayInputStream(baos.toByteArray), path)
-      .withHeader(HttpHeader.ContentType.name, ec.contentTypeHeader)
+      .withHeader(Header.ContentType.name, ec.contentTypeHeader)

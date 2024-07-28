@@ -90,11 +90,11 @@ object Server extends Server[jetty.Server, jetty.Handler]:
   override def addToConfiguredServer(
     router: Router,
     filters: IndexedSeq[Filter]
-  )(c: jetty.Handler => jetty.Server): jetty.Server =
+  )(serverConfigurer: jetty.Handler => jetty.Server): jetty.Server =
     val lambdaHandler = HttpHandler(
       FilterEngine(filters :+ RouteHandlerFilter(router))
     )
-    val jettyServer = c(lambdaHandler)
+    val jettyServer = serverConfigurer(lambdaHandler)
 
     jettyServer.start()
 

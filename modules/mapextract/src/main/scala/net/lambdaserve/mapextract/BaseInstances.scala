@@ -19,6 +19,14 @@ trait BaseInstances:
     ): Int =
       MapExtract.extractString(m, prefix, offset).toInt
 
+  given MapExtract[Long] with
+    override def projectMaps(
+      m: Seq[Map[String, IndexedSeq[String]]],
+      prefix: String,
+      offset: Int
+    ): Long =
+      MapExtract.extractString(m, prefix, offset).toLong
+
   given MapExtract[Float] with
     override def projectMaps(
       m: Seq[Map[String, IndexedSeq[String]]],

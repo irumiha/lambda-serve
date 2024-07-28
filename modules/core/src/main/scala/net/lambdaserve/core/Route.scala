@@ -1,12 +1,12 @@
 package net.lambdaserve.core
 
 import net.lambdaserve.core.http.Request
-import net.lambdaserve.core.http.Util.HttpMethod
+import net.lambdaserve.core.http.Method
 
 import scala.util.matching.Regex
 import scala.jdk.CollectionConverters.given
 
-case class Route(method: HttpMethod, path: Regex, handler: RouteHandler):
+case class Route(method: Method, path: Regex, handler: RouteHandler):
   private val pathParamNames: Vector[String] =
     path.pattern.namedGroups().asScala.keys.toVector
 

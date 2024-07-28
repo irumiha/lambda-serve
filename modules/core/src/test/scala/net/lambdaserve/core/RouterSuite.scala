@@ -1,7 +1,7 @@
 package net.lambdaserve.core
 
 import net.lambdaserve.core.http.*
-import net.lambdaserve.core.http.Util.HttpMethod.GET
+import net.lambdaserve.core.http.Method.GET
 
 import java.io.ByteArrayOutputStream
 

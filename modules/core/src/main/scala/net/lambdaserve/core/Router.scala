@@ -1,7 +1,7 @@
 package net.lambdaserve.core
 
 import net.lambdaserve.core.http.Request
-import net.lambdaserve.core.http.Util.HttpMethod
+import net.lambdaserve.core.http.Method
 
 import scala.util.matching.Regex
 
@@ -23,7 +23,7 @@ final case class Router(routes: Seq[Route]):
 
 object Router:
 
-  def make(routes: ((HttpMethod, Regex), RouteHandler)*): Router =
+  def make(routes: ((Method, Regex), RouteHandler)*): Router =
     Router(routes.map{
       case ((m, r), rh) => Route(m,r,rh)
     })

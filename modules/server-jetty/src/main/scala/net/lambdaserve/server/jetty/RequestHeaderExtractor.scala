@@ -2,7 +2,7 @@ package net.lambdaserve.server.jetty
 
 import net.lambdaserve.core.http.RequestHeader
 import net.lambdaserve.core.http.RequestHeader.parseQuery
-import net.lambdaserve.core.http.Util.HttpMethod
+import net.lambdaserve.core.http.Method
 import org.eclipse.jetty.http.HttpFields
 
 import scala.jdk.CollectionConverters.*
@@ -72,7 +72,7 @@ object RequestHeaderExtractor:
 
     RequestHeader(
       scheme = scheme,
-      method = HttpMethod.valueOf(method),
+      method = Method.valueOf(method),
       path = path,
       pathParams = Map.empty,
       headers = headersMap,

@@ -19,8 +19,8 @@ lazy val jsonJsoniter = (project in file("modules/json-jsoniter"))
   .settings(
     name := "lambdaserve-json-jsoniter",
     libraryDependencies ++= commonDeps ++ Seq(
-      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.30.6",
-      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.30.7"
+      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.30.7",
+      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.30.7" % "provided"
       )
   )
   .dependsOn(core)
@@ -75,7 +75,10 @@ lazy val example = (project in file("modules/example"))
   .enablePlugins(JavaAppPackaging)
   .settings(
     name := "lambdaserve-example",
-    libraryDependencies ++= Seq("com.outr" %% "scribe-slf4j2" % "3.15.0")
+    libraryDependencies ++= Seq(
+      "com.outr" %% "scribe-slf4j2" % "3.15.0",
+      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.30.7" % "provided"
+    )
   )
   .dependsOn(all)
 
