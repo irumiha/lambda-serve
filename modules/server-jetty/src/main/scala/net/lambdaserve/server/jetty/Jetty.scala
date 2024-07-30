@@ -11,7 +11,7 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool
 
 import java.util.concurrent.Executors
 
-object Server extends Server[jetty.Server, jetty.Handler]:
+object Jetty extends Server[jetty.Server, jetty.Handler]:
   def makeServer(
     host: String,
     port: Int,

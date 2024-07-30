@@ -8,7 +8,7 @@ import net.lambdaserve.core.http.Method
 import net.lambdaserve.json.jsoniter.JsoniterCodec.given
 import net.lambdaserve.mapextract.{MapExtract, SourceName}
 import net.lambdaserve.requestmapped.mapped
-import net.lambdaserve.server.jetty.Server
+import net.lambdaserve.server.jetty.Jetty
 import net.lambdaserve.views.scalatags.ScalatagsEncoder.given
 import org.eclipse.jetty.server.ServerConnector
 import scalatags.Text.all.*
@@ -83,7 +83,7 @@ end HouseController
   val router =
     Router.combine("" -> topRouter, "/api/houses" -> HouseController().router)
 
-  val s = Server.makeServer(
+  val s = Jetty.makeServer(
     "localhost",
     0,
     router,
