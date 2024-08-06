@@ -110,7 +110,7 @@ class RouterSuite extends munit.FunSuite:
 
     val router = Router(Seq(route))
     val request =
-      Request.POST("username=user&password=123", "/something")
+      Request.POST("", "/something")
         .withHeader(Header.ContentType.name, "application/x-www-form-urlencoded")
         .withQueryParam("queryname", "123")
         .withFormParam("username", "user")

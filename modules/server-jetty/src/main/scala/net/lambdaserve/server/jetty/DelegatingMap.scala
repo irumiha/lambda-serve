@@ -35,7 +35,9 @@ class DelegatingMap private (
       .asScala
       .view
       .groupBy(_.getLowerCaseName)
-      .map(pair => pair._1 -> pair._2.map(_.getValue).toIndexedSeq)
+      .view
+      .mapValues(_.map(_.getValue).toIndexedSeq)
+      .toMap
       .concat(updateStore)
       .removedAll(removedKeys)
       .iterator
