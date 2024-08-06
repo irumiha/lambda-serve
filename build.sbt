@@ -57,13 +57,6 @@ lazy val serverJetty = (project in file("modules/server-jetty"))
   )
   .dependsOn(core)
 
-lazy val serverJava = (project in file("modules/server-java"))
-  .settings(
-    name := "lambdaserve-server-java",
-    libraryDependencies ++= commonDeps
-  )
-  .dependsOn(core)
-
 lazy val all = (project in file("modules/all"))
   .settings(
     name := "lambdaserve-all"
@@ -71,7 +64,6 @@ lazy val all = (project in file("modules/all"))
   .dependsOn(
     core,
     serverJetty,
-    serverJava,
     jsonJsoniter,
     mapextract,
     requestmapped,
@@ -107,6 +99,5 @@ lazy val `lambda-serve` = (project in file("."))
     mapextract,
     requestmapped,
     viewsScalatags,
-    viewsTyrian,
-    all
+    viewsTyrian
   )

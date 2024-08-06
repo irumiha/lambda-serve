@@ -19,24 +19,6 @@ class HttpHandler(filterEngine: FilterEngine) extends httpserver.HttpHandler:
     val requestQuery: Map[String, IndexedSeq[String]] =
       queryString.fold(Map.empty[String, IndexedSeq[String]])(parseQuery)
 
-    val contentType: Option[String] =
-      if headers.containsKey("Content-Type") then
-        Some(headers.getFirst("Content-Type"))
-      else
-        None
-
-    val contentLength: Option[Long] =
-      if headers.containsKey("Content-Length") then
-        Some(headers.getFirst("Content-Length").toLong)
-      else
-        None
-
-    val contentEncoding: Option[String] =
-      if headers.containsKey("Content-Encoding") then
-        Some(headers.getFirst("Content-Encoding"))
-      else
-        None
-
     val headersMap: Map[String, IndexedSeq[String]] =
       headers.asScala.view.mapValues(_.asScala.toIndexedSeq).toMap
 
@@ -47,9 +29,6 @@ class HttpHandler(filterEngine: FilterEngine) extends httpserver.HttpHandler:
       pathParams = Map.empty,
       headers = headersMap,
       query = requestQuery,
-      contentType = contentType,
-      contentLength = contentLength,
-      contentEncoding = contentEncoding
     )
 
   override def handle(exchange: HttpExchange): Unit =

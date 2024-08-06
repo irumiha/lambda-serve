@@ -1,13 +1,12 @@
 package net.lambdaserve.core
 
-import net.lambdaserve.core.http.Request
-import net.lambdaserve.core.http.Method
+import net.lambdaserve.core.http.{Request, Method}
 
 import scala.util.matching.Regex
 
 final case class Router(routes: Seq[Route]):
 
-  def matchRoute(request: Request): Option[(Request, RouteHandler)] =
+  def matchMethodAndPath(request: Request): Option[(Request, RouteHandler)] =
     var found: Option[(Request, RouteHandler)] = None
     var i                                      = 0
 
@@ -20,6 +19,9 @@ final case class Router(routes: Seq[Route]):
       i += 1
 
     found
+    
+  def findRoutesForPath(path: String): Seq[Route] =
+    routes.filter(_.path.pattern.matcher(path).matches())
 
 object Router:
 

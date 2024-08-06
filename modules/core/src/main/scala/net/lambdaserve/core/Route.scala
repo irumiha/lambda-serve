@@ -1,7 +1,6 @@
 package net.lambdaserve.core
 
-import net.lambdaserve.core.http.Request
-import net.lambdaserve.core.http.Method
+import net.lambdaserve.core.http.{Method, Request}
 
 import scala.util.matching.Regex
 import scala.jdk.CollectionConverters.given
@@ -19,10 +18,6 @@ case class Route(method: Method, path: Regex, handler: RouteHandler):
           .map(name => name -> IndexedSeq(pathMatch.group(name)))
           .toMap
       if pathParamValues.nonEmpty then
-        Some(
-          request.copy(header =
-            request.header.copy(pathParams = pathParamValues)
-          )
-        )
+        Some(request.copy(pathParams = pathParamValues))
       else Some(request)
     else None
