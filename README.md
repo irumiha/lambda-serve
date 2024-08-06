@@ -25,6 +25,7 @@ import net.lambdaserve.core.Router
 import net.lambdaserve.core.http.*
 import net.lambdaserve.core.http.Util.HttpMethod
 import net.lambdaserve.server.jetty.Server
+import org.eclipse.jetty.server.{Server, ServerConnector}
 import scala.io.StdIn
 
 import HttpMethod.*
