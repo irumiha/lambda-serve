@@ -28,6 +28,7 @@ class HttpHandler(filterEngine: FilterEngine) extends jetty.Handler.Abstract():
         .view
         .mapValues(_.toIndexedSeq)
         .toMap
+    val requestCookies = Cookies.extractCookies(in)
 
     val contentType = in.getHeaders.get(jettyHttp.HttpHeader.CONTENT_TYPE)
 
@@ -59,6 +60,7 @@ class HttpHandler(filterEngine: FilterEngine) extends jetty.Handler.Abstract():
           pathParams = Map.empty,
           headers = DelegatingMap.make(in.getHeaders),
           query = queryParams,
+          cookies = requestCookies,
           multipartForm = scalaMultiparts.toSeq
         )
         filterEngine.processRequest(request)
@@ -69,9 +71,10 @@ class HttpHandler(filterEngine: FilterEngine) extends jetty.Handler.Abstract():
             .get(inputTimeout, inputTimeutUnit)
             .toStringArrayMap
             .asScala
-            .view.mapValues(ArraySeq.from(_))
+            .view
+            .mapValues(ArraySeq.from(_))
             .toMap
-          
+
         val request = Request(
           scheme = in.getHttpURI.getScheme,
           method = Method.valueOf(in.getMethod),
@@ -79,6 +82,7 @@ class HttpHandler(filterEngine: FilterEngine) extends jetty.Handler.Abstract():
           pathParams = Map.empty,
           headers = DelegatingMap.make(in.getHeaders),
           query = queryParams,
+          cookies = requestCookies,
           form = formParams
         )
         filterEngine.processRequest(request)
@@ -90,14 +94,19 @@ class HttpHandler(filterEngine: FilterEngine) extends jetty.Handler.Abstract():
           pathParams = Map.empty,
           headers = DelegatingMap.make(in.getHeaders),
           query = queryParams,
+          cookies = requestCookies,
           requestContent = jetty.Request.asInputStream(in)
         )
         filterEngine.processRequest(request)
 
     out.setStatus(response.status.code)
-
+    for cookie <- response.cookies.values do
+      val jettyCookie = Cookies.toJettyCookie(cookie)
+      jetty.Response.addCookie(out, jettyCookie)
     val responseHeaders = out.getHeaders
-    response.length.foreach(responseHeaders.put(jettyHttp.HttpHeader.CONTENT_LENGTH, _))
+    response.length.foreach(
+      responseHeaders.put(jettyHttp.HttpHeader.CONTENT_LENGTH, _)
+    )
 
     response.headers.foreach { case (headerName, headerValue) =>
       responseHeaders.put(headerName, headerValue.asJava)

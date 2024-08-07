@@ -12,6 +12,7 @@ case class Request(
   pathParams: Map[String, IndexedSeq[String]] = Map.empty,
   headers: Map[String, IndexedSeq[String]] = Map.empty,
   query: Map[String, IndexedSeq[String]] = Map.empty,
+  cookies: Map[String, Cookie] = Map.empty,
   form: Map[String, IndexedSeq[String]] = Map.empty,
   multipartForm: Seq[MultiPart] = Seq.empty,
   requestContent: InputStream = InputStream.nullInputStream()
