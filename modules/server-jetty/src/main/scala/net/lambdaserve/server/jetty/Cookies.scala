@@ -23,7 +23,6 @@ object Cookies:
       value = cookie.getValue,
       path = Option(cookie.getPath),
       secure = Option(cookie.isSecure),
-      version = Option(cookie.getVersion),
       domain = Option(cookie.getDomain),
       comment = Option(cookie.getComment),
       maxAge = Option(cookie.getMaxAge),
@@ -33,10 +32,12 @@ object Cookies:
     )
 
   def toJettyCookie(source: Cookie): HttpCookie =
-    val builder = HttpCookie.build(source.name, source.value)
+    val builder = HttpCookie.build(source.name, source.value, 1)
     source.path.foreach(builder.path)
     source.secure.foreach(builder.secure)
-    source.sameSite.foreach(ss => builder.sameSite(HttpCookie.SameSite.from(ss.toString)))
+    source.sameSite.foreach(ss =>
+      builder.sameSite(HttpCookie.SameSite.from(ss.toString))
+    )
     source.domain.foreach(builder.domain)
     source.comment.foreach(builder.comment)
     source.maxAge.foreach(builder.maxAge)

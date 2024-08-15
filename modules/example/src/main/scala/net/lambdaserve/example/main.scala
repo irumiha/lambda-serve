@@ -14,7 +14,8 @@ import org.eclipse.jetty.server.ServerConnector
 import scalatags.Text.all.*
 import scalatags.Text.tags2.title
 
-import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.{Instant, LocalDateTime, ZoneOffset}
 import java.util.UUID
 import scala.io.StdIn
 
@@ -35,12 +36,29 @@ class HouseController:
     Response.Ok(s"House with id ${cmd.id}")
 
   def houseUI(req: Request): Response =
-    Response.Ok(
-      html(
-        head(title("Just a page!")),
-        body(div(h1("The great page title"), p("My little paragraph")))
+    val expiresFormatter = DateTimeFormatter.RFC_1123_DATE_TIME
+      .withZone(ZoneOffset.UTC)
+
+    Response
+      .Ok(
+        html(
+          head(title("Just a page!")),
+          body(div(h1("The great page title"), p("My little paragraph")))
+        )
       )
-    )
+      .withCookie(
+        Cookie(
+          "mycookie",
+          "myvalue",
+          // expires = Some(Instant.now().plusSeconds(3600)),
+          maxAge = Some(7200),
+          httpOnly = Some(true)
+        )
+      )
+      .addHeader(
+        "Expires",
+        expiresFormatter.format(Instant.now().plusSeconds(3600))
+      )
 
   val router: Router =
     import Method.*
@@ -85,13 +103,13 @@ end HouseController
 
   val s = Jetty.makeServer(
     "localhost",
-    0,
+    8080,
     router,
     staticPaths = List("classpath:static-files"),
     staticPrefix = Some("/static")
   )
 
-  StdIn.readLine(s"Listening on port ${s.getConnectors
+  println(s"Listening on port ${s.getConnectors
       .collect { case s: ServerConnector => s.getLocalPort }
-      .mkString(",")} Awaiting exit...")
-  s.stop()
+      .mkString(",")}")
+  s.join()

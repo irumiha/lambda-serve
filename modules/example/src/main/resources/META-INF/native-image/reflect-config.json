@@ -367,7 +367,7 @@
 },
 {
   "name":"net.lambdaserve.core.http.Request",
-  "fields":[{"name":"bodyCharset$lzy1"}]
+  "fields":[{"name":"bodyCharset$lzy1"}, {"name":"contentEncoding$lzy1"}, {"name":"contentLength$lzy1"}, {"name":"contentType$lzy1"}, {"name":"stringBody$lzy1"}]
 },
 {
   "name":"net.lambdaserve.example.HouseController$HouseCommand$",
@@ -383,7 +383,7 @@
 },
 {
   "name":"net.lambdaserve.mapextract.MapExtract$",
-  "fields":[{"name":"given_MapExtract_BigDecimal$lzy1"}, {"name":"given_MapExtract_Boolean$lzy1"}, {"name":"given_MapExtract_Double$lzy1"}, {"name":"given_MapExtract_Float$lzy1"}, {"name":"given_MapExtract_Int$lzy1"}, {"name":"given_MapExtract_Short$lzy1"}, {"name":"given_MapExtract_String$lzy1"}, {"name":"given_MapExtract_UUID$lzy1"}]
+  "fields":[{"name":"given_MapExtract_BigDecimal$lzy1"}, {"name":"given_MapExtract_Boolean$lzy1"}, {"name":"given_MapExtract_Double$lzy1"}, {"name":"given_MapExtract_Float$lzy1"}, {"name":"given_MapExtract_Int$lzy1"}, {"name":"given_MapExtract_Long$lzy1"}, {"name":"given_MapExtract_Short$lzy1"}, {"name":"given_MapExtract_String$lzy1"}, {"name":"given_MapExtract_UUID$lzy1"}]
 },
 {
   "name":"org.eclipse.jetty.util.TypeUtil",
@@ -468,10 +468,6 @@
 {
   "name":"scribe.slf4j.ScribeServiceProvider",
   "fields":[{"name":"markerFactory$lzy1"}]
-},
-{
-  "name":"scribe.throwable.TraceLoggableMessage",
-  "fields":[{"name":"logOutput$lzy1"}, {"name":"value$lzy1"}]
 },
 {
   "name":"sun.management.ClassLoadingImpl",

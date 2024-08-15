@@ -82,7 +82,7 @@ class RouterSuite extends munit.FunSuite:
     )
 
     val router  = Router(Seq(route))
-    val request = Request.GET("/something?queryname=123")
+    val request = Request.GET("/something").withQueryParam("queryname", "123")
     val matched = router.matchMethodAndPath(request)
 
     assert(matched.isDefined)
@@ -101,17 +101,24 @@ class RouterSuite extends munit.FunSuite:
         val paramValue =
           request.pathParams("paramname").headOption.getOrElse("")
 
-        val queryValue = request.query.get("queryname").flatMap(_.headOption).getOrElse("")
-        val username   = request.form.get("username").flatMap(_.headOption).getOrElse("")
-        val password   = request.form.get("password").flatMap(_.headOption).getOrElse("")
+        val queryValue =
+          request.query.get("queryname").flatMap(_.headOption).getOrElse("")
+        val username =
+          request.form.get("username").flatMap(_.headOption).getOrElse("")
+        val password =
+          request.form.get("password").flatMap(_.headOption).getOrElse("")
         Response.Ok(paramValue + queryValue + username + password)
       }
     )
 
     val router = Router(Seq(route))
     val request =
-      Request.POST("", "/something")
-        .withHeader(Header.ContentType.name, "application/x-www-form-urlencoded")
+      Request
+        .POST("", "/something")
+        .withHeader(
+          Header.ContentType.name,
+          "application/x-www-form-urlencoded"
+        )
         .withQueryParam("queryname", "123")
         .withFormParam("username", "user")
         .withFormParam("password", "123")

@@ -10,7 +10,6 @@ case class Cookie(
   value: String,
   path: Option[String] = None,
   secure: Option[Boolean] = None,
-  version: Option[Int] = None,
   domain: Option[String] = None,
   comment: Option[String] = None,
   maxAge: Option[Long] = None,
