@@ -61,6 +61,9 @@ object Response:
   def BadRequest: Response =
     Response(Status.BadRequest, Map.empty, "")
 
+  def BadRequest[R](entity: R)(using enc: EntityEncoder[R]): Response =
+    Response(Status.BadRequest, Map.empty, entity)
+
   def Found(location: String): Response =
     Response(Status.Found, Map(Header.Location.name -> Seq(location)), "")
 

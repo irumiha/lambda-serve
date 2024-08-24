@@ -19,7 +19,7 @@ trait Server[S, H]:
    *                    compressed request and response bodies.
    * @param limitRequestSize The uncompressed request size limit.
    * @param limitResponseSize The uncompressed response size limit.
-   * @param useVirtualTheads Run handler functions on virtual threads.
+   * @param useVirtualThreads Run handler functions on virtual threads.
    * @return
    */
   def makeServer(
@@ -32,7 +32,7 @@ trait Server[S, H]:
     gzipSupport: Boolean,
     limitRequestSize: Long,
     limitResponseSize: Long,
-    useVirtualTheads: Boolean,
+    useVirtualThreads: Boolean,
   ): S
 
   /**

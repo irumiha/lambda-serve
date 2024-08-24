@@ -23,7 +23,7 @@ object Jetty extends Server[jetty.Server, jetty.Handler]:
     // limit to 10MB uncompressed request size by default. Put in -1 for unlimited
     limitRequestSize: Long = 1024 * 1024 * 10,
     // limit to 100MB uncompressed response size by default. Put in -1 for unlimited
-    limitResponsetSize: Long = 1024 * 1024 * 100,
+    limitResponseSize: Long = 1024 * 1024 * 100,
     useVirtualThreads: Boolean = false
   ): jetty.Server =
     val threadPool = QueuedThreadPool()
@@ -68,7 +68,7 @@ object Jetty extends Server[jetty.Server, jetty.Handler]:
         lambdaHandler
 
     val requestSizeLimitHandler =
-      SizeLimitHandler(limitRequestSize, limitResponsetSize)
+      SizeLimitHandler(limitRequestSize, limitResponseSize)
 
     val finalHandler = if gzipSupport then
       requestSizeLimitHandler.setHandler(requestProcessingHandler)

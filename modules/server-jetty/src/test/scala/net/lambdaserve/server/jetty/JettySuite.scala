@@ -26,7 +26,7 @@ class JettySuite extends FunSuite:
       None,
       gzipSupport = true,
       limitRequestSize = 1024 * 1024 * 10,
-      limitResponsetSize = 1024 * 1024 * 100,
+      limitResponseSize = 1024 * 1024 * 100,
       useVirtualThreads = false
       )
 
