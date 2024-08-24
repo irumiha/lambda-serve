@@ -1,9 +1,19 @@
 package net.lambdaserve.core.filters
 
 import net.lambdaserve.core.http.{Request, Response}
+import org.slf4j.LoggerFactory
 
 final class FilterEngine(filters: IndexedSeq[Filter]):
+  private val logger = LoggerFactory.getLogger(classOf[FilterEngine])
+
+  logger.info(s"Filter engine initialized with filters: $filters")
+
   private[lambdaserve] def processRequest(request: Request): Response =
+    val validFilters =
+      filters
+        .filter(_.includePrefixes.exists(prefix => request.path.startsWith(prefix)))
+        .filterNot(_.excludePrefixes.exists(prefix => request.path.startsWith(prefix)))
+
     var progressing               = true
     var currentRequest            = request
     var currentResponse: Response = null
@@ -11,7 +21,7 @@ final class FilterEngine(filters: IndexedSeq[Filter]):
     var wrappers = Vector[Response => FilterOutResponse]()
 
     var i = 0
-    while progressing && i < filters.length do
+    while progressing && i < validFilters.length do
       filters(i).handle(currentRequest) match
         case FilterInResponse.Continue(request) =>
           currentRequest = request

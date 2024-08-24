@@ -15,7 +15,8 @@ case class Request(
   cookies: Map[String, Cookie] = Map.empty,
   form: Map[String, IndexedSeq[String]] = Map.empty,
   multipartForm: Seq[MultiPart] = Seq.empty,
-  requestContent: InputStream = InputStream.nullInputStream()
+  requestContent: InputStream = InputStream.nullInputStream(),
+  data: Map[TypedKey[_], Any] = Map.empty
 ):
   lazy val contentType: Option[String] =
     headers.get(Header.ContentType.name).flatMap(_.headOption)

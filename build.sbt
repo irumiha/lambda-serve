@@ -2,7 +2,10 @@ ThisBuild / version      := "0.1.0-SNAPSHOT"
 ThisBuild / scalaVersion := "3.3.3"
 ThisBuild / organization := "net.lambdaserve"
 
-val commonDeps = Seq("org.scalameta" %% "munit" % "1.0.0" % Test)
+val commonDeps = Seq(
+  "org.slf4j" % "slf4j-api" % "2.0.13",
+  "org.scalameta" %% "munit" % "1.0.0" % Test
+  )
 
 lazy val core = (project in file("modules/core"))
   .settings(name := "lambdaserve-core", libraryDependencies ++= commonDeps)
@@ -19,9 +22,18 @@ lazy val jsonJsoniter = (project in file("modules/json-jsoniter"))
   .settings(
     name := "lambdaserve-json-jsoniter",
     libraryDependencies ++= commonDeps ++ Seq(
-      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.30.7",
-      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.30.7" % "provided"
+      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.30.8",
+      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.30.8" % "provided"
       )
+  )
+  .dependsOn(core)
+
+lazy val jwt = (project in file("modules/jwt"))
+  .settings(
+    name := "lambdaserve-jwt",
+    libraryDependencies ++= commonDeps ++ Seq(
+      "org.bitbucket.b_c" % "jose4j" % "0.9.6"
+    )
   )
   .dependsOn(core)
 
@@ -48,6 +60,13 @@ lazy val requestmapped = (project in file("modules/requestmapped"))
   )
   .dependsOn(core, mapextract)
 
+lazy val filters = (project in file("modules/filters"))
+  .settings(
+    name := "lambdaserve-filters",
+    libraryDependencies ++= commonDeps
+  )
+  .dependsOn(core, jwt)
+
 lazy val serverJetty = (project in file("modules/server-jetty"))
   .settings(
     name := "lambdaserve-server-jetty",
@@ -68,7 +87,8 @@ lazy val all = (project in file("modules/all"))
     mapextract,
     requestmapped,
     viewsTyrian,
-    viewsScalatags
+    viewsScalatags,
+    filters
   )
 
 lazy val example = (project in file("modules/example"))
@@ -99,5 +119,6 @@ lazy val `lambda-serve` = (project in file("."))
     mapextract,
     requestmapped,
     viewsScalatags,
-    viewsTyrian
+    viewsTyrian,
+    filters
   )
