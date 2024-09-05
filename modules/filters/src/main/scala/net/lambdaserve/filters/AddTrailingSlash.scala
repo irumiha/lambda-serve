@@ -9,7 +9,7 @@ import net.lambdaserve.core.http.Request
   * beginning of the filter chain.
   *
   * Don't use together with the RemoveTrailingSlash filter if you don't want to
-  * confuse yourself.
+  * confuse yourself even further.
   */
 class AddTrailingSlash extends Filter:
   override val includePrefixes: List[String] = List("")

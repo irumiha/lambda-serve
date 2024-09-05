@@ -22,19 +22,19 @@ object Cookies:
       name = cookie.getName,
       value = cookie.getValue,
       path = Option(cookie.getPath),
-      secure = Option(cookie.isSecure),
+      secure = cookie.isSecure,
       domain = Option(cookie.getDomain),
       comment = Option(cookie.getComment),
       maxAge = Option(cookie.getMaxAge),
       expires = Option(cookie.getExpires),
-      httpOnly = Option(cookie.isHttpOnly),
-      partitioned = Option(cookie.isHttpOnly)
+      httpOnly = cookie.isHttpOnly,
+      partitioned = cookie.isHttpOnly
     )
 
   def toJettyCookie(source: Cookie): HttpCookie =
     val builder = HttpCookie.build(source.name, source.value, 1)
     source.path.foreach(builder.path)
-    source.secure.foreach(builder.secure)
+    builder.secure(source.secure)
     source.sameSite.foreach(ss =>
       builder.sameSite(HttpCookie.SameSite.from(ss.toString))
     )
@@ -42,6 +42,6 @@ object Cookies:
     source.comment.foreach(builder.comment)
     source.maxAge.foreach(builder.maxAge)
     source.expires.foreach(builder.expires)
-    source.httpOnly.foreach(builder.httpOnly)
-    source.partitioned.foreach(builder.partitioned)
+    builder.httpOnly(source.httpOnly)
+    builder.partitioned(source.partitioned)
     builder.build()

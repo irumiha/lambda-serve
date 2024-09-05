@@ -36,9 +36,6 @@ class HouseController:
     Response.Ok(s"House with id ${cmd.id}")
 
   def houseUI(req: Request): Response =
-    val expiresFormatter = DateTimeFormatter.RFC_1123_DATE_TIME
-      .withZone(ZoneOffset.UTC)
-
     Response
       .Ok(
         html(
@@ -47,18 +44,9 @@ class HouseController:
         )
       )
       .withCookie(
-        Cookie(
-          "mycookie",
-          "myvalue",
-          // expires = Some(Instant.now().plusSeconds(3600)),
-          maxAge = Some(7200),
-          httpOnly = Some(true)
-        )
+        Cookie("mycookie", "myvalue", maxAge = Some(7200), httpOnly = true)
       )
-      .addHeader(
-        "Expires",
-        expiresFormatter.format(Instant.now().plusSeconds(3600))
-      )
+      .addHeader("Server", "Lambdaserve")
 
   val router: Router =
     import Method.*
