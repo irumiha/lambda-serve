@@ -8,7 +8,7 @@ import net.lambdaserve.core.http.Response.Ok
 import net.lambdaserve.core.{Route, Router}
 import org.eclipse.jetty.server.{Server, ServerConnector}
 
-class JettySuite extends FunSuite:
+class JettyServerSuite extends FunSuite:
 
   val testRouter: Router = Router(
     List(Route(GET, "/test".r, req => Ok("test")))
@@ -17,7 +17,7 @@ class JettySuite extends FunSuite:
     FilterInResponse.Continue(request)
 
   test("makeServer should create and start the server") {
-    val server = Jetty.makeServer(
+    val server = Server.makeServer(
       "localhost",
       0,
       testRouter,
@@ -35,9 +35,9 @@ class JettySuite extends FunSuite:
   }
 
   test("addToConfiguredServer should configure and start the server") {
-    val server = Jetty.addToConfiguredServer(testRouter, IndexedSeq(testFilter)) { handler =>
+    val server = Server.addToConfiguredServer(testRouter, IndexedSeq(testFilter)) { handler =>
       assert(handler != null)
-      val server = Server()
+      val server = JettyServer()
       val connector = ServerConnector(server)
 
       connector.setHost("localhost")

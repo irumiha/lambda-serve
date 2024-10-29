@@ -1,7 +1,7 @@
 package net.lambdaserve.server.jetty
 
 import net.lambdaserve.core.filters.{Filter, FilterEngine, RouteHandlerFilter}
-import net.lambdaserve.core.{Router, Server}
+import net.lambdaserve.core
 import org.eclipse.jetty.server as jetty
 import org.eclipse.jetty.server.SizeLimitHandler
 import org.eclipse.jetty.server.handler.{ContextHandler, ContextHandlerCollection, ResourceHandler}
@@ -11,11 +11,11 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool
 
 import java.util.concurrent.Executors
 
-object Jetty extends Server[jetty.Server, jetty.Handler]:
+object JettyServer extends core.Server[jetty.Server, jetty.Handler]:
   def makeServer(
     host: String,
     port: Int,
-    router: Router,
+    router: core.Router,
     filters: IndexedSeq[Filter] = IndexedSeq(),
     staticPaths: List[String] = List.empty,
     staticPrefix: Option[String] = None,
@@ -88,7 +88,7 @@ object Jetty extends Server[jetty.Server, jetty.Handler]:
     server
 
   override def addToConfiguredServer(
-    router: Router,
+    router: core.Router,
     filters: IndexedSeq[Filter]
   )(serverConfigurer: jetty.Handler => jetty.Server): jetty.Server =
     val lambdaHandler = HttpHandler(

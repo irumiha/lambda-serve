@@ -17,9 +17,9 @@ trait Server[S, H]:
    * @param staticPrefix The URL prefix to serve the static assets from.
    * @param gzipSupport Whether to turn on support for decompressing the
    *                    compressed request and response bodies.
-   * @param limitRequestSize The uncompressed request size limit.
    * @param limitResponseSize The uncompressed response size limit.
-   * @param useVirtualThreads Run handler functions on virtual threads.
+   * @param limitRequestSize The uncompressed request size limit. -1 for unlimited.
+   * @param useVirtualThreads Run handler functions on virtual threads. -1 for unlimited.
    * @return
    */
   def makeServer(

@@ -49,4 +49,5 @@ build/
 .bloop/
 .metals/
 .ammonite/
+.scala-build
 metals.sbt
