@@ -10,6 +10,7 @@ import org.eclipse.jetty.util.resource.ResourceFactory
 import org.eclipse.jetty.util.thread.QueuedThreadPool
 
 import java.util.concurrent.Executors
+import scala.jdk.CollectionConverters.*
 
 object JettyServer extends core.Server[jetty.Server, jetty.Handler]:
   def makeServer(
@@ -56,7 +57,11 @@ object JettyServer extends core.Server[jetty.Server, jetty.Handler]:
               .newClassLoaderResource(sp.replaceAll("classpath:", ""))
           else ResourceFactory.of(resourceHandler).newResource(sp)
         }
-        val resources = ResourceFactory.combine(resourcesFromPaths*)
+        staticPaths.zip(resourcesFromPaths).foreach { case (sp, rp) =>
+          if rp == null then
+            throw new RuntimeException(s"Could not find static path: $sp")
+        }
+        val resources = ResourceFactory.combine(resourcesFromPaths.toArray*)
         resourceHandler.setBaseResource(resources)
         val contextHandlerCollection = ContextHandlerCollection()
 

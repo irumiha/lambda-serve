@@ -17,12 +17,12 @@ class JettyServerSuite extends FunSuite:
     FilterInResponse.Continue(request)
 
   test("makeServer should create and start the server") {
-    val server = Server.makeServer(
+    val server = JettyServer.makeServer(
       "localhost",
       0,
       testRouter,
       IndexedSeq(testFilter),
-      List(),
+      List.empty,
       None,
       gzipSupport = true,
       limitRequestSize = 1024 * 1024 * 10,
@@ -35,9 +35,9 @@ class JettyServerSuite extends FunSuite:
   }
 
   test("addToConfiguredServer should configure and start the server") {
-    val server = Server.addToConfiguredServer(testRouter, IndexedSeq(testFilter)) { handler =>
+    val server = JettyServer.addToConfiguredServer(testRouter, IndexedSeq(testFilter)) { handler =>
       assert(handler != null)
-      val server = JettyServer()
+      val server = Server()
       val connector = ServerConnector(server)
 
       connector.setHost("localhost")
