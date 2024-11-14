@@ -14,7 +14,7 @@ lazy val mapextract = (project in file("modules/mapextract"))
   .settings(
     name := "lambdaserve-mapextract",
     libraryDependencies ++= commonDeps ++ Seq(
-      "com.softwaremill.magnolia1_3" %% "magnolia" % "1.3.7"
+      "com.softwaremill.magnolia1_3" %% "magnolia" % "1.3.8"
     )
   )
 
@@ -22,8 +22,8 @@ lazy val jsonJsoniter = (project in file("modules/json-jsoniter"))
   .settings(
     name := "lambdaserve-json-jsoniter",
     libraryDependencies ++= commonDeps ++ Seq(
-      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.31.1",
-      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.31.1" % "provided"
+      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.31.3",
+      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.31.3" % "provided"
       )
   )
   .dependsOn(core)
@@ -71,7 +71,7 @@ lazy val serverJetty = (project in file("modules/server-jetty"))
   .settings(
     name := "lambdaserve-server-jetty",
     libraryDependencies ++= commonDeps ++ Seq(
-      "org.eclipse.jetty" % "jetty-server" % "12.0.14"
+      "org.eclipse.jetty" % "jetty-server" % "12.0.15"
     )
   )
   .dependsOn(core)
@@ -97,7 +97,7 @@ lazy val example = (project in file("modules/example"))
     name := "lambdaserve-example",
     libraryDependencies ++= Seq(
       "com.outr" %% "scribe-slf4j2" % "3.15.2",
-      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.31.1" % "provided"
+      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.31.3" % "provided"
       )
   )
   .dependsOn(
