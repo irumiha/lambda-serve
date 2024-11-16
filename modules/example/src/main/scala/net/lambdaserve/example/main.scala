@@ -2,9 +2,8 @@ package net.lambdaserve.example
 
 import com.github.plokhotnyuk.jsoniter_scala.core.JsonValueCodec
 import com.github.plokhotnyuk.jsoniter_scala.macros.JsonCodecMaker
-import net.lambdaserve.core.Router
-import net.lambdaserve.core.http.*
-import net.lambdaserve.core.http.Method
+import net.lambdaserve.Router
+import net.lambdaserve.http.*
 import net.lambdaserve.json.jsoniter.JsoniterCodec.given
 import net.lambdaserve.mapextract.{MapExtract, SourceName}
 import net.lambdaserve.requestmapped.mapped

@@ -1,8 +1,7 @@
-package net.lambdaserve.core.http
+package net.lambdaserve.http
 
-import net.lambdaserve.core.codec.EntityEncoder
-import net.lambdaserve.core.http.Header.ContentType
-import net.lambdaserve.core.http.{Header, Status}
+import net.lambdaserve.codec.EntityEncoder
+import Header.ContentType
 
 import java.io.OutputStream
 import java.time.Instant

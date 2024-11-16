@@ -1,4 +1,4 @@
-package net.lambdaserve.core.http
+package net.lambdaserve.http
 
 class TypedKey[A]:
   def get(m: Map[TypedKey[_], Any]): Option[A] =

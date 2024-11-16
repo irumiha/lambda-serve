@@ -1,7 +1,9 @@
 package net.lambdaserve.core
 
-import net.lambdaserve.core.http.*
-import net.lambdaserve.core.http.Method.{GET, POST}
+import net.lambdaserve.{Route, Router}
+import net.lambdaserve.http.*
+import net.lambdaserve.http.Method.{GET, POST}
+import net.lambdaserve.http.{Header, Request, Response}
 
 import java.io.ByteArrayOutputStream
 

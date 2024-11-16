@@ -1,6 +1,6 @@
-package net.lambdaserve.core
+package net.lambdaserve
 
-import net.lambdaserve.core.http.{Request, Response}
+import net.lambdaserve.http.{Request, Response}
 
 @FunctionalInterface
 trait RouteHandler:

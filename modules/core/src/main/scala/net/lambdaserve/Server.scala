@@ -1,6 +1,6 @@
-package net.lambdaserve.core
+package net.lambdaserve
 
-import net.lambdaserve.core.filters.Filter
+import net.lambdaserve.filters.Filter
 
 trait Server[S, H]:
   /**

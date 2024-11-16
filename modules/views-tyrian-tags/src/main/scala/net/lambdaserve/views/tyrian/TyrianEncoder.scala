@@ -1,6 +1,6 @@
 package net.lambdaserve.views.tyrian
 
-import net.lambdaserve.core.codec.EntityEncoder
+import net.lambdaserve.codec.EntityEncoder
 import tyrian.Elem
 
 import java.io.OutputStream

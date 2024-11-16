@@ -1,6 +1,6 @@
 package net.lambdaserve.server.jetty
 
-import net.lambdaserve.core.http.Cookie
+import net.lambdaserve.http.Cookie
 import org.eclipse.jetty.http.HttpCookie
 import org.eclipse.jetty.server.Request
 

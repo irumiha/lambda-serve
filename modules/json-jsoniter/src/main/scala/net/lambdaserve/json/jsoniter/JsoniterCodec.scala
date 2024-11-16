@@ -1,7 +1,7 @@
 package net.lambdaserve.json.jsoniter
 import com.github.plokhotnyuk.jsoniter_scala.core.{JsonValueCodec, readFromStream, writeToStream}
-import net.lambdaserve.core.codec.{EntityDecoder, EntityEncoder}
-import net.lambdaserve.core.http.Request
+import net.lambdaserve.codec.{EntityDecoder, EntityEncoder}
+import net.lambdaserve.http.Request
 import java.io.OutputStream
 
 object JsoniterCodec:

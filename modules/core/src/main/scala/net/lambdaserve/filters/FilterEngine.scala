@@ -1,6 +1,6 @@
-package net.lambdaserve.core.filters
+package net.lambdaserve.filters
 
-import net.lambdaserve.core.http.{Request, Response}
+import net.lambdaserve.http.{Request, Response}
 import org.slf4j.LoggerFactory
 
 final class FilterEngine(filters: IndexedSeq[Filter]):

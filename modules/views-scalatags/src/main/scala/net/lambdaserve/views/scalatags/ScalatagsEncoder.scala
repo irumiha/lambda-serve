@@ -1,5 +1,6 @@
 package net.lambdaserve.views.scalatags
-import net.lambdaserve.core.codec.EntityEncoder
+
+import net.lambdaserve.codec.EntityEncoder
 import scalatags.text.Frag
 
 import java.io.OutputStream

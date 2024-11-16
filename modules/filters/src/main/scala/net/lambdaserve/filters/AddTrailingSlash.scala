@@ -1,8 +1,7 @@
 package net.lambdaserve.filters
 
-import net.lambdaserve.core.filters.FilterInResponse.Continue
-import net.lambdaserve.core.filters.{Filter, FilterInResponse}
-import net.lambdaserve.core.http.Request
+import FilterInResponse.Continue
+import net.lambdaserve.http.Request
 
 /** Adds a trailing slash if the path does not end in one. Allows for simpler
   * path handling, but it can be confusing so use with care. Put it at the

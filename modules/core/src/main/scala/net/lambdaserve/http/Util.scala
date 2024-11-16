@@ -1,4 +1,4 @@
-package net.lambdaserve.core.http
+package net.lambdaserve.http
 
 enum Method:
   case GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS, TRACE, CONNECT

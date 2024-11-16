@@ -1,7 +1,6 @@
 package net.lambdaserve.filters
 
-import net.lambdaserve.core.filters.*
-import net.lambdaserve.core.http.{Request, TypedKey}
+import net.lambdaserve.http.{Request, TypedKey}
 import net.lambdaserve.jwt.{Jwt, JwtUtil}
 import org.slf4j.LoggerFactory
 

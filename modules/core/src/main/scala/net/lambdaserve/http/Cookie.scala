@@ -1,4 +1,4 @@
-package net.lambdaserve.core.http
+package net.lambdaserve.http
 
 import java.time.Instant
 

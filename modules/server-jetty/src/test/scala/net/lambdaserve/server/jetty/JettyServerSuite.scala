@@ -1,11 +1,11 @@
 package net.lambdaserve.server.jetty
 
 import munit.FunSuite
-import net.lambdaserve.core.filters.{Filter, FilterInResponse}
-import net.lambdaserve.core.http.Method.GET
-import net.lambdaserve.core.http.Request
-import net.lambdaserve.core.http.Response.Ok
-import net.lambdaserve.core.{Route, Router}
+import net.lambdaserve.{Route, Router}
+import net.lambdaserve.http.Method.GET
+import net.lambdaserve.http.Response.Ok
+import net.lambdaserve.filters.{Filter, FilterInResponse}
+import net.lambdaserve.http.Request
 import org.eclipse.jetty.server.{Server, ServerConnector}
 
 class JettyServerSuite extends FunSuite:

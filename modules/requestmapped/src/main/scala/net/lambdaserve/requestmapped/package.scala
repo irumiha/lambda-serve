@@ -1,7 +1,7 @@
 package net.lambdaserve.requestmapped
 
-import net.lambdaserve.core.codec.EntityDecoder
-import net.lambdaserve.core.http.{Request, Response}
+import net.lambdaserve.codec.EntityDecoder
+import net.lambdaserve.http.{Request, Response}
 import net.lambdaserve.mapextract.MapExtract
 
 trait Combined[T]:

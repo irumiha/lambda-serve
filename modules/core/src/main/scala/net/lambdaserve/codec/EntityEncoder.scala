@@ -1,4 +1,4 @@
-package net.lambdaserve.core.codec
+package net.lambdaserve.codec
 
 import java.io.OutputStream
 

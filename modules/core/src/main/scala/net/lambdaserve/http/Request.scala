@@ -1,7 +1,6 @@
-package net.lambdaserve.core.http
+package net.lambdaserve.http
 
-import net.lambdaserve.core.codec.EntityEncoder
-
+import net.lambdaserve.codec.EntityEncoder
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream}
 import scala.io.Source
 

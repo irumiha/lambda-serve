@@ -1,6 +1,6 @@
-package net.lambdaserve.core.filters
+package net.lambdaserve.filters
 
-import net.lambdaserve.core.http.Request
+import net.lambdaserve.http.Request
 
 trait Filter:
   // This default will apply the filter to all requests. Override to restrict.

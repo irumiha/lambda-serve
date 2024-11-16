@@ -1,7 +1,7 @@
 package net.lambdaserve.server.jetty
 
-import net.lambdaserve.core.filters.FilterEngine
-import net.lambdaserve.core.http.{Method, MultiPart, Request}
+import net.lambdaserve.filters.FilterEngine
+import net.lambdaserve.http.{Method, MultiPart, Request}
 import org.eclipse.jetty.io.Content
 import org.eclipse.jetty.{http as jettyHttp, server as jetty}
 import org.eclipse.jetty.util.Callback

@@ -1,6 +1,6 @@
-package net.lambdaserve.core
+package net.lambdaserve
 
-import net.lambdaserve.core.http.{Request, Method}
+import net.lambdaserve.http.{Method, Request}
 
 import scala.util.matching.Regex
 

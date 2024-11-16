@@ -1,7 +1,8 @@
-package net.lambdaserve.core.filters
-import net.lambdaserve.core.Router
-import net.lambdaserve.core.filters.FilterInResponse.Stop
-import net.lambdaserve.core.http.{Request, Response}
+package net.lambdaserve.filters
+
+import FilterInResponse.Stop
+import net.lambdaserve.Router
+import net.lambdaserve.http.{Request, Response}
 
 private [lambdaserve] class RouteHandlerFilter(router: Router) extends Filter:
   override def handle(request: Request): FilterInResponse =
