@@ -4,8 +4,8 @@
 // Create a native-image binary with:
 //  scala-cli --power package --native-image --graalvm-java-version 21 --graalvm-version 21.0.2 example.sc -o example-server
 
-import net.lambdaserve.core.*
-import net.lambdaserve.core.http.*
+import net.lambdaserve.*
+import net.lambdaserve.http.*
 import net.lambdaserve.server.jetty.JettyServer
 
 JettyServer.makeServer(
