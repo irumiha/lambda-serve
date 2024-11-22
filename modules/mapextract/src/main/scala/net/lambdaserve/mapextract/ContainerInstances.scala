@@ -48,6 +48,6 @@ trait ContainerInstances:
           it.keys.find(path => path.startsWith(prefix)) match
             case Some(prefKey) if it(prefKey).isEmpty => None
             case Some(_) => Some(sfm.projectMaps(ms, prefix, offset))
-            case _             => None
+            case _       => None
 
         }

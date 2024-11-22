@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets
 
 trait TyrianEncoder:
   private val documentPreamble: Array[Byte] = "<!DOCTYPE html>\n".getBytes()
-  val contentType = "text/html; charset=UTF-8"
+  val contentType                           = "text/html; charset=UTF-8"
 
   given tagEncoder[T <: Elem[?]]: EntityEncoder[T] with
     def bodyWriter(responseEntity: T): OutputStream => Unit =

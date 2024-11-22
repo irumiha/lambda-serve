@@ -2,7 +2,11 @@ package net.lambdaserve.jwt
 
 import org.jose4j.jwa.AlgorithmConstraints
 import org.jose4j.jwa.AlgorithmConstraints.ConstraintType
-import org.jose4j.jwe.{ContentEncryptionAlgorithmIdentifiers, JsonWebEncryption, KeyManagementAlgorithmIdentifiers}
+import org.jose4j.jwe.{
+  ContentEncryptionAlgorithmIdentifiers,
+  JsonWebEncryption,
+  KeyManagementAlgorithmIdentifiers
+}
 import org.jose4j.jwk.OctetKeyPairJsonWebKey
 import org.jose4j.jws.{AlgorithmIdentifiers, JsonWebSignature}
 import org.jose4j.jwt.JwtClaims
@@ -63,8 +67,10 @@ class JwtUtil(config: JwtConfig):
     claims: Map[String, JwtUtil.TokenClaimValue]
   ) =
     val claimsInJwt = new JwtClaims()
-    claimsInJwt.setIssuer(config.issuer)     // who creates the token and signs it
-    claimsInJwt.setAudience(audience.asJava) // to whom the token is intended to be sent
+    claimsInJwt.setIssuer(config.issuer) // who creates the token and signs it
+    claimsInJwt.setAudience(
+      audience.asJava
+    ) // to whom the token is intended to be sent
     claimsInJwt.setExpirationTimeMinutesInTheFuture(config.expirationMinutes)
     claimsInJwt.setGeneratedJwtId()
     claimsInJwt.setIssuedAtToNow()
@@ -72,7 +78,9 @@ class JwtUtil(config: JwtConfig):
     // time before which the token is not yet valid (2 minutes ago)
     claimsInJwt.setNotBeforeMinutesInThePast(config.notBeforeMinutes)
 
-    claimsInJwt.setSubject(subject) // the subject/principal is whom the token is about
+    claimsInJwt.setSubject(
+      subject
+    ) // the subject/principal is whom the token is about
 
     claims.foreach((key, value) =>
       value match
@@ -103,12 +111,13 @@ class JwtUtil(config: JwtConfig):
     val innerJwt = jws.getCompactSerialization
     innerJwt
 
-  def loadToken(
-    payload: String
-  ): Either[InvalidJwtException, Jwt] =
+  def loadToken(payload: String): Either[InvalidJwtException, Jwt] =
 
     val jwsAlgConstraints =
-      new AlgorithmConstraints(ConstraintType.PERMIT, AlgorithmIdentifiers.EDDSA)
+      new AlgorithmConstraints(
+        ConstraintType.PERMIT,
+        AlgorithmIdentifiers.EDDSA
+      )
 
     val jweAlgConstraints = new AlgorithmConstraints(
       ConstraintType.PERMIT,
@@ -123,8 +132,10 @@ class JwtUtil(config: JwtConfig):
     val jwtConsumer =
       new JwtConsumerBuilder()
         .setRequireExpirationTime() // the JWT must have an expiration time.setMaxFutureValidityInMinutes(300)
-        .setRequireSubject()                // the JWT must have a subject claim
-        .setExpectedIssuer(config.issuer)   // whom the JWT needs to have been issued by
+        .setRequireSubject() // the JWT must have a subject claim
+        .setExpectedIssuer(
+          config.issuer
+        ) // whom the JWT needs to have been issued by
         .setExpectedAudience(config.audience) // to whom the JWT is intended for
         .setDecryptionKey(
           config.encryptionJwk.getPrivateKey

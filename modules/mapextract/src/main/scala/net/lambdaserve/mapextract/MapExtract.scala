@@ -50,7 +50,8 @@ object MapExtract
         offset: Int
       ): T =
         val stringValue = extractString(ms, prefix)
-        val subtype     = ctx.subtypes.find(it => it.typeInfo.short == stringValue).get
+        val subtype =
+          ctx.subtypes.find(it => it.typeInfo.short == stringValue).get
 
         subtype.typeclass.projectMaps(ms, prefix, offset)
 

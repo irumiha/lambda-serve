@@ -70,12 +70,9 @@ enum Header(val name: String):
   case AcceptRanges   extends Header("Accept-Ranges")
   case AccessControlAllowCredentials
       extends Header("Access-Control-Allow-Credentials")
-  case AccessControlAllowHeaders
-      extends Header("Access-Control-Allow-Headers")
-  case AccessControlAllowMethods
-      extends Header("Access-Control-Allow-Methods")
-  case AccessControlAllowOrigin
-      extends Header("Access-Control-Allow-Origin")
+  case AccessControlAllowHeaders extends Header("Access-Control-Allow-Headers")
+  case AccessControlAllowMethods extends Header("Access-Control-Allow-Methods")
+  case AccessControlAllowOrigin  extends Header("Access-Control-Allow-Origin")
   case AccessControlExposeHeaders
       extends Header("Access-Control-Expose-Headers")
   case AccessControlMaxAge extends Header("Access-Control-Max-Age")

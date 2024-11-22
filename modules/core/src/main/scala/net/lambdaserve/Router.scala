@@ -19,15 +19,15 @@ final case class Router(routes: Seq[Route]):
       i += 1
 
     found
-    
+
   def findRoutesForPath(path: String): Seq[Route] =
     routes.filter(_.path.pattern.matcher(path).matches())
 
 object Router:
 
   def make(routes: ((Method, Regex), RouteHandler)*): Router =
-    Router(routes.map{
-      case ((m, r), rh) => Route(m,r,rh)
+    Router(routes.map { case ((m, r), rh) =>
+      Route(m, r, rh)
     })
 
   def combine(routerMounts: (String, Router)*): Router =

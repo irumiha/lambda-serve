@@ -31,9 +31,7 @@ class DelegatingMap private (
     else None
 
   override def iterator: Iterator[(String, IndexedSeq[String])] =
-    underlying
-      .asScala
-      .view
+    underlying.asScala.view
       .groupBy(_.getLowerCaseName)
       .view
       .mapValues(_.map(_.getValue).toIndexedSeq)

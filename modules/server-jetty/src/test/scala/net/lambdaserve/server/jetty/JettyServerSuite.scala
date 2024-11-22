@@ -12,7 +12,7 @@ class JettyServerSuite extends FunSuite:
 
   val testRouter: Router = Router(
     List(Route(GET, "/test".r, req => Ok("test")))
-    )
+  )
   val testFilter: Filter = (request: Request) =>
     FilterInResponse.Continue(request)
 
@@ -28,26 +28,32 @@ class JettyServerSuite extends FunSuite:
       limitRequestSize = 1024 * 1024 * 10,
       limitResponseSize = 1024 * 1024 * 100,
       useVirtualThreads = false
-      )
+    )
 
-    assert(server.getConnectors.collect { case s: ServerConnector => s.getLocalPort }.head > 0)
+    assert(server.getConnectors.collect { case s: ServerConnector =>
+      s.getLocalPort
+    }.head > 0)
     server.stop()
   }
 
   test("addToConfiguredServer should configure and start the server") {
-    val server = JettyServer.addToConfiguredServer(testRouter, IndexedSeq(testFilter)) { handler =>
-      assert(handler != null)
-      val server = Server()
-      val connector = ServerConnector(server)
+    val server =
+      JettyServer.addToConfiguredServer(testRouter, IndexedSeq(testFilter)) {
+        handler =>
+          assert(handler != null)
+          val server    = Server()
+          val connector = ServerConnector(server)
 
-      connector.setHost("localhost")
-      connector.setPort(0)
+          connector.setHost("localhost")
+          connector.setPort(0)
 
-      server.addConnector(connector)
-      server.setHandler(handler)
-      server
-    }
+          server.addConnector(connector)
+          server.setHandler(handler)
+          server
+      }
 
-    assert(server.getConnectors.collect { case s: ServerConnector => s.getLocalPort }.head > 0)
+    assert(server.getConnectors.collect { case s: ServerConnector =>
+      s.getLocalPort
+    }.head > 0)
     server.stop()
   }

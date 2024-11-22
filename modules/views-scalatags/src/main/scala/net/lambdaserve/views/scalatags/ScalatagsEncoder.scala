@@ -7,7 +7,7 @@ import java.io.OutputStream
 
 trait ScalatagsEncoder:
   private val documentPreamble: Array[Byte] = "<!DOCTYPE html>\n".getBytes()
-  val contentType = "text/html; charset=UTF-8"
+  val contentType                           = "text/html; charset=UTF-8"
 
   given tagEncoder[T <: Frag]: EntityEncoder[T] with
     def bodyWriter(responseEntity: T): OutputStream => Unit =

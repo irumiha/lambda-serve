@@ -71,5 +71,5 @@ class MapExtractTest extends FunSuite:
     assert(mapped.points == List(12, 44, 52))
     assert(mapped.bornIn == Months.Oct)
     assert(mapped.pet == List(Pet("Max", "Dog"), Pet("Milly", "Cat")))
-    
+
 end MapExtractTest

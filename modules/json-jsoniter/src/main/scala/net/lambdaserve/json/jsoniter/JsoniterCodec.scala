@@ -1,5 +1,9 @@
 package net.lambdaserve.json.jsoniter
-import com.github.plokhotnyuk.jsoniter_scala.core.{JsonValueCodec, readFromStream, writeToStream}
+import com.github.plokhotnyuk.jsoniter_scala.core.{
+  JsonValueCodec,
+  readFromStream,
+  writeToStream
+}
 import net.lambdaserve.codec.{EntityDecoder, EntityEncoder}
 import net.lambdaserve.http.Request
 import java.io.OutputStream
@@ -12,4 +16,5 @@ object JsoniterCodec:
     override val contentTypeHeader: String = "application/json"
 
   given [R](using c: JsonValueCodec[R]): EntityDecoder[R] with
-    def readBody(request: Request): R = readFromStream[R](request.requestContent)
+    def readBody(request: Request): R =
+      readFromStream[R](request.requestContent)

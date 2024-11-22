@@ -11,8 +11,12 @@ final class FilterEngine(filters: IndexedSeq[Filter]):
   private[lambdaserve] def processRequest(request: Request): Response =
     val validFilters =
       filters
-        .filter(_.includePrefixes.exists(prefix => request.path.startsWith(prefix)))
-        .filterNot(_.excludePrefixes.exists(prefix => request.path.startsWith(prefix)))
+        .filter(
+          _.includePrefixes.exists(prefix => request.path.startsWith(prefix))
+        )
+        .filterNot(
+          _.excludePrefixes.exists(prefix => request.path.startsWith(prefix))
+        )
 
     var progressing               = true
     var currentRequest            = request
