@@ -87,7 +87,8 @@ object JettyServer extends Server[jetty.Server, jetty.Handler]:
 
       val gzipHandler = GzipHandler(requestSizeLimitHandler)
       gzipHandler.setMinGzipSize(1024)
-      gzipHandler.addIncludedMethods("POST")
+      gzipHandler.setInflateBufferSize(2048)
+      gzipHandler.addIncludedMethods("GET", "POST")
       gzipHandler
     else
       requestSizeLimitHandler.setHandler(requestProcessingHandler)
