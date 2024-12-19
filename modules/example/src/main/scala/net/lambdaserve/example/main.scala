@@ -50,8 +50,8 @@ class HouseController:
   val router: Router =
     import Method.*
     Router.make(
-      POST -> "/".r            -> doWithHouse.mapped,
-      GET  -> "/(?<id>\\w+)".r -> getHouse.mapped,
+      POST -> "/".r            -> mapped(doWithHouse),
+      GET  -> "/(?<id>\\w+)".r -> mapped(getHouse),
       GET  -> "/house-ui".r    -> houseUI
     )
 end HouseController
@@ -80,9 +80,8 @@ end HouseController
         val name = request.pathParams.get("thisname").flatMap(_.headOption)
         Response.Ok(Message(name.getOrElse("Unknown"), LocalDateTime.now()))
       },
-      POST -> "/requestmapped".r -> { (command: JsonCommand) =>
+      POST -> "/requestmapped".r -> mapped: (command: JsonCommand) =>
         Response.Ok(Message(command.name, LocalDateTime.now()))
-      }.mapped
     )
 
   val router =

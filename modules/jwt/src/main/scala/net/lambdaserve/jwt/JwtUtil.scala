@@ -169,20 +169,20 @@ object JwtUtil:
 
   def main(args: Array[String]): Unit =
     val config = JwtConfig(
-      Jwk.generateSigningJWK(),
-      Jwk.generateEncryptionJWK(),
-      "https://example.com",
-      "https://example.com",
-      5,
-      2
+      signingJwk = Jwk.generateSigningJWK(),
+      encryptionJwk = Jwk.generateEncryptionJWK(),
+      issuer = "https://example.com",
+      audience = "https://example.com",
+      expirationMinutes = 5,
+      notBeforeMinutes = 2
     )
     val jwt = JwtUtil(config)
     val token = jwt.createToken(
-      "subject",
-      List("https://example.com"),
-      Map(
-        "key"     -> "value",
-        "groups"  -> List("group1", "group2"),
+      subject = "subject",
+      audience = List("https://example.com"),
+      claims = Map(
+        "key" -> "value",
+        "groups" -> List("group1", "group2"),
         "address" -> Map("street" -> "str1", "city" -> "city1")
       )
     )

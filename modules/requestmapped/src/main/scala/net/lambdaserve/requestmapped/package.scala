@@ -19,36 +19,40 @@ object Combined:
       Seq(request.pathParams, request.query, request.form, request.headers)
     )
 
-extension [T](handler: T => Response)(using m: Combined[T])
-  inline def mapped(request: Request): Response =
-    handler(m.mapValues(request))
+def mapped[T](handler: T => Response)(using
+  m: Combined[T]
+): Request => Response =
+  request => handler(m.mapValues(request))
 
-extension [T](handler: (T, Request) => Response)(using m: Combined[T])
-  inline def mapped(request: Request): Response =
-    handler(m.mapValues(request), request)
+def mapped[T](handler: (T, Request) => Response)(using
+  m: Combined[T]
+): Request => Response =
+  request => handler(m.mapValues(request), request)
 
-extension [T1, T2](
+def mapped[T1, T2](
   handler: (T1, T2) => Response
-)(using m1: Combined[T1], m2: Combined[T2])
-  inline def mapped(request: Request): Response =
-    handler(m1.mapValues(request), m2.mapValues(request))
+)(using m1: Combined[T1], m2: Combined[T2]): Request => Response =
+  request => handler(m1.mapValues(request), m2.mapValues(request))
 
-extension [T1, T2](
+def mapped[T1, T2](
   handler: (T1, T2, Request) => Response
-)(using m1: Combined[T1], m2: Combined[T2])
-  inline def mapped(request: Request): Response =
-    handler(m1.mapValues(request), m2.mapValues(request), request)
+)(using m1: Combined[T1], m2: Combined[T2]): Request => Response =
+  request => handler(m1.mapValues(request), m2.mapValues(request), request)
 
-extension [T1, T2, T3](
-  handler: (T1, T2, T3) => Response
-)(using m1: Combined[T1], m2: Combined[T2], m3: Combined[T3])
-  inline def mapped(request: Request): Response =
+def mapped[T1, T2, T3](handler: (T1, T2, T3) => Response)(using
+  m1: Combined[T1],
+  m2: Combined[T2],
+  m3: Combined[T3]
+): Request => Response =
+  request =>
     handler(m1.mapValues(request), m2.mapValues(request), m3.mapValues(request))
 
-extension [T1, T2, T3](
-  handler: (T1, T2, T3, Request) => Response
-)(using m1: Combined[T1], m2: Combined[T2], m3: Combined[T3])
-  inline def mapped(request: Request): Response =
+def mapped[T1, T2, T3](handler: (T1, T2, T3, Request) => Response)(using
+  m1: Combined[T1],
+  m2: Combined[T2],
+  m3: Combined[T3]
+): Request => Response =
+  request =>
     handler(
       m1.mapValues(request),
       m2.mapValues(request),
@@ -56,10 +60,13 @@ extension [T1, T2, T3](
       request
     )
 
-extension [T1, T2, T3, T4](
-  handler: (T1, T2, T3, T4) => Response
-)(using m1: Combined[T1], m2: Combined[T2], m3: Combined[T3], m4: Combined[T4])
-  inline def mapped(request: Request): Response =
+def mapped[T1, T2, T3, T4](handler: (T1, T2, T3, T4) => Response)(using
+  m1: Combined[T1],
+  m2: Combined[T2],
+  m3: Combined[T3],
+  m4: Combined[T4]
+): Request => Response =
+  request =>
     handler(
       m1.mapValues(request),
       m2.mapValues(request),
@@ -67,10 +74,13 @@ extension [T1, T2, T3, T4](
       m4.mapValues(request)
     )
 
-extension [T1, T2, T3, T4](
-  handler: (T1, T2, T3, T4, Request) => Response
-)(using m1: Combined[T1], m2: Combined[T2], m3: Combined[T3], m4: Combined[T4])
-  inline def mapped(request: Request): Response =
+def mapped[T1, T2, T3, T4](handler: (T1, T2, T3, T4, Request) => Response)(using
+  m1: Combined[T1],
+  m2: Combined[T2],
+  m3: Combined[T3],
+  m4: Combined[T4]
+): Request => Response =
+  request =>
     handler(
       m1.mapValues(request),
       m2.mapValues(request),

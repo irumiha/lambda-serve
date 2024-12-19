@@ -65,7 +65,7 @@ class RouterSuite extends munit.FunSuite:
     assert(matched.isDefined)
     val baos                      = ByteArrayOutputStream()
     val (matchedRequest, handler) = matched.get
-    handler.handle(matchedRequest).bodyWriter(baos)
+    handler(matchedRequest).bodyWriter(baos)
     val out = baos.toString()
     assert(out == "something")
   }
@@ -90,7 +90,7 @@ class RouterSuite extends munit.FunSuite:
     assert(matched.isDefined)
     val baos                      = ByteArrayOutputStream()
     val (matchedRequest, handler) = matched.get
-    handler.handle(matchedRequest).bodyWriter(baos)
+    handler(matchedRequest).bodyWriter(baos)
     val out = baos.toString()
     assert(out == "something123")
   }
@@ -130,7 +130,7 @@ class RouterSuite extends munit.FunSuite:
     assert(matched.isDefined)
     val baos                      = ByteArrayOutputStream()
     val (matchedRequest, handler) = matched.get
-    handler.handle(matchedRequest).bodyWriter(baos)
+    handler(matchedRequest).bodyWriter(baos)
     val out = baos.toString()
     assertEquals(out, "something123user123")
   }
