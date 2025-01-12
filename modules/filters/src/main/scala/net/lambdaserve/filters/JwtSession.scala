@@ -43,4 +43,4 @@ class JwtSession(config: JwtSessionFilterConfig, jwtUtil: JwtUtil)
 end JwtSession
 
 object JwtSession:
-  val JwtKey: TypedKey[Jwt] = TypedKey[Jwt]()
+  val JwtKey = TypedKey[Jwt]()
