@@ -3,7 +3,7 @@ package net.lambdaserve.server.jetty
 import net.lambdaserve.{Router, Server}
 import net.lambdaserve.filters.{Filter, FilterEngine, RouteHandlerFilter}
 import org.eclipse.jetty.server as jetty
-import org.eclipse.jetty.server.SizeLimitHandler
+import org.eclipse.jetty.server.handler.SizeLimitHandler
 import org.eclipse.jetty.server.handler.{
   ContextHandler,
   ContextHandlerCollection,
