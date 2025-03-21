@@ -67,4 +67,4 @@ object Response:
     Response(Status.Found, Map(Header.Location.name -> Seq(location)), "")
 
   def SeeOther(location: String): Response =
-    Response(Status.SeeOther, Map("Location" -> Seq(location)), "")
+    Response(Status.SeeOther, Map(Header.Location.name -> Seq(location)), "")
