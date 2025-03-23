@@ -1,6 +1,7 @@
 package net.lambdaserve.filters
 
-import net.lambdaserve.http.{Request, TypedKey}
+import net.lambdaserve.TypedKey
+import net.lambdaserve.http.Request
 import net.lambdaserve.jwt.{Jwt, JwtUtil}
 import org.slf4j.LoggerFactory
 
@@ -34,7 +35,7 @@ class JwtSession(config: JwtSessionFilterConfig, jwtUtil: JwtUtil)
     jwt match
       case Some(jwt) =>
         FilterInResponse.Continue(
-          request.copy(data = JwtSession.JwtKey.set(request.data, jwt))
+          request.copy(data = request.data.set(JwtSession, jwt))
         )
       case None =>
         FilterInResponse.Continue(request)
@@ -42,5 +43,4 @@ class JwtSession(config: JwtSessionFilterConfig, jwtUtil: JwtUtil)
 
 end JwtSession
 
-object JwtSession:
-  val JwtKey = TypedKey[Jwt]()
+object JwtSession extends TypedKey[Jwt]

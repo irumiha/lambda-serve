@@ -1,6 +1,8 @@
 package net.lambdaserve.http
 
+import net.lambdaserve.{TypedKey, TypedMap}
 import net.lambdaserve.codec.EntityEncoder
+
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream}
 import scala.io.Source
 
@@ -15,7 +17,7 @@ case class Request(
   form: Map[String, IndexedSeq[String]] = Map.empty,
   multipartForm: Seq[MultiPart] = Seq.empty,
   requestContent: InputStream = InputStream.nullInputStream(),
-  data: Map[TypedKey[_], Any] = Map.empty
+  data: TypedMap = TypedMap()
 ):
   lazy val contentType: Option[String] =
     headers.get(Header.ContentType.name).flatMap(_.headOption)
