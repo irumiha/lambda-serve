@@ -181,8 +181,8 @@ object JwtUtil:
       subject = "subject",
       audience = List("https://example.com"),
       claims = Map(
-        "key" -> "value",
-        "groups" -> List("group1", "group2"),
+        "key"     -> "value",
+        "groups"  -> List("group1", "group2"),
         "address" -> Map("street" -> "str1", "city" -> "city1")
       )
     )

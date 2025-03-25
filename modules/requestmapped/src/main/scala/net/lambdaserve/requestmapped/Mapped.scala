@@ -12,6 +12,7 @@ type MappedHandler[T] = Request ?=> Combined[T] ?=> T => Response
     @SourceName("User-Agent") userAgent: String
   ) derives MapExtract
 
-  val homeHandler: Request ?=> HouseCommand => Response = (param: HouseCommand) =>
+  val homeHandler: Request ?=> HouseCommand => Response =
+    (param: HouseCommand) =>
       val r = summon[Request]
       Response.Ok(s"Here we go, with headers: ${r.headers}!")

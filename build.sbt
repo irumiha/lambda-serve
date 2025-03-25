@@ -2,9 +2,10 @@ ThisBuild / version      := "0.1.0-SNAPSHOT"
 ThisBuild / scalaVersion := "3.3.3"
 ThisBuild / organization := "net.lambdaserve"
 
-val commonDeps = Seq(
-  "org.slf4j" % "slf4j-api" % "2.0.17",
-  "org.scalameta" %% "munit" % "1.1.0" % Test
+val commonDeps =
+  Seq(
+    "org.slf4j"      % "slf4j-api" % "2.0.17",
+    "org.scalameta" %% "munit"     % "1.1.0" % Test
   )
 
 lazy val core = (project in file("modules/core"))
@@ -24,7 +25,7 @@ lazy val jsonJsoniter = (project in file("modules/json-jsoniter"))
     libraryDependencies ++= commonDeps ++ Seq(
       "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.33.3",
       "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.33.3" % "provided"
-      )
+    )
   )
   .dependsOn(core)
 
@@ -34,7 +35,8 @@ lazy val viewsScalatags = (project in file("modules/views-scalatags"))
     libraryDependencies ++= commonDeps ++ Seq(
       "com.lihaoyi" %% "scalatags" % "0.13.1"
     )
-  ).dependsOn(core)
+  )
+  .dependsOn(core)
 
 lazy val viewsTyrian = (project in file("modules/views-tyrian-tags"))
   .settings(
@@ -42,7 +44,15 @@ lazy val viewsTyrian = (project in file("modules/views-tyrian-tags"))
     libraryDependencies ++= commonDeps ++ Seq(
       "io.indigoengine" %% "tyrian" % "0.10.0"
     )
-  ).dependsOn(core)
+  )
+  .dependsOn(core)
+
+lazy val viewsJte = (project in file("modules/views-jte"))
+  .settings(
+    name := "lambdaserve-views-jte",
+    libraryDependencies ++= commonDeps ++ Seq("gg.jte" % "jte" % "3.1.16")
+  )
+  .dependsOn(core)
 
 lazy val requestmapped = (project in file("modules/requestmapped"))
   .settings(
@@ -52,10 +62,7 @@ lazy val requestmapped = (project in file("modules/requestmapped"))
   .dependsOn(core, mapextract)
 
 lazy val filters = (project in file("modules/filters"))
-  .settings(
-    name := "lambdaserve-filters",
-    libraryDependencies ++= commonDeps
-  )
+  .settings(name := "lambdaserve-filters", libraryDependencies ++= commonDeps)
   .dependsOn(core)
 
 lazy val jwt = (project in file("modules/jwt"))
@@ -77,9 +84,7 @@ lazy val serverJetty = (project in file("modules/server-jetty"))
   .dependsOn(core)
 
 lazy val all = (project in file("modules/all"))
-  .settings(
-    name := "lambdaserve-all"
-  )
+  .settings(name := "lambdaserve-all")
   .dependsOn(
     core,
     serverJetty,
@@ -88,14 +93,12 @@ lazy val all = (project in file("modules/all"))
     requestmapped,
     viewsTyrian,
     viewsScalatags,
-    filters,
+    viewsJte,
+    filters
   )
 
 lazy val `lambda-serve` = (project in file("."))
-  .settings(
-    publish / skip := true,
-    publishLocal / skip := true
-  )
+  .settings(publish / skip := true, publishLocal / skip := true)
   .aggregate(
     core,
     jwt,
@@ -105,6 +108,7 @@ lazy val `lambda-serve` = (project in file("."))
     requestmapped,
     viewsScalatags,
     viewsTyrian,
+    viewsJte,
     filters,
     all
   )
