@@ -36,7 +36,7 @@ class JwtSession(config: JwtSessionFilterConfig, jwtUtil: JwtUtil)
     jwt match
       case Some(jwt) =>
         FilterInResponse.Continue(
-          request.copy(data = request.data.set(JwtSession, jwt))
+          request.copy(data = request.data.set(JwtSessionKey, jwt))
         )
       case None =>
         FilterInResponse.Continue(request)
@@ -44,4 +44,4 @@ class JwtSession(config: JwtSessionFilterConfig, jwtUtil: JwtUtil)
 
 end JwtSession
 
-object JwtSession extends TypedKey[Jwt]
+object JwtSessionKey extends TypedKey[Jwt]

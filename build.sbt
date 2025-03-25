@@ -88,6 +88,7 @@ lazy val all = (project in file("modules/all"))
   .dependsOn(
     core,
     serverJetty,
+    jwt,
     jsonJsoniter,
     mapextract,
     requestmapped,

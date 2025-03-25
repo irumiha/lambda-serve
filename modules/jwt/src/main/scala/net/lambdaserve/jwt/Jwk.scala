@@ -3,7 +3,7 @@ package net.lambdaserve.jwt
 import org.jose4j.jwk.JsonWebKey.OutputControlLevel
 import org.jose4j.jwk.{JsonWebKey, OctetKeyPairJsonWebKey, OkpJwkGenerator}
 
-import java.util.UUID
+import java.util.{Base64, UUID}
 
 object Jwk:
   def generateSigningJWK(): OctetKeyPairJsonWebKey =
@@ -26,15 +26,29 @@ object Jwk:
   def toPublicJson(jwk: OctetKeyPairJsonWebKey): String =
     jwk.toJson(OutputControlLevel.PUBLIC_ONLY)
 
-  def jwkFromJson(json: String): JsonWebKey =
-    JsonWebKey.Factory.newJwk(json)
+  def jwkFromJson(json: String): OctetKeyPairJsonWebKey =
+    JsonWebKey.Factory.newJwk(json).asInstanceOf[OctetKeyPairJsonWebKey]
+
+  def jwkFromJsonBase64(base64Json: String): OctetKeyPairJsonWebKey =
+    val decodedJson = Base64.getDecoder.decode(base64Json)
+    jwkFromJson(String(decodedJson))
 
   @main
   def newSigningJWK(): Unit =
-    println(toJson(generateSigningJWK()))
+    val jwkJson = toJson(generateSigningJWK())
+    val encoded = Base64.getEncoder.encodeToString(jwkJson.getBytes())
+
+    println(s"JWK: $jwkJson")
+    println(s"Base64: $encoded")
+    println(Base64.getDecoder.decode(encoded) sameElements jwkJson.getBytes())
 
   @main
   def newEncryptionJWK(): Unit =
-    println(toJson(generateEncryptionJWK()))
+    val jwkJson = toJson(generateEncryptionJWK())
+    val encoded = Base64.getEncoder.encodeToString(jwkJson.getBytes())
+
+    println(s"JWK: $jwkJson")
+    println(s"Base64: $encoded")
+    println(Base64.getDecoder.decode(encoded) sameElements jwkJson.getBytes())
 
 end Jwk
