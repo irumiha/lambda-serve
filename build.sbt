@@ -3,7 +3,7 @@ ThisBuild / scalaVersion := "3.3.3"
 ThisBuild / organization := "net.lambdaserve"
 
 val commonDeps = Seq(
-  "org.slf4j" % "slf4j-api" % "2.0.16",
+  "org.slf4j" % "slf4j-api" % "2.0.17",
   "org.scalameta" %% "munit" % "1.1.0" % Test
   )
 
@@ -14,7 +14,7 @@ lazy val mapextract = (project in file("modules/mapextract"))
   .settings(
     name := "lambdaserve-mapextract",
     libraryDependencies ++= commonDeps ++ Seq(
-      "com.softwaremill.magnolia1_3" %% "magnolia" % "1.3.12"
+      "com.softwaremill.magnolia1_3" %% "magnolia" % "1.3.16"
     )
   )
 
@@ -22,18 +22,9 @@ lazy val jsonJsoniter = (project in file("modules/json-jsoniter"))
   .settings(
     name := "lambdaserve-json-jsoniter",
     libraryDependencies ++= commonDeps ++ Seq(
-      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.33.2",
-      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.33.2" % "provided"
+      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.33.3",
+      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.33.3" % "provided"
       )
-  )
-  .dependsOn(core)
-
-lazy val jwt = (project in file("modules/jwt"))
-  .settings(
-    name := "lambdaserve-jwt",
-    libraryDependencies ++= commonDeps ++ Seq(
-      "org.bitbucket.b_c" % "jose4j" % "0.9.6"
-    )
   )
   .dependsOn(core)
 
@@ -65,21 +56,23 @@ lazy val filters = (project in file("modules/filters"))
     name := "lambdaserve-filters",
     libraryDependencies ++= commonDeps
   )
-  .dependsOn(core, jwt)
+  .dependsOn(core)
+
+lazy val jwt = (project in file("modules/jwt"))
+  .settings(
+    name := "lambdaserve-jwt",
+    libraryDependencies ++= commonDeps ++ Seq(
+      "org.bitbucket.b_c" % "jose4j" % "0.9.6"
+    )
+  )
+  .dependsOn(core, filters)
 
 lazy val serverJetty = (project in file("modules/server-jetty"))
   .settings(
     name := "lambdaserve-server-jetty",
     libraryDependencies ++= commonDeps ++ Seq(
-      "org.eclipse.jetty" % "jetty-server" % "12.0.16"
+      "org.eclipse.jetty" % "jetty-server" % "12.0.18"
     )
-  )
-  .dependsOn(core)
-
-lazy val jdbc = (project in file("modules/jdbc"))
-  .settings(
-    name := "lambdaserve-jdbc",
-    libraryDependencies ++= commonDeps
   )
   .dependsOn(core)
 
@@ -96,7 +89,6 @@ lazy val all = (project in file("modules/all"))
     viewsTyrian,
     viewsScalatags,
     filters,
-    jdbc
   )
 
 lazy val `lambda-serve` = (project in file("."))
@@ -114,6 +106,5 @@ lazy val `lambda-serve` = (project in file("."))
     viewsScalatags,
     viewsTyrian,
     filters,
-    jdbc,
     all
   )
