@@ -1,8 +1,8 @@
 //> using scala "3.6.3"
 //> using jvm graalvm-oracle:23
 //> using dep "net.lambdaserve::lambdaserve-all:0.1.0-SNAPSHOT"
-//> using dep "com.github.plokhotnyuk.jsoniter-scala::jsoniter-scala-macros:2.33.2"
-//> using dep "com.outr::scribe-slf4j2:3.16.0"
+//> using dep "com.github.plokhotnyuk.jsoniter-scala::jsoniter-scala-macros:2.36.5"
+//> using dep "com.outr::scribe-slf4j2:3.16.1"
 
 // Create a native-image binary with:
 // scala-cli --power package --native-image --graalvm-java-version 23 --graalvm-version 23 example.scala -o example-server
@@ -85,7 +85,7 @@ class TopController:
     given codec: JsonValueCodec[JsonCommand] =
       JsonCodecMaker.makeCirceLikeSnakeCased
 
-  val topRouter =
+  val topRouter: Router =
     import Method.*
     Router.make(
       GET -> "/hello".r -> { request =>
@@ -100,7 +100,7 @@ class TopController:
         Response.Ok(Message(command.name, LocalDateTime.now()))
     )
 
-@main def server() = JettyServer
+@main def server(): Unit = JettyServer
   .makeServer(
     host = "localhost",
     port = 8080,

@@ -23,6 +23,11 @@ final case class Router(routes: Seq[Route]):
   def findRoutesForPath(path: String): Seq[Route] =
     routes.filter(_.path.pattern.matcher(path).matches())
 
+  def printRoutes: Seq[String] =
+    routes.map { r =>
+      s"${r.method}: ${r.path} => ${pprint.apply(r.handler)}"
+    }
+
 object Router:
 
   def make(routes: ((Method, Regex), RouteHandler)*): Router =

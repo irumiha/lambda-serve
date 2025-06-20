@@ -26,7 +26,7 @@ final class FilterEngine(filters: IndexedSeq[Filter]):
 
     var i = 0
     while progressing && i < validFilters.length do
-      filters(i).handle(currentRequest) match
+      validFilters(i).handle(currentRequest) match
         case FilterInResponse.Continue(request) =>
           currentRequest = request
         case FilterInResponse.Stop(response) =>

@@ -20,9 +20,18 @@ class JteTemplateSupport(
 
   val templateEngine =
     if usePrecompiled then TemplateEngine.createPrecompiled(ContentType.Html)
-    else TemplateEngine.create(resolver, Path.of(generatedClassesPath), ContentType.Html)
+    else
+      TemplateEngine.create(
+        resolver,
+        Path.of(generatedClassesPath),
+        ContentType.Html
+      )
 
-  def render[A](templateName: String, model: A, outputStream: OutputStream): Unit =
+  def render[A](
+    templateName: String,
+    model: A,
+    outputStream: OutputStream
+  ): Unit =
     val osw = new OutputStreamWriter(outputStream)
     templateEngine.render(templateName, model, WriterOutput(osw))
     osw.flush()
@@ -34,8 +43,8 @@ object JteTemplateSupport:
 case class TemplateOutput[T](templateName: String, model: T)
 
 object TemplateOutput:
-  def apply(templateName: String): TemplateOutput[Nothing] =
-    TemplateOutput(templateName, null.asInstanceOf[Nothing])
+  def apply(templateName: String): TemplateOutput[Null] =
+    TemplateOutput(templateName, null)
 
 trait JteTemplateEncoder(jteTemplate: JteTemplateSupport):
   val contentType = "text/html; charset=UTF-8"
@@ -43,7 +52,11 @@ trait JteTemplateEncoder(jteTemplate: JteTemplateSupport):
   given tagEncoder[T]: EntityEncoder[TemplateOutput[T]] with
     def bodyWriter(responseEntity: TemplateOutput[T]): OutputStream => Unit =
       os =>
-        jteTemplate.render(responseEntity.templateName, responseEntity.model, os)
+        jteTemplate.render(
+          responseEntity.templateName,
+          responseEntity.model,
+          os
+        )
         os.flush()
 
     override val contentTypeHeader: String = contentType

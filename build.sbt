@@ -1,5 +1,5 @@
 ThisBuild / version      := "0.1.0-SNAPSHOT"
-ThisBuild / scalaVersion := "3.3.3"
+ThisBuild / scalaVersion := "3.3.5"
 ThisBuild / organization := "net.lambdaserve"
 
 val commonDeps =
@@ -9,13 +9,18 @@ val commonDeps =
   )
 
 lazy val core = (project in file("modules/core"))
-  .settings(name := "lambdaserve-core", libraryDependencies ++= commonDeps)
+  .settings(
+    name := "lambdaserve-core",
+    libraryDependencies ++= commonDeps ++ Seq(
+      "com.lihaoyi" %% "pprint" % "0.9.0"
+    )
+  )
 
 lazy val mapextract = (project in file("modules/mapextract"))
   .settings(
     name := "lambdaserve-mapextract",
     libraryDependencies ++= commonDeps ++ Seq(
-      "com.softwaremill.magnolia1_3" %% "magnolia" % "1.3.16"
+      "com.softwaremill.magnolia1_3" %% "magnolia" % "1.3.18"
     )
   )
 
@@ -23,9 +28,9 @@ lazy val jsonJsoniter = (project in file("modules/json-jsoniter"))
   .settings(
     name := "lambdaserve-json-jsoniter",
     libraryDependencies ++= commonDeps ++ Seq(
-      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.33.3",
-      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.33.3" % "provided"
-    )
+      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.36.4",
+      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.36.4" % "provided"
+      )
   )
   .dependsOn(core)
 
@@ -50,7 +55,7 @@ lazy val viewsTyrian = (project in file("modules/views-tyrian-tags"))
 lazy val viewsJte = (project in file("modules/views-jte"))
   .settings(
     name := "lambdaserve-views-jte",
-    libraryDependencies ++= commonDeps ++ Seq("gg.jte" % "jte" % "3.1.16")
+    libraryDependencies ++= commonDeps ++ Seq("gg.jte" % "jte" % "3.2.1")
   )
   .dependsOn(core)
 
@@ -78,7 +83,7 @@ lazy val serverJetty = (project in file("modules/server-jetty"))
   .settings(
     name := "lambdaserve-server-jetty",
     libraryDependencies ++= commonDeps ++ Seq(
-      "org.eclipse.jetty" % "jetty-server" % "12.0.18"
+      "org.eclipse.jetty" % "jetty-server" % "12.0.22"
     )
   )
   .dependsOn(core)
