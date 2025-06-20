@@ -5,7 +5,7 @@ ThisBuild / organization := "net.lambdaserve"
 val commonDeps =
   Seq(
     "org.slf4j"      % "slf4j-api" % "2.0.17",
-    "org.scalameta" %% "munit"     % "1.1.0" % Test
+    "org.scalameta" %% "munit"     % "1.1.1" % Test
   )
 
 lazy val core = (project in file("modules/core"))
@@ -28,8 +28,8 @@ lazy val jsonJsoniter = (project in file("modules/json-jsoniter"))
   .settings(
     name := "lambdaserve-json-jsoniter",
     libraryDependencies ++= commonDeps ++ Seq(
-      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.36.4",
-      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.36.4" % "provided"
+      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.36.5",
+      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.36.5" % "provided"
       )
   )
   .dependsOn(core)
