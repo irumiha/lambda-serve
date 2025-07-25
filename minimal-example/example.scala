@@ -1,8 +1,8 @@
 //> using scala "3.7.1"
 //> using jvm graalvm-oracle:24
 //> using dep "net.lambdaserve::lambdaserve-all:0.1.0-SNAPSHOT"
-//> using dep "com.github.plokhotnyuk.jsoniter-scala::jsoniter-scala-macros:2.36.5"
-//> using dep "com.outr::scribe-slf4j2:3.16.1"
+//> using dep "com.github.plokhotnyuk.jsoniter-scala::jsoniter-scala-macros:2.37.0"
+//> using dep "com.outr::scribe-slf4j2:3.17.0"
 
 // This runs the app with the native-image-agent to generate the metadata before generating the native image binary
 //> using javaOpt -agentlib:native-image-agent=config-merge-dir=resources/META-INF/native-image

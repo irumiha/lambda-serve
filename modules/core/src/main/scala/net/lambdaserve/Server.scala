@@ -3,12 +3,13 @@ package net.lambdaserve
 import net.lambdaserve.filters.Filter
 
 trait Server[S, H]:
-  /** Create a new server. Pass in the typically useful options.
+  /** Creates a new server. Accepts some typically useful options. The returned
+    * server will be already started.
     *
     * @param host
     *   The hostname to listen on.
     * @param port
-    *   The port to listen on. Giving the value 0 means a random port will be
+    *   The port to listen on. A value of 0 means a random port will be
     *   selected.
     * @param router
     *   The router for all application routes.
