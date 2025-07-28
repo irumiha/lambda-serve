@@ -2,12 +2,13 @@ package net.lambdaserve.server.jetty
 
 import net.lambdaserve.filters.FilterEngine
 import net.lambdaserve.http.{Method, MultiPart, Request}
+import org.eclipse.jetty.http.MultiPartFormData
 import org.eclipse.jetty.io.Content
-import org.eclipse.jetty.{http as jettyHttp, server as jetty}
+import org.eclipse.jetty.util.Blocker.Promise
 import org.eclipse.jetty.util.Callback
+import org.eclipse.jetty.{http as jettyHttp, server as jetty}
 
 import java.nio.file.Files
-import java.util
 import scala.collection.immutable.ArraySeq
 import scala.jdk.CollectionConverters.*
 
@@ -33,12 +34,19 @@ class HttpHandler(filterEngine: FilterEngine) extends jetty.Handler.Abstract():
     val contentType = in.getHeaders.get(jettyHttp.HttpHeader.CONTENT_TYPE)
 
     val response =
-      if jettyHttp.MimeTypes.Type.MULTIPART_FORM_DATA.is(contentType) then
+      if contentType != null && contentType.startsWith(
+          jettyHttp.MimeTypes.Type.MULTIPART_FORM_DATA.asString()
+        )
+      then
         val boundary = jettyHttp.MultiPart.extractBoundary(contentType)
         val parser   = new jettyHttp.MultiPartFormData.Parser(boundary)
         parser.setFilesDirectory(Files.createTempDirectory("tmpDirPrefix"))
         val multiparts: Iterable[jettyHttp.MultiPart.Part] =
-          parser.parse(in).get(inputTimeout, inputTimeutUnit).asScala
+          parser.parse(in, new Promise[MultiPartFormData.Parts] {
+            override def block(): MultiPartFormData.Parts = ???
+
+            override def close(): Unit = ???
+          }).get(inputTimeout, inputTimeutUnit).asScala
 
         val scalaMultiparts = multiparts.map(part =>
           MultiPart(
@@ -67,8 +75,7 @@ class HttpHandler(filterEngine: FilterEngine) extends jetty.Handler.Abstract():
       else if jettyHttp.MimeTypes.Type.FORM_ENCODED.is(contentType) then
         val formParams =
           jetty.FormFields
-            .from(in)
-            .get(inputTimeout, inputTimeutUnit)
+            .getFields(in)
             .toStringArrayMap
             .asScala
             .view

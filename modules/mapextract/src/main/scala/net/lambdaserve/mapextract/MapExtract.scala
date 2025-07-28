@@ -43,38 +43,28 @@ object MapExtract
   override def split[T](
     ctx: SealedTrait[MapExtract.Typeclass, T]
   ): MapExtract.Typeclass[T] =
-    new MapExtract[T]:
-      override def projectMaps(
-        ms: Seq[Map[String, IndexedSeq[String]]],
-        prefix: String,
-        offset: Int
-      ): T =
-        val stringValue = extractString(ms, prefix)
-        val subtype =
-          ctx.subtypes.find(it => it.typeInfo.short == stringValue).get
+    (ms: Seq[Map[String, IndexedSeq[String]]], prefix: String, offset: Int) =>
+      val stringValue = extractString(ms, prefix)
+      val subtype =
+        ctx.subtypes.find(it => it.typeInfo.short == stringValue).get
 
-        subtype.typeclass.projectMaps(ms, prefix, offset)
+      subtype.typeclass.projectMaps(ms, prefix, offset)
 
   override def join[T](
     ctx: CaseClass[MapExtract.Typeclass, T]
   ): MapExtract.Typeclass[T] =
-    new MapExtract[T]:
-      override def projectMaps(
-        ms: Seq[Map[String, IndexedSeq[String]]],
-        prefix: String,
-        offset: Int
-      ): T =
-        val allParams = ctx.parameters.map { param =>
-          val overrideName = param.annotations.collect {
-            case SourceName(sourceName) => sourceName
-          }.headOption
+    (ms: Seq[Map[String, IndexedSeq[String]]], prefix: String, offset: Int) =>
+      val allParams = ctx.parameters.map { param =>
+        val overrideName = param.annotations.collect {
+          case SourceName(sourceName) => sourceName
+        }.headOption
 
-          val paramName = overrideName.getOrElse(param.label)
+        val paramName = overrideName.getOrElse(param.label)
 
-          val currentPrefix =
-            if prefix.isEmpty then paramName
-            else s"$prefix.$paramName"
-          param.typeclass.projectMaps(ms, currentPrefix, offset)
-        }
+        val currentPrefix =
+          if prefix.isEmpty then paramName
+          else s"$prefix.$paramName"
+        param.typeclass.projectMaps(ms, currentPrefix, offset)
+      }
 
-        ctx.rawConstruct(allParams)
+      ctx.rawConstruct(allParams)

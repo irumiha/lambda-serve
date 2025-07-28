@@ -85,7 +85,7 @@ class TopController:
     given codec: JsonValueCodec[JsonCommand] =
       JsonCodecMaker.makeCirceLikeSnakeCased
 
-  val topRouter: Router =
+  val router: Router =
     import Method.*
     Router.make(
       GET -> "/hello".r -> { request =>
@@ -107,12 +107,16 @@ class TopController:
     useVirtualThreads = true,
     router = Router.combine(
       "/api/houses" -> HouseController().router,
-      "/top"        -> TopController().topRouter,
-      "/" -> Router.make(Method.GET -> "/hello".r -> { request =>
-        val name = request.query.get("name").flatMap(_.headOption)
-
-        Response.Ok(name.getOrElse("Unknown"))
-      })
+      "/top"        -> TopController().router,
+      "/" -> Router.make(
+        Method.GET -> "hello".r -> { request =>
+          val name = request.query.get("name").flatMap(_.headOption)
+          Response.Ok(name.getOrElse("Unknown"))
+        },
+        Method.POST -> "multipart".r -> { request =>
+          Response.Ok("accepted")
+        }
+      )
     )
   )
   .join()
