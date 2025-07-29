@@ -4,17 +4,16 @@ import net.lambdaserve.filters.FilterEngine
 import net.lambdaserve.http.{Method, MultiPart, Request}
 import org.eclipse.jetty.http.MultiPartFormData
 import org.eclipse.jetty.io.Content
-import org.eclipse.jetty.util.Blocker.Promise
-import org.eclipse.jetty.util.Callback
+import org.eclipse.jetty.util.{Callback, Promise}
 import org.eclipse.jetty.{http as jettyHttp, server as jetty}
 
 import java.nio.file.Files
 import scala.collection.immutable.ArraySeq
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationInt
 import scala.jdk.CollectionConverters.*
 
 class HttpHandler(filterEngine: FilterEngine) extends jetty.Handler.Abstract():
-  val inputTimeout    = 60
-  val inputTimeutUnit = java.util.concurrent.TimeUnit.SECONDS
 
   override def handle(
     in: jetty.Request,
@@ -41,25 +40,35 @@ class HttpHandler(filterEngine: FilterEngine) extends jetty.Handler.Abstract():
         val boundary = jettyHttp.MultiPart.extractBoundary(contentType)
         val parser   = new jettyHttp.MultiPartFormData.Parser(boundary)
         parser.setFilesDirectory(Files.createTempDirectory("tmpDirPrefix"))
-        val multiparts: Iterable[jettyHttp.MultiPart.Part] =
-          parser.parse(in, new Promise[MultiPartFormData.Parts] {
-            override def block(): MultiPartFormData.Parts = ???
 
-            override def close(): Unit = ???
-          }).get(inputTimeout, inputTimeutUnit).asScala
+        val multiparts =
+          scala.concurrent.Promise[Iterator[jettyHttp.MultiPart.Part]]
 
-        val scalaMultiparts = multiparts.map(part =>
-          MultiPart(
-            name = Option(part.getName),
-            fileName = Option(part.getFileName),
-            headers = part.getHeaders.asScala
-              .groupMap(_.getName)(_.getValue)
-              .view
-              .mapValues(_.toIndexedSeq)
-              .toMap,
-            content = Content.Source.asInputStream(part.getContentSource)
-          )
+        parser.parse(
+          in,
+          new Promise.Invocable[MultiPartFormData.Parts]:
+            override def accept(
+              result: MultiPartFormData.Parts,
+              error: Throwable
+            ): Unit =
+              if error != null then multiparts.failure(error)
+              else multiparts.success(result.iterator().asScala)
         )
+
+        val scalaMultiparts = Await
+          .result(multiparts.future, 60.seconds)
+          .map(part =>
+            MultiPart(
+              name = Option(part.getName),
+              fileName = Option(part.getFileName),
+              headers = part.getHeaders.asScala
+                .groupMap(_.getName)(_.getValue)
+                .view
+                .mapValues(_.toIndexedSeq)
+                .toMap,
+              content = Content.Source.asInputStream(part.getContentSource)
+            )
+          )
 
         val request = Request(
           scheme = in.getHttpURI.getScheme,
