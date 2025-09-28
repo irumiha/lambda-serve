@@ -4,6 +4,7 @@ import net.lambdaserve.filters.FilterEngine
 import net.lambdaserve.http.{Method, MultiPart, Request}
 import org.eclipse.jetty.http.MultiPartFormData
 import org.eclipse.jetty.io.Content
+import org.eclipse.jetty.util.thread.Invocable
 import org.eclipse.jetty.util.{Callback, Promise}
 import org.eclipse.jetty.{http as jettyHttp, server as jetty}
 
@@ -47,12 +48,14 @@ class HttpHandler(filterEngine: FilterEngine) extends jetty.Handler.Abstract():
         parser.parse(
           in,
           new Promise.Invocable[MultiPartFormData.Parts]:
-            override def accept(
-              result: MultiPartFormData.Parts,
-              error: Throwable
-            ): Unit =
-              if error != null then multiparts.failure(error)
-              else multiparts.success(result.iterator().asScala)
+            override def succeeded(result: MultiPartFormData.Parts): Unit =
+              multiparts.success(result.iterator().asScala)
+
+            override def failed(x: Throwable): Unit =
+              multiparts.failure(x)
+
+            override def getInvocationType: Invocable.InvocationType =
+              Invocable.InvocationType.BLOCKING
         )
 
         val scalaMultiparts = Await
