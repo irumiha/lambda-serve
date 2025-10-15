@@ -2,10 +2,16 @@ ThisBuild / version      := "0.1.0-SNAPSHOT"
 ThisBuild / scalaVersion := "3.3.6"
 ThisBuild / organization := "net.lambdaserve"
 
+// Coverage settings
+ThisBuild / coverageMinimumStmtTotal := 60
+ThisBuild / coverageMinimumBranchTotal := 50
+ThisBuild / coverageFailOnMinimum := false
+ThisBuild / coverageHighlighting := true
+
 val commonDeps =
   Seq(
     "org.slf4j"      % "slf4j-api" % "2.0.17",
-    "org.scalameta" %% "munit"     % "1.2.0" % Test
+    "org.scalameta" %% "munit"     % "1.2.1" % Test
   )
 
 lazy val core = (project in file("modules/core"))
@@ -28,8 +34,8 @@ lazy val jsonJsoniter = (project in file("modules/json-jsoniter"))
   .settings(
     name := "lambdaserve-json-jsoniter",
     libraryDependencies ++= commonDeps ++ Seq(
-      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.38.2",
-      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.38.2" % "provided"
+      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.38.3",
+      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.38.3" % "provided"
       )
   )
   .dependsOn(core)
@@ -83,7 +89,7 @@ lazy val serverJetty = (project in file("modules/server-jetty"))
   .settings(
     name := "lambdaserve-server-jetty",
     libraryDependencies ++= commonDeps ++ Seq(
-      "org.eclipse.jetty" % "jetty-server" % "12.1.1"
+      "org.eclipse.jetty" % "jetty-server" % "12.1.2"
     )
   )
   .dependsOn(core)
