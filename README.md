@@ -52,12 +52,10 @@ val openPorts = jetty.getConnectors
 
 StdIn.readLine(s"Listening on port(s) $openPorts, awaiting exit...")
 jetty.stop()
+jetty.join()
 
 ```
 
-### Easy extraction of data from requests
-
-### Easy to use and extend
 
 ### Minimal dependencies
 

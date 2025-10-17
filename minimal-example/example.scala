@@ -1,15 +1,15 @@
 //> using scala "3.7.1"
-//> using jvm graalvm-oracle:24
+//> using jvm graalvm-oracle:25
 //> using dep "net.lambdaserve::lambdaserve-all:0.1.0-SNAPSHOT"
-//> using dep "com.github.plokhotnyuk.jsoniter-scala::jsoniter-scala-macros:2.37.0"
+//> using dep "com.github.plokhotnyuk.jsoniter-scala::jsoniter-scala-macros:2.38.3"
 //> using dep "com.outr::scribe-slf4j2:3.17.0"
 
 // This runs the app with the native-image-agent to generate the metadata before generating the native image binary
-//> using javaOpt -agentlib:native-image-agent=config-merge-dir=resources/META-INF/native-image
-//> using resourceDir ./resources
+// //> using javaOpt -agentlib:native-image-agent=config-merge-dir=resources/META-INF/native-image
+// //> using resourceDir ./resources
 
 // After you've run the app one with `scala-cli run .`, create a native-image binary with:
-// scala-cli --power package --native-image --graalvm-java-version 24 --graalvm-version 24 --graalvm-jvm-id graalvm-oracle:24 example.scala -o example-server
+// scala-cli --power package --native-image --graalvm-java-version 25 --graalvm-version 25 --graalvm-jvm-id graalvm-oracle:25 example.scala -o example-server
 
 // GraalVM options needed by jetty
 //> using packaging.graalvmArgs --no-fallback
