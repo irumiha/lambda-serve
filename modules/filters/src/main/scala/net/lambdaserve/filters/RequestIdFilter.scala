@@ -31,7 +31,7 @@ class RequestIdFilter(
     // Check if request already has an ID (e.g., from a load balancer)
     val requestId = request.headers
       .get(requestIdHeader)
-      .flatMap(_.headOption)
+      .headOption
       .getOrElse(generateId())
 
     // Add request ID to request if it wasn't already present

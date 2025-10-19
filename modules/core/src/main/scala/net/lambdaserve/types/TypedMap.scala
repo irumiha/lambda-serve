@@ -1,4 +1,4 @@
-package net.lambdaserve
+package net.lambdaserve.types
 
 class TypedKey[A]:
   def get(m: Map[TypedKey[_], Any]): Option[A] =

@@ -103,8 +103,8 @@ private def defaultKeyExtractor(request: Request): String =
   // Try to get client IP from various headers (for proxied requests)
   request.headers
     .get("X-Forwarded-For")
-    .flatMap(_.headOption)
-    .orElse(request.headers.get("X-Real-IP").flatMap(_.headOption))
+    .headOption
+    .orElse(request.headers.get("X-Real-IP").headOption)
     .getOrElse("unknown")
 
 object RateLimitFilter:
@@ -127,7 +127,7 @@ object RateLimitFilter:
       req =>
         req.headers
           .get(headerName)
-          .flatMap(_.headOption)
+          .headOption
           .getOrElse("anonymous")
     )
 

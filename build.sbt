@@ -28,7 +28,7 @@ lazy val mapextract = (project in file("modules/mapextract"))
     libraryDependencies ++= commonDeps ++ Seq(
       "com.softwaremill.magnolia1_3" %% "magnolia" % "1.3.18"
     )
-  )
+  ).dependsOn(core)
 
 lazy val jsonJsoniter = (project in file("modules/json-jsoniter"))
   .settings(

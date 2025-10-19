@@ -16,7 +16,12 @@ object Combined:
 
   private def map1[T](request: Request, m: MapExtract[T]): T =
     m.projectMaps(
-      Seq(request.pathParams, request.query, request.form, request.headers)
+      Seq(
+        request.pathParams.toRawMap,
+        request.query.toRawMap,
+        request.form.toRawMap,
+        request.headers.toRawMap
+      )
     )
 
 def mapped[T](handler: T => Response)(using

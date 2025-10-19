@@ -47,7 +47,7 @@ class RateLimitFilterTest extends FunSuite:
     val filter = RateLimitFilter(
       maxRequests = 2,
       windowMs = 60000,
-      keyExtractor = req => req.headers.get("API-Key").flatMap(_.headOption).getOrElse("anonymous")
+      keyExtractor = req => req.headers.get("API-Key").headOption.getOrElse("anonymous")
     )
 
     val request1 = Request.GET("/test").withHeader("API-Key", "key-123")

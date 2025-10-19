@@ -2,6 +2,7 @@ package net.lambdaserve.server.jetty
 
 import net.lambdaserve.filters.FilterEngine
 import net.lambdaserve.http.{Method, MultiPart, Request}
+import net.lambdaserve.types.MultiMap
 import org.eclipse.jetty.http.MultiPartFormData
 import org.eclipse.jetty.io.Content
 import org.eclipse.jetty.util.thread.Invocable
@@ -9,7 +10,6 @@ import org.eclipse.jetty.util.{Callback, Promise}
 import org.eclipse.jetty.{http as jettyHttp, server as jetty}
 
 import java.nio.file.Files
-import scala.collection.immutable.ArraySeq
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 import scala.jdk.CollectionConverters.*
@@ -22,13 +22,15 @@ class HttpHandler(filterEngine: FilterEngine) extends jetty.Handler.Abstract():
     callback: Callback
   ): Boolean =
     val queryParams =
-      jetty.Request
+      val params = jetty.Request
         .extractQueryParameters(in)
-        .toStringArrayMap
+        .iterator()
         .asScala
-        .view
-        .mapValues(_.toIndexedSeq)
-        .toMap
+        .flatMap(f => f.getValues.asScala.map(v => f.getName -> v))
+        .toSeq
+
+      MultiMap(params*)
+
     val requestCookies = Cookies.extractCookies(in)
 
     val contentType = in.getHeaders.get(jettyHttp.HttpHeader.CONTENT_TYPE)
@@ -64,11 +66,13 @@ class HttpHandler(filterEngine: FilterEngine) extends jetty.Handler.Abstract():
             MultiPart(
               name = Option(part.getName),
               fileName = Option(part.getFileName),
-              headers = part.getHeaders.asScala
-                .groupMap(_.getName)(_.getValue)
-                .view
-                .mapValues(_.toIndexedSeq)
-                .toMap,
+              headers =
+                val pairs =
+                  part.getHeaders.asScala.flatMap { f =>
+                    f.getValueList.asScala.map(v => f.getName -> v)
+                  }
+                MultiMap(pairs.toSeq*)
+              ,
               content = Content.Source.asInputStream(part.getContentSource)
             )
           )
@@ -77,8 +81,8 @@ class HttpHandler(filterEngine: FilterEngine) extends jetty.Handler.Abstract():
           scheme = in.getHttpURI.getScheme,
           method = Method.valueOf(in.getMethod),
           path = in.getHttpURI.getPath,
-          pathParams = Map.empty,
-          headers = DelegatingMap.make(in.getHeaders),
+          pathParams = MultiMap(),
+          headers = in.getHeaders.toMultiMap,
           query = queryParams,
           cookies = requestCookies,
           multipartForm = scalaMultiparts.toSeq
@@ -86,20 +90,21 @@ class HttpHandler(filterEngine: FilterEngine) extends jetty.Handler.Abstract():
         filterEngine.processRequest(request)
       else if jettyHttp.MimeTypes.Type.FORM_ENCODED.is(contentType) then
         val formParams =
-          jetty.FormFields
+          val params = jetty.FormFields
             .getFields(in)
-            .toStringArrayMap
+            .iterator()
             .asScala
-            .view
-            .mapValues(ArraySeq.from(_))
-            .toMap
+            .flatMap(f => f.getValues.asScala.map(v => f.getName -> v))
+            .toSeq
+
+          MultiMap(params*)
 
         val request = Request(
           scheme = in.getHttpURI.getScheme,
           method = Method.valueOf(in.getMethod),
           path = in.getHttpURI.getPath,
-          pathParams = Map.empty,
-          headers = DelegatingMap.make(in.getHeaders),
+          pathParams = MultiMap(),
+          headers = in.getHeaders.toMultiMap,
           query = queryParams,
           cookies = requestCookies,
           form = formParams
@@ -110,8 +115,8 @@ class HttpHandler(filterEngine: FilterEngine) extends jetty.Handler.Abstract():
           scheme = in.getHttpURI.getScheme,
           method = Method.valueOf(in.getMethod),
           path = in.getHttpURI.getPath,
-          pathParams = Map.empty,
-          headers = DelegatingMap.make(in.getHeaders),
+          pathParams = MultiMap(),
+          headers = in.getHeaders.toMultiMap,
           query = queryParams,
           cookies = requestCookies,
           requestContent = jetty.Request.asInputStream(in)

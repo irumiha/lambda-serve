@@ -52,7 +52,7 @@ class RouterSuite extends munit.FunSuite:
       raw"/(?<paramname>.*?)/?".r,
       { request =>
         val paramValue =
-          request.pathParams("paramname").headOption.getOrElse("")
+          request.pathParams.get("paramname", "")
 
         Response.Ok(paramValue)
       }
@@ -76,8 +76,8 @@ class RouterSuite extends munit.FunSuite:
       "/(?<paramname>\\w+)/?".r,
       { request =>
         val paramValue =
-          request.pathParams("paramname").headOption.getOrElse("")
-        val queryValue = request.query("queryname").headOption.getOrElse("")
+          request.pathParams.get("paramname", "")
+        val queryValue = request.query.get("queryname", "")
 
         Response.Ok(paramValue + queryValue)
       }
@@ -100,15 +100,10 @@ class RouterSuite extends munit.FunSuite:
       POST,
       "/(?<paramname>\\w+)/?".r,
       { request =>
-        val paramValue =
-          request.pathParams("paramname").headOption.getOrElse("")
-
-        val queryValue =
-          request.query.get("queryname").flatMap(_.headOption).getOrElse("")
-        val username =
-          request.form.get("username").flatMap(_.headOption).getOrElse("")
-        val password =
-          request.form.get("password").flatMap(_.headOption).getOrElse("")
+        val paramValue = request.pathParams.get("paramname", "")
+        val queryValue = request.query.get("queryname", "")
+        val username   = request.form.get("username", "")
+        val password   = request.form.get("password", "")
         Response.Ok(paramValue + queryValue + username + password)
       }
     )

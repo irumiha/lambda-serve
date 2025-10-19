@@ -19,7 +19,7 @@ class RequestIdFilterTest extends FunSuite:
       case FilterInResponse.Wrap(updatedRequest, responseWrapper) =>
         assertEquals(
           updatedRequest.headers.get("X-Request-ID"),
-          Some(IndexedSeq("test-id-123"))
+          IndexedSeq("test-id-123")
         )
         val mockResponse = Response.Ok("test")
         responseWrapper(mockResponse) match
@@ -43,7 +43,7 @@ class RequestIdFilterTest extends FunSuite:
       case FilterInResponse.Wrap(updatedRequest, responseWrapper) =>
         assertEquals(
           updatedRequest.headers.get("X-Request-ID"),
-          Some(IndexedSeq("existing-id-456"))
+          IndexedSeq("existing-id-456")
         )
         val mockResponse = Response.Ok("test")
         responseWrapper(mockResponse) match
@@ -68,7 +68,7 @@ class RequestIdFilterTest extends FunSuite:
       case FilterInResponse.Wrap(updatedRequest, responseWrapper) =>
         assertEquals(
           updatedRequest.headers.get("X-Trace-ID"),
-          Some(IndexedSeq("trace-789"))
+          IndexedSeq("trace-789")
         )
         val mockResponse = Response.Ok("test")
         responseWrapper(mockResponse) match
@@ -97,7 +97,7 @@ class RequestIdFilterTest extends FunSuite:
       case FilterInResponse.Wrap(updatedRequest, _) =>
         assertEquals(
           updatedRequest.headers.get("X-Request-ID"),
-          Some(IndexedSeq("id-1"))
+          IndexedSeq("id-1")
         )
       case _ => fail("Expected Wrap response")
 
@@ -105,7 +105,7 @@ class RequestIdFilterTest extends FunSuite:
       case FilterInResponse.Wrap(updatedRequest, _) =>
         assertEquals(
           updatedRequest.headers.get("X-Request-ID"),
-          Some(IndexedSeq("id-2"))
+          IndexedSeq("id-2")
         )
       case _ => fail("Expected Wrap response")
 

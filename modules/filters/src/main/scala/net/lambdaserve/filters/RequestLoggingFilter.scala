@@ -27,7 +27,7 @@ class RequestLoggingFilter(
     val method = request.method
     val path = request.path
     val queryString =
-      if logQueryParams && request.query.nonEmpty then
+      if logQueryParams && !request.query.isEmpty then
         val params = request.query
           .map { case (k, v) => s"$k=${v.mkString(",")}" }
           .mkString("&")
@@ -36,7 +36,7 @@ class RequestLoggingFilter(
 
     val baseLog = s"$method $path$queryString"
 
-    if logHeaders && request.headers.nonEmpty then
+    if logHeaders && !request.headers.isEmpty then
       val headersStr = request.headers
         .map { case (k, v) => s"  $k: ${v.mkString(", ")}" }
         .mkString("\n")

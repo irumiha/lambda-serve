@@ -82,7 +82,7 @@ class CorsFilter(
       case None => response
 
   private def handlePreflightRequest(request: Request): Response =
-    val origin = request.headers.get(Header.Origin.name).flatMap(_.headOption)
+    val origin = request.headers.get(Header.Origin.name).headOption
 
     getAllowOriginHeader(origin) match
       case Some(allowOriginValue) =>
@@ -120,7 +120,7 @@ class CorsFilter(
         )
 
   override def handle(request: Request): FilterInResponse =
-    val origin = request.headers.get(Header.Origin.name).flatMap(_.headOption)
+    val origin = request.headers.get(Header.Origin.name).headOption
 
     // Handle preflight OPTIONS request
     if request.method == Method.OPTIONS then

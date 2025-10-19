@@ -1,6 +1,7 @@
 package net.lambdaserve.http
 
 import munit.FunSuite
+import net.lambdaserve.types.MultiMap
 
 import java.io.ByteArrayInputStream
 
@@ -48,71 +49,41 @@ class RequestTest extends FunSuite:
   test("Request withHeader adds single header"):
     val request = Request.GET("/test").withHeader("X-Custom", "value")
 
-    assertEquals(request.headers.get("X-Custom"), Some(IndexedSeq("value")))
+    assertEquals(request.headers.get("X-Custom"), Seq("value"))
 
   test("Request withHeader adds multiple values"):
     val request =
-      Request.GET("/test").withHeader("X-Custom", IndexedSeq("value1", "value2"))
+      Request.GET("/test").withHeader("X-Custom", "value1").withHeader("X-Custom", "value2")
 
     assertEquals(
       request.headers.get("X-Custom"),
-      Some(IndexedSeq("value1", "value2"))
+      Seq("value1", "value2")
     )
-
-  test("Request withHeaders merges multiple headers"):
-    val request = Request
-      .GET("/test")
-      .withHeaders(
-        Map(
-          "X-Header-1" -> IndexedSeq("value1"),
-          "X-Header-2" -> IndexedSeq("value2")
-        )
-      )
-
-    assertEquals(request.headers.get("X-Header-1"), Some(IndexedSeq("value1")))
-    assertEquals(request.headers.get("X-Header-2"), Some(IndexedSeq("value2")))
 
   test("Request withQueryParam adds single query parameter"):
     val request = Request.GET("/test").withQueryParam("key", "value")
 
-    assertEquals(request.query.get("key"), Some(IndexedSeq("value")))
+    assertEquals(request.query.get("key"), Seq("value"))
 
   test("Request withQueryParam adds multiple values"):
     val request =
-      Request.GET("/test").withQueryParam("tags", IndexedSeq("scala", "web"))
+      Request.GET("/test").withQueryParam("tags", "scala").withQueryParam("tags", "web")
 
-    assertEquals(request.query.get("tags"), Some(IndexedSeq("scala", "web")))
-
-  test("Request withQuery merges multiple query parameters"):
-    val request = Request
-      .GET("/test")
-      .withQuery(
-        Map(
-          "page" -> IndexedSeq("1"),
-          "size" -> IndexedSeq("10")
-        )
-      )
-
-    assertEquals(request.query.get("page"), Some(IndexedSeq("1")))
-    assertEquals(request.query.get("size"), Some(IndexedSeq("10")))
+    assertEquals(request.query.get("tags"), Seq("scala", "web"))
 
   test("Request withFormParam adds single form parameter"):
     val request = Request.GET("/test").withFormParam("username", "john")
 
-    assertEquals(request.form.get("username"), Some(IndexedSeq("john")))
+    assertEquals(request.form.get("username"), Seq("john"))
 
-  test("Request withForm merges multiple form parameters"):
+  test("Request withFormParam adds multiple values"):
     val request = Request
       .GET("/test")
-      .withForm(
-        Map(
-          "username" -> IndexedSeq("john"),
-          "email" -> IndexedSeq("john@example.com")
-        )
-      )
+      .withFormParam("username", "john")
+      .withFormParam("email", "john@example.com")
 
-    assertEquals(request.form.get("username"), Some(IndexedSeq("john")))
-    assertEquals(request.form.get("email"), Some(IndexedSeq("john@example.com")))
+    assertEquals(request.form.get("username"), Seq("john"))
+    assertEquals(request.form.get("email"), Seq("john@example.com"))
 
   test("Request contentType extracts Content-Type header"):
     val request = Request
@@ -138,19 +109,19 @@ class RequestTest extends FunSuite:
   test("Request handles empty headers"):
     val request = Request.GET("/test")
 
-    assertEquals(request.headers, Map.empty)
+    assertEquals(request.headers.get("any-header"), Seq())
     assertEquals(request.contentType, None)
     assertEquals(request.contentLength, None)
 
   test("Request handles empty query parameters"):
     val request = Request.GET("/test")
 
-    assertEquals(request.query, Map.empty)
+    assertEquals(request.query.get("any-param"), Seq())
 
   test("Request handles empty form data"):
     val request = Request.GET("/test")
 
-    assertEquals(request.form, Map.empty)
+    assertEquals(request.form.get("any-field"), Seq())
 
   test("Request copy preserves all fields"):
     val original = Request.GET("/test")
@@ -178,9 +149,9 @@ class RequestTest extends FunSuite:
   test("Request handles path params"):
     val request = Request
       .GET("/users/123")
-      .copy(pathParams = Map("id" -> IndexedSeq("123")))
+      .copy(pathParams = MultiMap("id" -> "123"))
 
-    assertEquals(request.pathParams.get("id"), Some(IndexedSeq("123")))
+    assertEquals(request.pathParams.get("id"), Seq("123"))
 
   test("Request handles cookies"):
     val cookie = Cookie("session_id", "abc123")

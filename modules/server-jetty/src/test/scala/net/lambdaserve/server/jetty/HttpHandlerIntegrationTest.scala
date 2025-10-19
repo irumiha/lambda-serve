@@ -30,7 +30,7 @@ class HttpHandlerIntegrationTest extends FunSuite:
     val contentSummary =
       if request.multipartForm.nonEmpty then
         s"multipart: ${request.multipartForm.size} parts"
-      else if request.form.nonEmpty then s"form: ${request.form.size} fields"
+      else if !request.form.isEmpty then s"form: ${request.form.size} fields"
       else s"raw bytes"
 
     Response.Ok(s"Received $contentSummary")
@@ -122,21 +122,21 @@ class HttpHandlerIntegrationTest extends FunSuite:
 
     assertEquals(receivedRequests.size, 1)
     val receivedRequest = receivedRequests.head
-    assert(receivedRequest.form.nonEmpty)
+    assert(!receivedRequest.form.isEmpty)
 
     assertEquals(
       receivedRequest.form.get("username"),
-      Some(IndexedSeq("testuser"))
+      IndexedSeq("testuser")
     )
 
     assertEquals(
       receivedRequest.form.get("email"),
-      Some(IndexedSeq("test@example.com"))
+      IndexedSeq("test@example.com")
     )
-    assertEquals(receivedRequest.form.get("age"), Some(IndexedSeq("25")))
+    assertEquals(receivedRequest.form.get("age"), IndexedSeq("25"))
     assertEquals(
       receivedRequest.form.get("tags"),
-      Some(IndexedSeq("scala", "web"))
+      IndexedSeq("scala", "web")
     )
 
     // Should not have multipart or raw content

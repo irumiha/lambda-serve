@@ -1,6 +1,7 @@
 package net.lambdaserve
 
 import net.lambdaserve.http.{Method, Request}
+import net.lambdaserve.types.MultiMap
 
 import scala.jdk.CollectionConverters.given
 import scala.util.matching.Regex
@@ -15,9 +16,9 @@ case class Route(method: Method, path: Regex, handler: RouteHandler):
     if pathMatch.matches() then
       val pathParamValues =
         pathParamNames
-          .map(name => name -> IndexedSeq(pathMatch.group(name)))
-          .toMap
+          .map(name => name -> pathMatch.group(name))
+
       if pathParamValues.nonEmpty then
-        Some(request.copy(pathParams = pathParamValues))
+        Some(request.copy(pathParams = MultiMap(pathParamValues*)))
       else Some(request)
     else None

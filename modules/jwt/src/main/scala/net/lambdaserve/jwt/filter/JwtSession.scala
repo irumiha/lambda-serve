@@ -1,9 +1,9 @@
 package net.lambdaserve.jwt.filter
 
-import net.lambdaserve.TypedKey
 import net.lambdaserve.filters.{Filter, FilterInResponse}
 import net.lambdaserve.http.Request
 import net.lambdaserve.jwt.{Jwt, JwtUtil}
+import net.lambdaserve.types.TypedKey
 import org.slf4j.LoggerFactory
 
 case class JwtSessionFilterConfig(cookieName: String)
