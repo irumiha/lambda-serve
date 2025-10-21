@@ -3,12 +3,12 @@ package net.lambdaserve.core
 import net.lambdaserve.{Route, Router}
 import net.lambdaserve.http.*
 import net.lambdaserve.http.Method.{GET, POST}
-import net.lambdaserve.http.{Header, Request, Response}
+import net.lambdaserve.http.{Header, Request, HttpResponse}
 
 import java.io.ByteArrayOutputStream
 
 class RouterSuite extends munit.FunSuite:
-  def defaultHandler(request: Request): Response = Response.Ok("Done")
+  def defaultHandler(request: Request): HttpResponse = HttpResponse.Ok("Done")
 
   test("matchRequest empty regex does not match /") {
     val route = Route(GET, "".r, defaultHandler)
@@ -54,7 +54,7 @@ class RouterSuite extends munit.FunSuite:
         val paramValue =
           request.pathParams.get("paramname", "")
 
-        Response.Ok(paramValue)
+        HttpResponse.Ok(paramValue)
       }
     )
 
@@ -65,7 +65,7 @@ class RouterSuite extends munit.FunSuite:
     assert(matched.isDefined)
     val baos                      = ByteArrayOutputStream()
     val (matchedRequest, handler) = matched.get
-    handler(matchedRequest).bodyWriter(baos)
+    handler(matchedRequest).asHttp.bodyWriter(baos)
     val out = baos.toString()
     assert(out == "something")
   }
@@ -79,7 +79,7 @@ class RouterSuite extends munit.FunSuite:
           request.pathParams.get("paramname", "")
         val queryValue = request.query.get("queryname", "")
 
-        Response.Ok(paramValue + queryValue)
+        HttpResponse.Ok(paramValue + queryValue)
       }
     )
 
@@ -90,7 +90,7 @@ class RouterSuite extends munit.FunSuite:
     assert(matched.isDefined)
     val baos                      = ByteArrayOutputStream()
     val (matchedRequest, handler) = matched.get
-    handler(matchedRequest).bodyWriter(baos)
+    handler(matchedRequest).asHttp.bodyWriter(baos)
     val out = baos.toString()
     assert(out == "something123")
   }
@@ -104,7 +104,7 @@ class RouterSuite extends munit.FunSuite:
         val queryValue = request.query.get("queryname", "")
         val username   = request.form.get("username", "")
         val password   = request.form.get("password", "")
-        Response.Ok(paramValue + queryValue + username + password)
+        HttpResponse.Ok(paramValue + queryValue + username + password)
       }
     )
 
@@ -125,7 +125,7 @@ class RouterSuite extends munit.FunSuite:
     assert(matched.isDefined)
     val baos                      = ByteArrayOutputStream()
     val (matchedRequest, handler) = matched.get
-    handler(matchedRequest).bodyWriter(baos)
+    handler(matchedRequest).asHttp.bodyWriter(baos)
     val out = baos.toString()
     assertEquals(out, "something123user123")
   }

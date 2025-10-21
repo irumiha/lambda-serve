@@ -14,8 +14,8 @@ class PredicateRedirectFilterTest extends FunSuite:
 
     result match
       case FilterInResponse.Stop(response) =>
-        assertEquals(response.status, Status.SeeOther)
-        assertEquals(response.headers.get("Location"), Some(Seq("/new")))
+        assertEquals(response.asHttp.status, Status.SeeOther)
+        assertEquals(response.asHttp.headers.get("Location"), Some(Seq("/new")))
       case _ => fail("Expected Stop response with redirect")
 
   test("PredicateRedirectFilter continues when predicate is false"):
@@ -43,7 +43,7 @@ class PredicateRedirectFilterTest extends FunSuite:
 
     resultWithParam match
       case FilterInResponse.Stop(response) =>
-        assertEquals(response.status, Status.SeeOther)
+        assertEquals(response.asHttp.status, Status.SeeOther)
       case _ => fail("Expected redirect for request with query param")
 
     resultWithoutParam match
@@ -69,8 +69,8 @@ class PredicateRedirectFilterTest extends FunSuite:
 
     resultWithoutHeader match
       case FilterInResponse.Stop(response) =>
-        assertEquals(response.status, Status.SeeOther)
-        assertEquals(response.headers.get("Location"), Some(Seq("/error")))
+        assertEquals(response.asHttp.status, Status.SeeOther)
+        assertEquals(response.asHttp.headers.get("Location"), Some(Seq("/error")))
       case _ => fail("Expected redirect for request without header")
 
   test("PredicateRedirectFilter can check method"):
@@ -86,7 +86,7 @@ class PredicateRedirectFilterTest extends FunSuite:
 
     postResult match
       case FilterInResponse.Stop(response) =>
-        assertEquals(response.status, Status.SeeOther)
+        assertEquals(response.asHttp.status, Status.SeeOther)
       case _ => fail("Expected redirect for POST request")
 
     getResult match
@@ -103,7 +103,7 @@ class PredicateRedirectFilterTest extends FunSuite:
     result match
       case FilterInResponse.Stop(response) =>
         assertEquals(
-          response.headers.get("Location"),
+          response.asHttp.headers.get("Location"),
           Some(Seq("/custom/redirect/path"))
         )
       case _ => fail("Expected redirect")

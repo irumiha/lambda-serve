@@ -1,7 +1,7 @@
 package net.lambdaserve.server.jetty
 
 import net.lambdaserve.filters.FilterEngine
-import net.lambdaserve.http.{Method, MultiPart, Request}
+import net.lambdaserve.http.{HttpResponse, Method, MultiPart, Request}
 import net.lambdaserve.types.MultiMap
 import org.eclipse.jetty.http.MultiPartFormData
 import org.eclipse.jetty.io.Content
@@ -123,22 +123,24 @@ class HttpHandler(filterEngine: FilterEngine) extends jetty.Handler.Abstract():
         )
         filterEngine.processRequest(request)
 
-    out.setStatus(response.status.code)
-    for cookie <- response.cookies.values do
-      val jettyCookie = Cookies.toJettyCookie(cookie)
-      jetty.Response.addCookie(out, jettyCookie)
-    val responseHeaders = out.getHeaders
-    response.length.foreach(
-      responseHeaders.put(jettyHttp.HttpHeader.CONTENT_LENGTH, _)
-    )
+    response match
+      case httpResponse: HttpResponse =>
+        out.setStatus(httpResponse.status.code)
+        for cookie <- httpResponse.cookies.values do
+          val jettyCookie = Cookies.toJettyCookie(cookie)
+          jetty.Response.addCookie(out, jettyCookie)
+        val responseHeaders = out.getHeaders
+        httpResponse.length.foreach(
+          responseHeaders.put(jettyHttp.HttpHeader.CONTENT_LENGTH, _)
+        )
 
-    response.headers.foreach { case (headerName, headerValue) =>
-      responseHeaders.put(headerName, headerValue.asJava)
-    }
+        httpResponse.headers.foreach { case (headerName, headerValue) =>
+          responseHeaders.put(headerName, headerValue.asJava)
+        }
 
-    val os = jetty.Response.asBufferedOutputStream(in, out)
-    response.bodyWriter(os)
-    os.close()
-    callback.succeeded()
-
+        val os = jetty.Response.asBufferedOutputStream(in, out)
+        httpResponse.bodyWriter(os)
+        os.close()
+        callback.succeeded()
+      case _ =>
     true

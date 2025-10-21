@@ -1,7 +1,7 @@
 package net.lambdaserve.filters
 
 import munit.FunSuite
-import net.lambdaserve.http.{Request, Response}
+import net.lambdaserve.http.{Request, HttpResponse}
 
 class RequestIdFilterTest extends FunSuite:
 
@@ -21,11 +21,11 @@ class RequestIdFilterTest extends FunSuite:
           updatedRequest.headers.get("X-Request-ID"),
           IndexedSeq("test-id-123")
         )
-        val mockResponse = Response.Ok("test")
+        val mockResponse = HttpResponse.Ok("test")
         responseWrapper(mockResponse) match
           case FilterOutResponse.Continue(wrappedResponse) =>
             assertEquals(
-              wrappedResponse.headers.get("X-Request-ID"),
+              wrappedResponse.asHttp.headers.get("X-Request-ID"),
               Some(Seq("test-id-123"))
             )
           case _ => fail("Expected Continue response")
@@ -45,11 +45,11 @@ class RequestIdFilterTest extends FunSuite:
           updatedRequest.headers.get("X-Request-ID"),
           IndexedSeq("existing-id-456")
         )
-        val mockResponse = Response.Ok("test")
+        val mockResponse = HttpResponse.Ok("test")
         responseWrapper(mockResponse) match
           case FilterOutResponse.Continue(wrappedResponse) =>
             assertEquals(
-              wrappedResponse.headers.get("X-Request-ID"),
+              wrappedResponse.asHttp.headers.get("X-Request-ID"),
               Some(Seq("existing-id-456"))
             )
           case _ => fail("Expected Continue response")
@@ -70,11 +70,11 @@ class RequestIdFilterTest extends FunSuite:
           updatedRequest.headers.get("X-Trace-ID"),
           IndexedSeq("trace-789")
         )
-        val mockResponse = Response.Ok("test")
+        val mockResponse = HttpResponse.Ok("test")
         responseWrapper(mockResponse) match
           case FilterOutResponse.Continue(wrappedResponse) =>
             assertEquals(
-              wrappedResponse.headers.get("X-Trace-ID"),
+              wrappedResponse.asHttp.headers.get("X-Trace-ID"),
               Some(Seq("trace-789"))
             )
           case _ => fail("Expected Continue response")

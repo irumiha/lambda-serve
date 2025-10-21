@@ -1,6 +1,6 @@
 package net.lambdaserve.filters
 
-import net.lambdaserve.http.{Header, Method, Request, Response, Status}
+import net.lambdaserve.http.{Header, Method, Request, HttpResponse, Status}
 
 /** CORS (Cross-Origin Resource Sharing) filter that handles preflight requests
   * and adds appropriate CORS headers to responses.
@@ -34,11 +34,8 @@ class CorsFilter(
     Method.DELETE,
     Method.OPTIONS
   ),
-  val allowedHeaders: Set[String] = Set(
-    "Content-Type",
-    "Authorization",
-    "X-Requested-With"
-  ),
+  val allowedHeaders: Set[String] =
+    Set("Content-Type", "Authorization", "X-Requested-With"),
   val exposedHeaders: Set[String] = Set.empty,
   val allowCredentials: Boolean = false,
   val maxAge: Option[Int] = Some(3600),
@@ -51,7 +48,9 @@ class CorsFilter(
   private def isOriginAllowed(origin: String): Boolean =
     allowAllOrigins || allowedOrigins.contains(origin)
 
-  private def getAllowOriginHeader(requestOrigin: Option[String]): Option[String] =
+  private def getAllowOriginHeader(
+    requestOrigin: Option[String]
+  ): Option[String] =
     requestOrigin match
       case Some(origin) if isOriginAllowed(origin) =>
         // When credentials are allowed, we must return the specific origin, not "*"
@@ -60,7 +59,10 @@ class CorsFilter(
         else Some(origin)
       case _ => None
 
-  private def addCorsHeaders(response: Response, origin: Option[String]): Response =
+  private def addCorsHeaders(
+    response: HttpResponse,
+    origin: Option[String]
+  ): HttpResponse =
     getAllowOriginHeader(origin) match
       case Some(allowOriginValue) =>
         var updatedResponse = response
@@ -81,12 +83,12 @@ class CorsFilter(
 
       case None => response
 
-  private def handlePreflightRequest(request: Request): Response =
+  private def handlePreflightRequest(request: Request): HttpResponse =
     val origin = request.headers.get(Header.Origin.name).headOption
 
     getAllowOriginHeader(origin) match
       case Some(allowOriginValue) =>
-        var response = Response(
+        var response = HttpResponse(
           status = Status.NoContent,
           headers = Map(
             Header.AccessControlAllowOrigin.name -> Seq(allowOriginValue),
@@ -113,7 +115,7 @@ class CorsFilter(
 
       case None =>
         // Origin is not allowed, return 403
-        Response(
+        HttpResponse(
           status = Status.Forbidden,
           headers = Map.empty,
           bodyWriter = _ => ()
@@ -129,5 +131,9 @@ class CorsFilter(
       // For actual requests, wrap the response to add CORS headers
       FilterInResponse.Wrap(
         request,
-        response => FilterOutResponse.Continue(addCorsHeaders(response, origin))
+        {
+          case response: HttpResponse =>
+            FilterOutResponse.Continue(addCorsHeaders(response, origin))
+          case anyOtherResponse => FilterOutResponse.Continue(anyOtherResponse)
+        }
       )

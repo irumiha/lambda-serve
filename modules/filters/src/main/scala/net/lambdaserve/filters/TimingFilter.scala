@@ -1,6 +1,6 @@
 package net.lambdaserve.filters
 
-import net.lambdaserve.http.Request
+import net.lambdaserve.http.{HttpResponse, Request}
 import org.slf4j.LoggerFactory
 
 /** Filter that measures request processing time and optionally adds timing
@@ -26,7 +26,9 @@ class TimingFilter(
   val addHeaderToResponse: Boolean = true,
   val timingHeader: String = "X-Response-Time",
   val logTiming: Boolean = true,
-  val logSlowRequests: Option[Long] = Some(1000), // Log requests taking > 1 second
+  val logSlowRequests: Option[Long] = Some(
+    1000
+  ), // Log requests taking > 1 second
   override val includePrefixes: List[String] = List(""),
   override val excludePrefixes: List[String] = List.empty
 ) extends Filter:
@@ -38,28 +40,31 @@ class TimingFilter(
 
     FilterInResponse.Wrap(
       request,
-      response =>
-        val endTime = System.nanoTime()
-        val durationMs = (endTime - startTime) / 1_000_000.0
+      {
+        case response: HttpResponse =>
+          val endTime    = System.nanoTime()
+          val durationMs = (endTime - startTime) / 1_000_000.0
 
-        if logTiming then
-          val method = request.method
-          val path = request.path
-          logger.debug(f"$method $path completed in $durationMs%.2f ms")
+          if logTiming then
+            val method = request.method
+            val path   = request.path
+            logger.debug(f"$method $path completed in $durationMs%.2f ms")
 
-          logSlowRequests.foreach { threshold =>
-            if durationMs > threshold then
-              logger.warn(
-                f"Slow request detected: $method $path took $durationMs%.2f ms (threshold: $threshold ms)"
-              )
-          }
+            logSlowRequests.foreach { threshold =>
+              if durationMs > threshold then
+                logger.warn(
+                  f"Slow request detected: $method $path took $durationMs%.2f ms (threshold: $threshold ms)"
+                )
+            }
 
-        val updatedResponse =
-          if addHeaderToResponse then
-            response.addHeader(timingHeader, f"$durationMs%.2f ms")
-          else response
+          val updatedResponse =
+            if addHeaderToResponse then
+              response.addHeader(timingHeader, f"$durationMs%.2f ms")
+            else response
 
-        FilterOutResponse.Continue(updatedResponse)
+          FilterOutResponse.Continue(updatedResponse)
+        case anyOtherResponse => FilterOutResponse.Continue(anyOtherResponse)
+      }
     )
 
 end TimingFilter

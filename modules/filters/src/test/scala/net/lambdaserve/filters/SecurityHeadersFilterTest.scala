@@ -1,7 +1,7 @@
 package net.lambdaserve.filters
 
 import munit.FunSuite
-import net.lambdaserve.http.{Request, Response}
+import net.lambdaserve.http.{Request, HttpResponse}
 
 class SecurityHeadersFilterTest extends FunSuite:
 
@@ -13,23 +13,23 @@ class SecurityHeadersFilterTest extends FunSuite:
 
     result match
       case FilterInResponse.Wrap(_, responseWrapper) =>
-        val mockResponse = Response.Ok("test")
+        val mockResponse = HttpResponse.Ok("test")
         responseWrapper(mockResponse) match
           case FilterOutResponse.Continue(wrappedResponse) =>
             assertEquals(
-              wrappedResponse.headers.get("X-Frame-Options"),
+              wrappedResponse.asHttp.headers.get("X-Frame-Options"),
               Some(Seq("DENY"))
             )
             assertEquals(
-              wrappedResponse.headers.get("X-Content-Type-Options"),
+              wrappedResponse.asHttp.headers.get("X-Content-Type-Options"),
               Some(Seq("nosniff"))
             )
             assertEquals(
-              wrappedResponse.headers.get("X-XSS-Protection"),
+              wrappedResponse.asHttp.headers.get("X-XSS-Protection"),
               Some(Seq("1; mode=block"))
             )
             assertEquals(
-              wrappedResponse.headers.get("Referrer-Policy"),
+              wrappedResponse.asHttp.headers.get("Referrer-Policy"),
               Some(Seq("strict-origin-when-cross-origin"))
             )
           case _ => fail("Expected Continue response")
@@ -43,11 +43,11 @@ class SecurityHeadersFilterTest extends FunSuite:
 
     result match
       case FilterInResponse.Wrap(_, responseWrapper) =>
-        val mockResponse = Response.Ok("test")
+        val mockResponse = HttpResponse.Ok("test")
         responseWrapper(mockResponse) match
           case FilterOutResponse.Continue(wrappedResponse) =>
             assertEquals(
-              wrappedResponse.headers.get("X-Frame-Options"),
+              wrappedResponse.asHttp.headers.get("X-Frame-Options"),
               Some(Seq("SAMEORIGIN"))
             )
           case _ => fail("Expected Continue response")
@@ -64,11 +64,11 @@ class SecurityHeadersFilterTest extends FunSuite:
 
     result match
       case FilterInResponse.Wrap(_, responseWrapper) =>
-        val mockResponse = Response.Ok("test")
+        val mockResponse = HttpResponse.Ok("test")
         responseWrapper(mockResponse) match
           case FilterOutResponse.Continue(wrappedResponse) =>
             assertEquals(
-              wrappedResponse.headers.get("Strict-Transport-Security"),
+              wrappedResponse.asHttp.headers.get("Strict-Transport-Security"),
               Some(Seq("max-age=31536000; includeSubDomains; preload"))
             )
           case _ => fail("Expected Continue response")
@@ -83,11 +83,11 @@ class SecurityHeadersFilterTest extends FunSuite:
 
     result match
       case FilterInResponse.Wrap(_, responseWrapper) =>
-        val mockResponse = Response.Ok("test")
+        val mockResponse = HttpResponse.Ok("test")
         responseWrapper(mockResponse) match
           case FilterOutResponse.Continue(wrappedResponse) =>
             assertEquals(
-              wrappedResponse.headers.get("Content-Security-Policy"),
+              wrappedResponse.asHttp.headers.get("Content-Security-Policy"),
               Some(Seq(csp))
             )
           case _ => fail("Expected Continue response")
@@ -101,11 +101,11 @@ class SecurityHeadersFilterTest extends FunSuite:
 
     result match
       case FilterInResponse.Wrap(_, responseWrapper) =>
-        val mockResponse = Response.Ok("test")
+        val mockResponse = HttpResponse.Ok("test")
         responseWrapper(mockResponse) match
           case FilterOutResponse.Continue(wrappedResponse) =>
             assert(
-              !wrappedResponse.headers.contains("Strict-Transport-Security")
+              !wrappedResponse.asHttp.headers.contains("Strict-Transport-Security")
             )
           case _ => fail("Expected Continue response")
       case _ => fail("Expected Wrap response")

@@ -1,6 +1,6 @@
 package net.lambdaserve.filters
 
-import net.lambdaserve.http.Request
+import net.lambdaserve.http.{HttpResponse, Request}
 import org.slf4j.LoggerFactory
 
 /** Filter that logs HTTP requests for debugging and monitoring purposes.
@@ -25,7 +25,7 @@ class RequestLoggingFilter(
 
   override def handle(request: Request): FilterInResponse =
     val method = request.method
-    val path = request.path
+    val path   = request.path
     val queryString =
       if logQueryParams && !request.query.isEmpty then
         val params = request.query
@@ -45,9 +45,12 @@ class RequestLoggingFilter(
 
     FilterInResponse.Wrap(
       request,
-      response =>
-        logger.info(s"$method $path -> ${response.status.code}")
-        FilterOutResponse.Continue(response)
+      {
+        case response: HttpResponse =>
+          logger.info(s"$method $path -> ${response.status.code}")
+          FilterOutResponse.Continue(response)
+        case anyOtherResponse => FilterOutResponse.Continue(anyOtherResponse)
+      }
     )
 
 end RequestLoggingFilter

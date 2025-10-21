@@ -1,6 +1,6 @@
 package net.lambdaserve.filters
 
-import net.lambdaserve.http.{Request, Response, Status}
+import net.lambdaserve.http.{Request, HttpResponse, Status}
 
 import java.util.concurrent.ConcurrentHashMap
 import scala.jdk.CollectionConverters.*
@@ -28,7 +28,7 @@ class RateLimitFilter(
   val maxRequests: Int = 100,
   val windowMs: Long = 60000, // 1 minute
   val keyExtractor: Request => String = defaultKeyExtractor,
-  val rateLimitedResponse: Response = Response(
+  val rateLimitedResponse: HttpResponse = HttpResponse(
     Status.TooManyRequests,
     Map("Content-Type" -> Seq("text/plain")),
     ""
@@ -57,7 +57,7 @@ class RateLimitFilter(
       _ => new java.util.concurrent.CopyOnWriteArrayList[Long]()
     )
 
-    val cutoff = now - windowMs
+    val cutoff         = now - windowMs
     val recentRequests = timestamps.asScala.count(_ > cutoff)
 
     if recentRequests >= maxRequests then true
@@ -79,22 +79,25 @@ class RateLimitFilter(
       // Continue with the request and add rate limit headers to response
       FilterInResponse.Wrap(
         request,
-        response =>
-          val key = keyExtractor(request)
-          val now = System.currentTimeMillis()
-          val timestamps = requestLog.get(key)
-          val remaining =
-            if timestamps != null then
-              val cutoff = now - windowMs
-              val recentCount = timestamps.asScala.count(_ > cutoff)
-              Math.max(0, maxRequests - recentCount)
-            else maxRequests
+        {
+          case response: HttpResponse =>
+            val key        = keyExtractor(request)
+            val now        = System.currentTimeMillis()
+            val timestamps = requestLog.get(key)
+            val remaining =
+              if timestamps != null then
+                val cutoff      = now - windowMs
+                val recentCount = timestamps.asScala.count(_ > cutoff)
+                Math.max(0, maxRequests - recentCount)
+              else maxRequests
 
-          FilterOutResponse.Continue(
-            response
-              .addHeader("X-RateLimit-Limit", maxRequests.toString)
-              .addHeader("X-RateLimit-Remaining", remaining.toString)
-          )
+            FilterOutResponse.Continue(
+              response
+                .addHeader("X-RateLimit-Limit", maxRequests.toString)
+                .addHeader("X-RateLimit-Remaining", remaining.toString)
+            )
+          case anyOtherResponse => FilterOutResponse.Continue(anyOtherResponse)
+        }
       )
 
 end RateLimitFilter
@@ -109,10 +112,7 @@ private def defaultKeyExtractor(request: Request): String =
 
 object RateLimitFilter:
   /** Creates a rate limit filter based on an IP address */
-  def perIp(
-    maxRequests: Int = 100,
-    windowMs: Long = 60000
-  ): RateLimitFilter =
+  def perIp(maxRequests: Int = 100, windowMs: Long = 60000): RateLimitFilter =
     RateLimitFilter(maxRequests, windowMs, defaultKeyExtractor)
 
   /** Creates a rate limit filter based on a custom header (e.g., API key) */

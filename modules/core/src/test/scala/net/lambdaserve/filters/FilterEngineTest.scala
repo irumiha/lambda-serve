@@ -1,7 +1,7 @@
 package net.lambdaserve.filters
 
 import munit.FunSuite
-import net.lambdaserve.http.{Request, Response, Status}
+import net.lambdaserve.http.{Request, HttpResponse, Status}
 
 class FilterEngineTest extends FunSuite:
 
@@ -10,7 +10,7 @@ class FilterEngineTest extends FunSuite:
     override def handle(request: Request): FilterInResponse =
       FilterInResponse.Continue(request.copy(path = pathModifier(request.path)))
 
-  class StopFilter(val response: Response) extends Filter:
+  class StopFilter(val response: HttpResponse) extends Filter:
     override def handle(request: Request): FilterInResponse =
       FilterInResponse.Stop(response)
 
@@ -20,14 +20,14 @@ class FilterEngineTest extends FunSuite:
         request,
         response =>
           FilterOutResponse.Continue(
-            response.addHeader(headerToAdd._1, headerToAdd._2)
+            response.asHttp.addHeader(headerToAdd._1, headerToAdd._2)
           )
       )
 
   class ConditionalStopFilter(val predicate: Request => Boolean) extends Filter:
     override def handle(request: Request): FilterInResponse =
       if predicate(request) then
-        FilterInResponse.Stop(Response.Ok("Stopped by filter"))
+        FilterInResponse.Stop(HttpResponse.Ok("Stopped by filter"))
       else FilterInResponse.Continue(request)
 
   test("FilterEngine with empty filter list fails assertion"):
@@ -51,17 +51,17 @@ class FilterEngineTest extends FunSuite:
 
   test("FilterEngine with Continue then Stop filters processes both"):
     val continueFilter = ContinueFilter(path => path + "/modified")
-    val stopFilter = StopFilter(Response.Ok("Done"))
+    val stopFilter = StopFilter(HttpResponse.Ok("Done"))
     val engine = FilterEngine(IndexedSeq(continueFilter, stopFilter))
     val request = Request.GET("/test")
 
     val response = engine.processRequest(request)
 
-    assertEquals(response.status, Status.OK)
+    assertEquals(response.asHttp.status, Status.OK)
 
   test("FilterEngine stops processing when Stop is encountered"):
     val continueFilter1 = ContinueFilter(path => path + "/first")
-    val stopFilter = StopFilter(Response.Ok("Stopped"))
+    val stopFilter = StopFilter(HttpResponse.Ok("Stopped"))
     val continueFilter2 =
       ContinueFilter(path => path + "/second") // Should not be executed
     val engine =
@@ -70,60 +70,60 @@ class FilterEngineTest extends FunSuite:
 
     val response = engine.processRequest(request)
 
-    assertEquals(response.status, Status.OK)
+    assertEquals(response.asHttp.status, Status.OK)
     // Verify that the third filter was not applied (path should not contain "/second")
 
   test("FilterEngine processes multiple Continue filters in sequence"):
     val filter1 = ContinueFilter(path => path + "/first")
     val filter2 = ContinueFilter(path => path + "/second")
     val filter3 = ContinueFilter(path => path + "/third")
-    val stopFilter = StopFilter(Response.Ok("Done"))
+    val stopFilter = StopFilter(HttpResponse.Ok("Done"))
     val engine = FilterEngine(IndexedSeq(filter1, filter2, filter3, stopFilter))
     val request = Request.GET("/test")
 
     val response = engine.processRequest(request)
 
     // All Continue filters should have been applied before Stop
-    assertEquals(response.status, Status.OK)
+    assertEquals(response.asHttp.status, Status.OK)
 
   test("FilterEngine applies Wrap filters to response"):
     val wrapFilter = WrapFilter("X-Custom-Header" -> "CustomValue")
-    val stopFilter = StopFilter(Response.Ok("Done"))
+    val stopFilter = StopFilter(HttpResponse.Ok("Done"))
     val engine = FilterEngine(IndexedSeq(wrapFilter, stopFilter))
     val request = Request.GET("/test")
 
     val response = engine.processRequest(request)
 
-    assertEquals(response.status, Status.OK)
+    assertEquals(response.asHttp.status, Status.OK)
     assertEquals(
-      response.headers.get("X-Custom-Header"),
+      response.asHttp.headers.get("X-Custom-Header"),
       Some(Seq("CustomValue"))
     )
 
   test("FilterEngine applies multiple Wrap filters in reverse order"):
     val wrapFilter1 = WrapFilter("X-Header-1" -> "Value1")
     val wrapFilter2 = WrapFilter("X-Header-2" -> "Value2")
-    val stopFilter = StopFilter(Response.Ok("Done"))
+    val stopFilter = StopFilter(HttpResponse.Ok("Done"))
     val engine = FilterEngine(IndexedSeq(wrapFilter1, wrapFilter2, stopFilter))
     val request = Request.GET("/test")
 
     val response = engine.processRequest(request)
 
-    assertEquals(response.status, Status.OK)
-    assertEquals(response.headers.get("X-Header-1"), Some(Seq("Value1")))
-    assertEquals(response.headers.get("X-Header-2"), Some(Seq("Value2")))
+    assertEquals(response.asHttp.status, Status.OK)
+    assertEquals(response.asHttp.headers.get("X-Header-1"), Some(Seq("Value1")))
+    assertEquals(response.asHttp.headers.get("X-Header-2"), Some(Seq("Value2")))
 
   test("FilterEngine combines Continue, Wrap, and Stop filters"):
     val continueFilter = ContinueFilter(path => path + "/modified")
     val wrapFilter = WrapFilter("X-Modified" -> "true")
-    val stopFilter = StopFilter(Response.Ok("Final"))
+    val stopFilter = StopFilter(HttpResponse.Ok("Final"))
     val engine = FilterEngine(IndexedSeq(continueFilter, wrapFilter, stopFilter))
     val request = Request.GET("/test")
 
     val response = engine.processRequest(request)
 
-    assertEquals(response.status, Status.OK)
-    assertEquals(response.headers.get("X-Modified"), Some(Seq("true")))
+    assertEquals(response.asHttp.status, Status.OK)
+    assertEquals(response.asHttp.headers.get("X-Modified"), Some(Seq("true")))
 
   test("FilterEngine respects includePrefixes"):
     val filter = new Filter:
@@ -131,18 +131,18 @@ class FilterEngineTest extends FunSuite:
       override def handle(request: Request): FilterInResponse =
         FilterInResponse.Continue(request.copy(path = request.path + "/api-only"))
 
-    val stopFilter = StopFilter(Response.Ok("Done"))
+    val stopFilter = StopFilter(HttpResponse.Ok("Done"))
     val engine = FilterEngine(IndexedSeq(filter, stopFilter))
 
     // Request matching includePrefixes
     val apiRequest = Request.GET("/api/test")
     val apiResponse = engine.processRequest(apiRequest)
-    assertEquals(apiResponse.status, Status.OK)
+    assertEquals(apiResponse.asHttp.status, Status.OK)
 
     // Request not matching includePrefixes
     val nonApiRequest = Request.GET("/other/test")
     val nonApiResponse = engine.processRequest(nonApiRequest)
-    assertEquals(nonApiResponse.status, Status.OK)
+    assertEquals(nonApiResponse.asHttp.status, Status.OK)
 
   test("FilterEngine respects excludePrefixes"):
     val filter = new Filter:
@@ -151,18 +151,18 @@ class FilterEngineTest extends FunSuite:
       override def handle(request: Request): FilterInResponse =
         FilterInResponse.Continue(request.copy(path = request.path + "/filtered"))
 
-    val stopFilter = StopFilter(Response.Ok("Done"))
+    val stopFilter = StopFilter(HttpResponse.Ok("Done"))
     val engine = FilterEngine(IndexedSeq(filter, stopFilter))
 
     // Request matching excludePrefixes should skip filter
     val adminRequest = Request.GET("/admin/test")
     val adminResponse = engine.processRequest(adminRequest)
-    assertEquals(adminResponse.status, Status.OK)
+    assertEquals(adminResponse.asHttp.status, Status.OK)
 
     // Regular request should apply filter
     val regularRequest = Request.GET("/api/test")
     val regularResponse = engine.processRequest(regularRequest)
-    assertEquals(regularResponse.status, Status.OK)
+    assertEquals(regularResponse.asHttp.status, Status.OK)
 
   test("FilterEngine handles FilterOutResponse.Stop"):
     val wrapFilterWithStop = new Filter:
@@ -171,23 +171,23 @@ class FilterEngineTest extends FunSuite:
           request,
           response =>
             FilterOutResponse.Stop(
-              response.addHeader("X-Stopped", "true")
+              response.asHttp.addHeader("X-Stopped", "true")
             )
         )
 
     val wrapFilter2 =
       WrapFilter("X-Should-Not-Appear" -> "value") // Should not be applied
-    val stopFilter = StopFilter(Response.Ok("Done"))
+    val stopFilter = StopFilter(HttpResponse.Ok("Done"))
     val engine =
       FilterEngine(IndexedSeq(wrapFilter2, wrapFilterWithStop, stopFilter))
     val request = Request.GET("/test")
 
     val response = engine.processRequest(request)
 
-    assertEquals(response.status, Status.OK)
-    assertEquals(response.headers.get("X-Stopped"), Some(Seq("true")))
+    assertEquals(response.asHttp.status, Status.OK)
+    assertEquals(response.asHttp.headers.get("X-Stopped"), Some(Seq("true")))
     // The second wrap filter should not have been applied
-    assert(!response.headers.contains("X-Should-Not-Appear"))
+    assert(!response.asHttp.headers.contains("X-Should-Not-Appear"))
 
   test("FilterEngine handles conditional Stop in middle of chain"):
     val continueFilter = ContinueFilter(path => path + "/first")
@@ -195,7 +195,7 @@ class FilterEngineTest extends FunSuite:
       ConditionalStopFilter(req => req.path.contains("/stop"))
     val continueFilter2 =
       ContinueFilter(path => path + "/second") // Should not execute
-    val stopFilter = StopFilter(Response.Ok("Final"))
+    val stopFilter = StopFilter(HttpResponse.Ok("Final"))
     val engine = FilterEngine(
       IndexedSeq(continueFilter, conditionalStop, continueFilter2, stopFilter)
     )
@@ -203,7 +203,7 @@ class FilterEngineTest extends FunSuite:
     val stopRequest = Request.GET("/stop/test")
     val response = engine.processRequest(stopRequest)
 
-    assertEquals(response.status, Status.OK)
+    assertEquals(response.asHttp.status, Status.OK)
 
   test("FilterEngine with request modification through chain"):
     val addHeaderFilter = new Filter:
@@ -218,14 +218,14 @@ class FilterEngineTest extends FunSuite:
           request.withQueryParam("filtered", "true")
         )
 
-    val stopFilter = StopFilter(Response.Ok("Done"))
+    val stopFilter = StopFilter(HttpResponse.Ok("Done"))
     val engine =
       FilterEngine(IndexedSeq(addHeaderFilter, addQueryParamFilter, stopFilter))
     val request = Request.GET("/test")
 
     val response = engine.processRequest(request)
 
-    assertEquals(response.status, Status.OK)
+    assertEquals(response.asHttp.status, Status.OK)
     // Request modifications should have been applied through the chain
 
 end FilterEngineTest

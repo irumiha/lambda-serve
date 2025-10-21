@@ -31,16 +31,16 @@ class RateLimitFilterTest extends FunSuite:
     val blockedResult = filter.handle(request)
     blockedResult match
       case FilterInResponse.Stop(response) =>
-        assertEquals(response.status, Status.TooManyRequests)
+        assertEquals(response.asHttp.status, Status.TooManyRequests)
         assertEquals(
-          response.headers.get("X-RateLimit-Limit"),
+          response.asHttp.headers.get("X-RateLimit-Limit"),
           Some(Seq("2"))
         )
         assertEquals(
-          response.headers.get("X-RateLimit-Remaining"),
+          response.asHttp.headers.get("X-RateLimit-Remaining"),
           Some(Seq("0"))
         )
-        assert(response.headers.contains("Retry-After"))
+        assert(response.asHttp.headers.contains("Retry-After"))
       case _ => fail("Expected Stop response for rate-limited request")
 
   test("RateLimitFilter uses custom key extractor"):
@@ -66,12 +66,12 @@ class RateLimitFilterTest extends FunSuite:
     // Both should be at their limits now
     filter.handle(request1) match
       case FilterInResponse.Stop(response) =>
-        assertEquals(response.status, Status.TooManyRequests)
+        assertEquals(response.asHttp.status, Status.TooManyRequests)
       case _ => fail("Expected Stop response")
 
     filter.handle(request2) match
       case FilterInResponse.Stop(response) =>
-        assertEquals(response.status, Status.TooManyRequests)
+        assertEquals(response.asHttp.status, Status.TooManyRequests)
       case _ => fail("Expected Stop response")
 
   test("RateLimitFilter adds rate limit headers to response"):
@@ -82,16 +82,16 @@ class RateLimitFilterTest extends FunSuite:
 
     result match
       case FilterInResponse.Wrap(_, responseWrapper) =>
-        import net.lambdaserve.http.Response
-        val mockResponse = Response.Ok("test")
+        import net.lambdaserve.http.HttpResponse
+        val mockResponse = HttpResponse.Ok("test")
         responseWrapper(mockResponse) match
           case FilterOutResponse.Continue(wrappedResponse) =>
             assertEquals(
-              wrappedResponse.headers.get("X-RateLimit-Limit"),
+              wrappedResponse.asHttp.headers.get("X-RateLimit-Limit"),
               Some(Seq("5"))
             )
             // After first request, should have 4 remaining
-            assert(wrappedResponse.headers.contains("X-RateLimit-Remaining"))
+            assert(wrappedResponse.asHttp.headers.contains("X-RateLimit-Remaining"))
           case _ => fail("Expected Continue response")
       case _ => fail("Expected Wrap response")
 

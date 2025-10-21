@@ -1,6 +1,6 @@
 package net.lambdaserve.filters
 
-import net.lambdaserve.http.Request
+import net.lambdaserve.http.{HttpResponse, Request}
 
 import java.util.UUID
 
@@ -42,10 +42,13 @@ class RequestIdFilter(
     // Also add request ID to response
     FilterInResponse.Wrap(
       updatedRequest,
-      response =>
-        FilterOutResponse.Continue(
-          response.addHeader(requestIdHeader, requestId)
-        )
+      {
+        case response: HttpResponse =>
+          FilterOutResponse.Continue(
+            response.addHeader(requestIdHeader, requestId)
+          )
+        case anyOtherResponse => FilterOutResponse.Continue(anyOtherResponse)
+      }
     )
 
 end RequestIdFilter

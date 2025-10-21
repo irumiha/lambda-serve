@@ -1,7 +1,7 @@
 package net.lambdaserve.filters
 
 import munit.FunSuite
-import net.lambdaserve.http.{Request, Response}
+import net.lambdaserve.http.{Request, HttpResponse}
 
 class CacheControlFilterTest extends FunSuite:
 
@@ -13,11 +13,11 @@ class CacheControlFilterTest extends FunSuite:
 
     result match
       case FilterInResponse.Wrap(_, responseWrapper) =>
-        val mockResponse = Response.Ok("test")
+        val mockResponse = HttpResponse.Ok("test")
         responseWrapper(mockResponse) match
           case FilterOutResponse.Continue(wrappedResponse) =>
             assertEquals(
-              wrappedResponse.headers.get("Cache-Control"),
+              wrappedResponse.asHttp.headers.get("Cache-Control"),
               Some(Seq("public, max-age=3600"))
             )
           case _ => fail("Expected Continue response")
@@ -33,11 +33,11 @@ class CacheControlFilterTest extends FunSuite:
 
     result match
       case FilterInResponse.Wrap(_, responseWrapper) =>
-        val mockResponse = Response.Ok("test")
+        val mockResponse = HttpResponse.Ok("test")
         responseWrapper(mockResponse) match
           case FilterOutResponse.Continue(wrappedResponse) =>
             assertEquals(
-              wrappedResponse.headers.get("Expires"),
+              wrappedResponse.asHttp.headers.get("Expires"),
               Some(Seq(expiresValue))
             )
           case _ => fail("Expected Continue response")
@@ -54,12 +54,12 @@ class CacheControlFilterTest extends FunSuite:
 
     result match
       case FilterInResponse.Wrap(_, responseWrapper) =>
-        val mockResponse = Response.Ok("test")
+        val mockResponse = HttpResponse.Ok("test")
         responseWrapper(mockResponse) match
           case FilterOutResponse.Continue(wrappedResponse) =>
             val expectedETag = s"etag-${request.path.hashCode}"
             assertEquals(
-              wrappedResponse.headers.get("ETag"),
+              wrappedResponse.asHttp.headers.get("ETag"),
               Some(Seq(expectedETag))
             )
           case _ => fail("Expected Continue response")
@@ -73,11 +73,11 @@ class CacheControlFilterTest extends FunSuite:
 
     result match
       case FilterInResponse.Wrap(_, responseWrapper) =>
-        val mockResponse = Response.Ok("test")
+        val mockResponse = HttpResponse.Ok("test")
         responseWrapper(mockResponse) match
           case FilterOutResponse.Continue(wrappedResponse) =>
             assertEquals(
-              wrappedResponse.headers.get("Cache-Control"),
+              wrappedResponse.asHttp.headers.get("Cache-Control"),
               Some(Seq("public, max-age=86400, immutable"))
             )
           case _ => fail("Expected Continue response")
@@ -91,14 +91,14 @@ class CacheControlFilterTest extends FunSuite:
 
     result match
       case FilterInResponse.Wrap(_, responseWrapper) =>
-        val mockResponse = Response.Ok("test")
+        val mockResponse = HttpResponse.Ok("test")
         responseWrapper(mockResponse) match
           case FilterOutResponse.Continue(wrappedResponse) =>
             assertEquals(
-              wrappedResponse.headers.get("Cache-Control"),
+              wrappedResponse.asHttp.headers.get("Cache-Control"),
               Some(Seq("no-cache, no-store, must-revalidate"))
             )
-            assertEquals(wrappedResponse.headers.get("Expires"), Some(Seq("0")))
+            assertEquals(wrappedResponse.asHttp.headers.get("Expires"), Some(Seq("0")))
           case _ => fail("Expected Continue response")
       case _ => fail("Expected Wrap response")
 
@@ -110,11 +110,11 @@ class CacheControlFilterTest extends FunSuite:
 
     result match
       case FilterInResponse.Wrap(_, responseWrapper) =>
-        val mockResponse = Response.Ok("test")
+        val mockResponse = HttpResponse.Ok("test")
         responseWrapper(mockResponse) match
           case FilterOutResponse.Continue(wrappedResponse) =>
             assertEquals(
-              wrappedResponse.headers.get("Cache-Control"),
+              wrappedResponse.asHttp.headers.get("Cache-Control"),
               Some(Seq("private, max-age=600"))
             )
           case _ => fail("Expected Continue response")

@@ -1,6 +1,6 @@
 package net.lambdaserve.filters
 
-import net.lambdaserve.http.Request
+import net.lambdaserve.http.{HttpResponse, Request}
 
 /** Filter that adds cache control headers to responses.
   *
@@ -30,19 +30,22 @@ class CacheControlFilter(
   override def handle(request: Request): FilterInResponse =
     FilterInResponse.Wrap(
       request,
-      response =>
-        var updatedResponse = response.addHeader("Cache-Control", cacheControl)
+      {
+        case httpResponse: HttpResponse =>
+          var updatedResponse = httpResponse.addHeader("Cache-Control", cacheControl)
 
-        expires.foreach { exp =>
-          updatedResponse = updatedResponse.addHeader("Expires", exp)
-        }
+          expires.foreach { exp =>
+            updatedResponse = updatedResponse.addHeader("Expires", exp)
+          }
 
-        eTag.foreach { eTagGenerator =>
-          val eTagValue = eTagGenerator(request)
-          updatedResponse = updatedResponse.addHeader("ETag", eTagValue)
-        }
+          eTag.foreach { eTagGenerator =>
+            val eTagValue = eTagGenerator(request)
+            updatedResponse = updatedResponse.addHeader("ETag", eTagValue)
+          }
 
-        FilterOutResponse.Continue(updatedResponse)
+          FilterOutResponse.Continue(updatedResponse)
+        case anyOtherResponse => FilterOutResponse.Continue(anyOtherResponse)
+      }
     )
 
 end CacheControlFilter

@@ -2,10 +2,10 @@ package net.lambdaserve.server.jetty
 
 import munit.FunSuite
 import net.lambdaserve.Router
-import net.lambdaserve.http.{Method, Request, Response}
+import net.lambdaserve.http.{Method, Request, HttpResponse}
 
 import java.net.http.HttpRequest.BodyPublishers
-import java.net.http.{HttpClient, HttpRequest, HttpResponse}
+import java.net.http.{HttpClient, HttpRequest, HttpResponse => JHttpResponse}
 import java.net.{ServerSocket, URI}
 import java.nio.charset.StandardCharsets
 import scala.util.Using
@@ -23,7 +23,7 @@ class HttpHandlerIntegrationTest extends FunSuite:
   private def findAvailablePort(): Int =
     Using(new ServerSocket(0))(_.getLocalPort).get
 
-  private def testHandler(request: Request): Response =
+  private def testHandler(request: Request): HttpResponse =
     receivedRequests += request
     receivedBytes += request.requestContent.readAllBytes()
 
@@ -33,7 +33,7 @@ class HttpHandlerIntegrationTest extends FunSuite:
       else if !request.form.isEmpty then s"form: ${request.form.size} fields"
       else s"raw bytes"
 
-    Response.Ok(s"Received $contentSummary")
+    HttpResponse.Ok(s"Received $contentSummary")
 
   override def beforeEach(context: BeforeEach): Unit =
     receivedRequests.clear()
@@ -78,7 +78,7 @@ class HttpHandlerIntegrationTest extends FunSuite:
 
     // Act
     val response =
-      httpClient.send(request, HttpResponse.BodyHandlers.ofString())
+      httpClient.send(request, JHttpResponse.BodyHandlers.ofString())
 
     // Assert
     assertEquals(response.statusCode(), 200)
@@ -114,7 +114,7 @@ class HttpHandlerIntegrationTest extends FunSuite:
 
     // Act
     val response =
-      httpClient.send(request, HttpResponse.BodyHandlers.ofString())
+      httpClient.send(request, JHttpResponse.BodyHandlers.ofString())
 
     // Assert
     assertEquals(response.statusCode(), 200)
@@ -156,7 +156,7 @@ class HttpHandlerIntegrationTest extends FunSuite:
 
     // Act
     val response =
-      httpClient.send(request, HttpResponse.BodyHandlers.ofString())
+      httpClient.send(request, JHttpResponse.BodyHandlers.ofString())
 
     // Assert
     assertEquals(response.statusCode(), 200)
@@ -188,7 +188,7 @@ class HttpHandlerIntegrationTest extends FunSuite:
 
     // Act
     val response =
-      httpClient.send(request, HttpResponse.BodyHandlers.ofString())
+      httpClient.send(request, JHttpResponse.BodyHandlers.ofString())
 
     // Assert
     assertEquals(response.statusCode(), 200)
@@ -216,7 +216,7 @@ class HttpHandlerIntegrationTest extends FunSuite:
 
     // Act
     val response =
-      httpClient.send(request, HttpResponse.BodyHandlers.ofString())
+      httpClient.send(request, JHttpResponse.BodyHandlers.ofString())
 
     // Assert
     assertEquals(response.statusCode(), 200)

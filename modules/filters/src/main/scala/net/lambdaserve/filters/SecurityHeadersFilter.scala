@@ -1,15 +1,15 @@
 package net.lambdaserve.filters
 
-import net.lambdaserve.http.Request
+import net.lambdaserve.http.{HttpResponse, Request}
 
 /** Filter that adds common security headers to HTTP responses.
   *
   * Adds the following security headers by default: - X-Frame-Options: Protects
   * against clickjacking - X-Content-Type-Options: Prevents MIME type sniffing -
-  * X-XSS-Protection: Enables browser XSS protection - Strict-Transport-Security:
-  * Enforces HTTPS (if enabled) - Content-Security-Policy: Defines content
-  * security policy (if provided) - Referrer-Policy: Controls referrer
-  * information
+  * X-XSS-Protection: Enables browser XSS protection -
+  * Strict-Transport-Security: Enforces HTTPS (if enabled) -
+  * Content-Security-Policy: Defines content security policy (if provided) -
+  * Referrer-Policy: Controls referrer information
   *
   * @param xFrameOptions
   *   X-Frame-Options header value (default: "DENY")
@@ -32,7 +32,8 @@ class SecurityHeadersFilter(
   val xFrameOptions: String = "DENY",
   val xContentTypeOptions: String = "nosniff",
   val xXSSProtection: String = "1; mode=block",
-  val strictTransportSecurity: Option[String] = None, // e.g., "max-age=31536000; includeSubDomains"
+  val strictTransportSecurity: Option[String] =
+    None, // e.g., "max-age=31536000; includeSubDomains"
   val contentSecurityPolicy: Option[String] = None,
   val referrerPolicy: String = "strict-origin-when-cross-origin",
   override val includePrefixes: List[String] = List(""),
@@ -42,24 +43,27 @@ class SecurityHeadersFilter(
   override def handle(request: Request): FilterInResponse =
     FilterInResponse.Wrap(
       request,
-      response =>
-        var updatedResponse = response
-          .addHeader("X-Frame-Options", xFrameOptions)
-          .addHeader("X-Content-Type-Options", xContentTypeOptions)
-          .addHeader("X-XSS-Protection", xXSSProtection)
-          .addHeader("Referrer-Policy", referrerPolicy)
+      {
+        case response: HttpResponse =>
+          var updatedResponse = response
+            .addHeader("X-Frame-Options", xFrameOptions)
+            .addHeader("X-Content-Type-Options", xContentTypeOptions)
+            .addHeader("X-XSS-Protection", xXSSProtection)
+            .addHeader("Referrer-Policy", referrerPolicy)
 
-        strictTransportSecurity.foreach { hsts =>
-          updatedResponse =
-            updatedResponse.addHeader("Strict-Transport-Security", hsts)
-        }
+          strictTransportSecurity.foreach { hsts =>
+            updatedResponse =
+              updatedResponse.addHeader("Strict-Transport-Security", hsts)
+          }
 
-        contentSecurityPolicy.foreach { csp =>
-          updatedResponse =
-            updatedResponse.addHeader("Content-Security-Policy", csp)
-        }
+          contentSecurityPolicy.foreach { csp =>
+            updatedResponse =
+              updatedResponse.addHeader("Content-Security-Policy", csp)
+          }
 
-        FilterOutResponse.Continue(updatedResponse)
+          FilterOutResponse.Continue(updatedResponse)
+        case anyOtherResponse => FilterOutResponse.Continue(anyOtherResponse)
+      }
     )
 
 end SecurityHeadersFilter

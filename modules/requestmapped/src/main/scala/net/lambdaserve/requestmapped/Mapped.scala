@@ -1,9 +1,9 @@
 package net.lambdaserve.requestmapped
 
-import net.lambdaserve.http.{Request, Response}
+import net.lambdaserve.http.{Request, HttpResponse}
 import net.lambdaserve.mapextract.{MapExtract, SourceName}
 
-type MappedHandler[T] = Request ?=> Combined[T] ?=> T => Response
+type MappedHandler[T] = Request ?=> Combined[T] ?=> T => HttpResponse
 
 @main def testMapped(): Unit =
   case class HouseCommand(
@@ -12,7 +12,7 @@ type MappedHandler[T] = Request ?=> Combined[T] ?=> T => Response
     @SourceName("User-Agent") userAgent: String
   ) derives MapExtract
 
-  val homeHandler: Request ?=> HouseCommand => Response =
+  val homeHandler: Request ?=> HouseCommand => HttpResponse =
     (param: HouseCommand) =>
       val r = summon[Request]
-      Response.Ok(s"Here we go, with headers: ${r.headers}!")
+      HttpResponse.Ok(s"Here we go, with headers: ${r.headers}!")
