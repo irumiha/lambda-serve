@@ -27,7 +27,7 @@ class RequestTest extends FunSuite:
     assertEquals(request.stringBody, "test body")
 
   test("Request.POST creates POST request with InputStream body"):
-    val body = ByteArrayInputStream("test body".getBytes)
+    val body    = ByteArrayInputStream("test body".getBytes)
     val request = Request.POST(body, "/api/test")
 
     assertEquals(request.method, Method.POST)
@@ -53,12 +53,12 @@ class RequestTest extends FunSuite:
 
   test("Request withHeader adds multiple values"):
     val request =
-      Request.GET("/test").withHeader("X-Custom", "value1").withHeader("X-Custom", "value2")
+      Request
+        .GET("/test")
+        .withHeader("X-Custom", "value1")
+        .withHeader("X-Custom", "value2")
 
-    assertEquals(
-      request.headers.get("X-Custom"),
-      Seq("value1", "value2")
-    )
+    assertEquals(request.headers.get("X-Custom"), Seq("value1", "value2"))
 
   test("Request withQueryParam adds single query parameter"):
     val request = Request.GET("/test").withQueryParam("key", "value")
@@ -67,7 +67,10 @@ class RequestTest extends FunSuite:
 
   test("Request withQueryParam adds multiple values"):
     val request =
-      Request.GET("/test").withQueryParam("tags", "scala").withQueryParam("tags", "web")
+      Request
+        .GET("/test")
+        .withQueryParam("tags", "scala")
+        .withQueryParam("tags", "web")
 
     assertEquals(request.query.get("tags"), Seq("scala", "web"))
 
@@ -124,7 +127,8 @@ class RequestTest extends FunSuite:
     assertEquals(request.form.get("any-field"), Seq())
 
   test("Request copy preserves all fields"):
-    val original = Request.GET("/test")
+    val original = Request
+      .GET("/test")
       .withHeader("X-Custom", "value")
       .withQueryParam("page", "1")
       .withFormParam("username", "john")
@@ -155,7 +159,8 @@ class RequestTest extends FunSuite:
 
   test("Request handles cookies"):
     val cookie = Cookie("session_id", "abc123")
-    val request = Request.GET("/test").copy(cookies = Map("session_id" -> cookie))
+    val request =
+      Request.GET("/test").copy(cookies = Map("session_id" -> cookie))
 
     assertEquals(request.cookies.get("session_id"), Some(cookie))
 

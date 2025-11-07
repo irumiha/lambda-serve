@@ -1,5 +1,5 @@
 
-# Lambdaserve - A minimal web server platform for Scala on Jetty
+# Lambdaserve - A minimal web server platform for Scala
 
 Lambdaserve is a minimalistic web server platform for Scala on Jetty. It is designed to be simple
 and easy to use, and to provide a solid foundation for building small to medium web applications
@@ -59,9 +59,9 @@ jetty.join()
 
 ### Minimal dependencies
 
-With everything included the dependencies are:
+With everything included, the dependencies are:
 
- - Jetty
+ - Jetty or simply use the embedded OpenJDK HTTP server
  - jsoniter for JSON (de)serialization
  - slf4j and I recommend Scribe for logging
  - Tyrian or Scalatags

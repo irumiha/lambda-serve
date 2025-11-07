@@ -9,12 +9,12 @@ trait ContainerInstances:
     ): Seq[T] =
       // Helper function to check if a key matches the prefix pattern
       def matchesPrefix(key: String): Boolean =
-        key == prefix || key.startsWith(s"$prefix.") || key.startsWith(s"$prefix[")
+        key == prefix || key.startsWith(s"$prefix.") || key.startsWith(
+          s"$prefix["
+        )
 
       // Check if any map contains keys with indexed notation or regular prefix
-      val mapOpt = ms.find(it =>
-        it.keys.exists(matchesPrefix)
-      )
+      val mapOpt = ms.find(it => it.keys.exists(matchesPrefix))
 
       mapOpt match
         case Some(it) =>

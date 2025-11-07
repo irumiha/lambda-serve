@@ -3,7 +3,10 @@ package net.lambdaserve.server.jetty
 import net.lambdaserve.filters.{Filter, FilterEngine, RouteHandlerFilter}
 import net.lambdaserve.{Router, Server}
 import org.eclipse.jetty.server as jetty
-import org.eclipse.jetty.server.handler.gzip.GzipHandler
+import org.eclipse.jetty.compression.server.{
+  CompressionConfig,
+  CompressionHandler
+}
 import org.eclipse.jetty.server.handler.{
   ContextHandler,
   ContextHandlerCollection,
@@ -36,7 +39,7 @@ object JettyServer extends Server[jetty.Server, jetty.Handler]:
     if useVirtualThreads then
       threadPool.setVirtualThreadsExecutor(
         Executors.newVirtualThreadPerTaskExecutor()
-        )
+      )
 
     val server    = jetty.Server(threadPool)
     val connector = jetty.ServerConnector(server)
@@ -48,11 +51,13 @@ object JettyServer extends Server[jetty.Server, jetty.Handler]:
 
     val lambdaHandler = HttpHandler(
       FilterEngine(filters :+ RouteHandlerFilter(router))
-      )
+    )
 
     // Build the handler chain step by step
-    val baseHandler = createBaseHandler(lambdaHandler, staticPaths, staticPrefix)
-    val sizeLimitedHandler = applySizeLimits(baseHandler, limitRequestSize, limitResponseSize)
+    val baseHandler =
+      createBaseHandler(lambdaHandler, staticPaths, staticPrefix)
+    val sizeLimitedHandler =
+      applySizeLimits(baseHandler, limitRequestSize, limitResponseSize)
     val finalHandler = applyGzipIfNeeded(sizeLimitedHandler, gzipSupport)
 
     server.setHandler(finalHandler)
@@ -67,8 +72,7 @@ object JettyServer extends Server[jetty.Server, jetty.Handler]:
   ): jetty.Handler =
     if staticPaths.nonEmpty && staticPrefix.nonEmpty then
       createStaticContentHandler(lambdaHandler, staticPaths, staticPrefix.get)
-    else
-      lambdaHandler
+    else lambdaHandler
 
   private def createStaticContentHandler(
     lambdaHandler: jetty.Handler,
@@ -94,7 +98,9 @@ object JettyServer extends Server[jetty.Server, jetty.Handler]:
 
     val contextHandlerCollection = ContextHandlerCollection()
     contextHandlerCollection.addHandler(new ContextHandler(lambdaHandler, "/"))
-    contextHandlerCollection.addHandler(new ContextHandler(resourceHandler, staticPrefix))
+    contextHandlerCollection.addHandler(
+      new ContextHandler(resourceHandler, staticPrefix)
+    )
 
     contextHandlerCollection
 
@@ -112,13 +118,12 @@ object JettyServer extends Server[jetty.Server, jetty.Handler]:
     gzipSupport: Boolean
   ): jetty.Handler =
     if gzipSupport then
-      val gzipHandler = GzipHandler(handler)
-      gzipHandler.setMinGzipSize(1024)
-      gzipHandler.setInflateBufferSize(2048)
-      gzipHandler.addIncludedMethods("GET", "POST")
-      gzipHandler
-    else
-      handler
+      val compressionHandler = CompressionHandler(handler)
+      val compressionConfig  = CompressionConfig.builder().defaults().build()
+      compressionHandler.putConfiguration("/*", compressionConfig)
+
+      compressionHandler
+    else handler
 
   override def addToConfiguredServer(
     router: Router,
@@ -126,7 +131,7 @@ object JettyServer extends Server[jetty.Server, jetty.Handler]:
   )(serverConfigurer: jetty.Handler => jetty.Server): jetty.Server =
     val lambdaHandler = HttpHandler(
       FilterEngine(filters :+ RouteHandlerFilter(router))
-      )
+    )
     val jettyServer = serverConfigurer(lambdaHandler)
 
     jettyServer.start()

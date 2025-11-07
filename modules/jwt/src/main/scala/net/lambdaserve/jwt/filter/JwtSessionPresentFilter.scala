@@ -5,4 +5,7 @@ class JwtSessionPresentFilter(
   redirectToIfNot: String,
   override val includePrefixes: List[String] = List(""),
   override val excludePrefixes: List[String] = List.empty
-) extends PredicateRedirectFilter(!_.data.contains(JwtSessionKey), redirectToIfNot)
+) extends PredicateRedirectFilter(
+      !_.data.contains(JwtSessionKey),
+      redirectToIfNot
+    )

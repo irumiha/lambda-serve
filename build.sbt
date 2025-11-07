@@ -89,8 +89,17 @@ lazy val serverJetty = (project in file("modules/server-jetty"))
   .settings(
     name := "lambdaserve-server-jetty",
     libraryDependencies ++= commonDeps ++ Seq(
-      "org.eclipse.jetty" % "jetty-server" % "12.1.2"
+      "org.eclipse.jetty" % "jetty-server" % "12.1.3",
+      "org.eclipse.jetty.compression" % "jetty-compression-server" % "12.1.3",
+      "org.eclipse.jetty.compression" % "jetty-compression-gzip" % "12.1.3",
     )
+  )
+  .dependsOn(core)
+
+lazy val serverJdk = (project in file("modules/server-jdk"))
+  .settings(
+    name := "lambdaserve-server-jdk",
+    libraryDependencies ++= commonDeps
   )
   .dependsOn(core)
 

@@ -6,7 +6,7 @@ import net.lambdaserve.http.{Request, HttpResponse}
 class CacheControlFilterTest extends FunSuite:
 
   test("CacheControlFilter adds cache control header"):
-    val filter = CacheControlFilter("public, max-age=3600")
+    val filter  = CacheControlFilter("public, max-age=3600")
     val request = Request.GET("/test")
 
     val result = filter.handle(request)
@@ -66,7 +66,7 @@ class CacheControlFilterTest extends FunSuite:
       case _ => fail("Expected Wrap response")
 
   test("CacheControlFilter.forStaticAssets creates appropriate filter"):
-    val filter = CacheControlFilter.forStaticAssets(maxAgeSeconds = 86400)
+    val filter  = CacheControlFilter.forStaticAssets(maxAgeSeconds = 86400)
     val request = Request.GET("/static/image.png")
 
     val result = filter.handle(request)
@@ -84,7 +84,7 @@ class CacheControlFilterTest extends FunSuite:
       case _ => fail("Expected Wrap response")
 
   test("CacheControlFilter.noCache creates no-cache filter"):
-    val filter = CacheControlFilter.noCache()
+    val filter  = CacheControlFilter.noCache()
     val request = Request.GET("/api/data")
 
     val result = filter.handle(request)
@@ -98,12 +98,15 @@ class CacheControlFilterTest extends FunSuite:
               wrappedResponse.asHttp.headers.get("Cache-Control"),
               Some(Seq("no-cache, no-store, must-revalidate"))
             )
-            assertEquals(wrappedResponse.asHttp.headers.get("Expires"), Some(Seq("0")))
+            assertEquals(
+              wrappedResponse.asHttp.headers.get("Expires"),
+              Some(Seq("0"))
+            )
           case _ => fail("Expected Continue response")
       case _ => fail("Expected Wrap response")
 
   test("CacheControlFilter.forPrivateContent creates private cache filter"):
-    val filter = CacheControlFilter.forPrivateContent(maxAgeSeconds = 600)
+    val filter  = CacheControlFilter.forPrivateContent(maxAgeSeconds = 600)
     val request = Request.GET("/user/profile")
 
     val result = filter.handle(request)

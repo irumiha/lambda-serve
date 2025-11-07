@@ -32,7 +32,8 @@ class CacheControlFilter(
       request,
       {
         case httpResponse: HttpResponse =>
-          var updatedResponse = httpResponse.addHeader("Cache-Control", cacheControl)
+          var updatedResponse =
+            httpResponse.addHeader("Cache-Control", cacheControl)
 
           expires.foreach { exp =>
             updatedResponse = updatedResponse.addHeader("Expires", exp)

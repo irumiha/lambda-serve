@@ -46,10 +46,10 @@ case class Request(
     this.copy(form = form.update(name, value))
 
   def withQueryParams(params: (String, String)*): Request =
-    this.copy(query = query.extend(MultiMap(params: _*)))
+    this.copy(query = query.extend(MultiMap(params*)))
 
   def withFormParams(params: (String, String)*): Request =
-    this.copy(form = form.extend(MultiMap(params: _*)))
+    this.copy(form = form.extend(MultiMap(params*)))
 
 object Request:
   private def requestWithBody(

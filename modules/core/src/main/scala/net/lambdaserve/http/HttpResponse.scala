@@ -13,7 +13,7 @@ object Response:
     def asHttp: HttpResponse =
       r match
         case r: HttpResponse => r
-        case _               => throw new IllegalArgumentException("Not an HTTP response")
+        case _ => throw new IllegalArgumentException("Not an HTTP response")
 
 case class HttpResponse(
   status: Status,
@@ -48,8 +48,6 @@ case class HttpResponse(
         cookie.copy(expires = Some(Instant.EPOCH), maxAge = Some(0)))
     )
 
-
-
 object HttpResponse:
 
   def apply[R](status: Status, headers: Map[String, Seq[String]], entity: R)(
@@ -79,9 +77,12 @@ object HttpResponse:
     HttpResponse(Status.Found, Map(Header.Location.name -> Seq(location)), "")
 
   def SeeOther(location: String): HttpResponse =
-    HttpResponse(Status.SeeOther, Map(Header.Location.name -> Seq(location)), "")
+    HttpResponse(
+      Status.SeeOther,
+      Map(Header.Location.name -> Seq(location)),
+      ""
+    )
 
 sealed trait SSEResponse extends Response:
-  case class Event (event: String, data: String) extends SSEResponse
-  case class Close () extends SSEResponse
-
+  case class Event(event: String, data: String) extends SSEResponse
+  case class Close()                            extends SSEResponse

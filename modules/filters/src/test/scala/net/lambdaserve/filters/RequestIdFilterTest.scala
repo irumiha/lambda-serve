@@ -7,10 +7,10 @@ class RequestIdFilterTest extends FunSuite:
 
   test("RequestIdFilter generates and adds request ID"):
     var generatedId = ""
-    val filter = RequestIdFilter(generateId = () => {
+    val filter = RequestIdFilter(generateId = () =>
       generatedId = "test-id-123"
       generatedId
-    })
+    )
     val request = Request.GET("/test")
 
     val result = filter.handle(request)
@@ -82,10 +82,10 @@ class RequestIdFilterTest extends FunSuite:
 
   test("RequestIdFilter generates unique IDs for different requests"):
     var idCounter = 0
-    val filter = RequestIdFilter(generateId = () => {
+    val filter = RequestIdFilter(generateId = () =>
       idCounter += 1
       s"id-$idCounter"
-    })
+    )
 
     val request1 = Request.GET("/test1")
     val request2 = Request.GET("/test2")

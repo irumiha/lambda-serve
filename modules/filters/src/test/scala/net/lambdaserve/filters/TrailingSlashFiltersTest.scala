@@ -6,7 +6,7 @@ import net.lambdaserve.http.Request
 class TrailingSlashFiltersTest extends FunSuite:
 
   test("AddTrailingSlash adds slash to path without trailing slash"):
-    val filter = AddTrailingSlash()
+    val filter  = AddTrailingSlash()
     val request = Request.GET("/api/users")
 
     val result = filter.handle(request)
@@ -17,7 +17,7 @@ class TrailingSlashFiltersTest extends FunSuite:
       case _ => fail("Expected Continue response")
 
   test("AddTrailingSlash does not modify path that already has trailing slash"):
-    val filter = AddTrailingSlash()
+    val filter  = AddTrailingSlash()
     val request = Request.GET("/api/users/")
 
     val result = filter.handle(request)
@@ -28,7 +28,7 @@ class TrailingSlashFiltersTest extends FunSuite:
       case _ => fail("Expected Continue response")
 
   test("AddTrailingSlash handles root path"):
-    val filter = AddTrailingSlash()
+    val filter  = AddTrailingSlash()
     val request = Request.GET("/")
 
     val result = filter.handle(request)
@@ -39,7 +39,7 @@ class TrailingSlashFiltersTest extends FunSuite:
       case _ => fail("Expected Continue response")
 
   test("AddTrailingSlash handles empty path"):
-    val filter = AddTrailingSlash()
+    val filter  = AddTrailingSlash()
     val request = Request.GET("")
 
     val result = filter.handle(request)
@@ -50,7 +50,7 @@ class TrailingSlashFiltersTest extends FunSuite:
       case _ => fail("Expected Continue response")
 
   test("RemoveTrailingSlash removes slash from path with trailing slash"):
-    val filter = RemoveTrailingSlash()
+    val filter  = RemoveTrailingSlash()
     val request = Request.GET("/api/users/")
 
     val result = filter.handle(request)
@@ -61,7 +61,7 @@ class TrailingSlashFiltersTest extends FunSuite:
       case _ => fail("Expected Continue response")
 
   test("RemoveTrailingSlash does not modify path without trailing slash"):
-    val filter = RemoveTrailingSlash()
+    val filter  = RemoveTrailingSlash()
     val request = Request.GET("/api/users")
 
     val result = filter.handle(request)
@@ -72,7 +72,7 @@ class TrailingSlashFiltersTest extends FunSuite:
       case _ => fail("Expected Continue response")
 
   test("RemoveTrailingSlash preserves root path"):
-    val filter = RemoveTrailingSlash()
+    val filter  = RemoveTrailingSlash()
     val request = Request.GET("/")
 
     val result = filter.handle(request)
@@ -83,7 +83,7 @@ class TrailingSlashFiltersTest extends FunSuite:
       case _ => fail("Expected Continue response")
 
   test("RemoveTrailingSlash handles paths with multiple segments"):
-    val filter = RemoveTrailingSlash()
+    val filter  = RemoveTrailingSlash()
     val request = Request.GET("/api/v1/users/123/")
 
     val result = filter.handle(request)
@@ -94,10 +94,10 @@ class TrailingSlashFiltersTest extends FunSuite:
       case _ => fail("Expected Continue response")
 
   test("AddTrailingSlash and RemoveTrailingSlash are inverses"):
-    val addFilter = AddTrailingSlash()
+    val addFilter    = AddTrailingSlash()
     val removeFilter = RemoveTrailingSlash()
     val originalPath = "/api/users"
-    val request = Request.GET(originalPath)
+    val request      = Request.GET(originalPath)
 
     // Apply AddTrailingSlash
     val afterAdd = addFilter.handle(request) match

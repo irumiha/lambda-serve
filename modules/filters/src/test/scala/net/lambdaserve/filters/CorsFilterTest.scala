@@ -60,7 +60,8 @@ class CorsFilterTest extends FunSuite:
         responseWrapper(mockResponse) match
           case FilterOutResponse.Continue(wrappedResponse) =>
             assertEquals(
-              wrappedResponse.asHttp.headers.get(Header.AccessControlAllowOrigin.name),
+              wrappedResponse.asHttp.headers
+                .get(Header.AccessControlAllowOrigin.name),
               Some(Seq("*"))
             )
           case _ => fail("Expected Continue response")
@@ -68,7 +69,9 @@ class CorsFilterTest extends FunSuite:
 
   test("CORS filter with specific allowed origins accepts allowed origin"):
     val filter =
-      CorsFilter(allowedOrigins = Set("https://example.com", "https://test.com"))
+      CorsFilter(allowedOrigins =
+        Set("https://example.com", "https://test.com")
+      )
     val request = Request
       .GET("/api/test")
       .withHeader(Header.Origin.name, "https://example.com")
@@ -98,7 +101,8 @@ class CorsFilterTest extends FunSuite:
       case FilterInResponse.Stop(response) =>
         assertEquals(response.asHttp.status, Status.Forbidden)
         assert(
-          !response.asHttp.headers.contains(Header.AccessControlAllowOrigin.name)
+          !response.asHttp.headers
+            .contains(Header.AccessControlAllowOrigin.name)
         )
       case _ => fail("Expected Stop response")
 
@@ -117,7 +121,8 @@ class CorsFilterTest extends FunSuite:
     result match
       case FilterInResponse.Stop(response) =>
         assertEquals(
-          response.asHttp.headers.get(Header.AccessControlAllowCredentials.name),
+          response.asHttp.headers
+            .get(Header.AccessControlAllowCredentials.name),
           Some(Seq("true"))
         )
         // With credentials, should return specific origin, not "*"
@@ -128,9 +133,8 @@ class CorsFilterTest extends FunSuite:
       case _ => fail("Expected Stop response")
 
   test("CORS filter with exposed headers includes expose headers"):
-    val filter = CorsFilter(
-      exposedHeaders = Set("X-Custom-Header", "X-Another-Header")
-    )
+    val filter =
+      CorsFilter(exposedHeaders = Set("X-Custom-Header", "X-Another-Header"))
     val request = Request
       .GET("/api/test")
       .withHeader(Header.Origin.name, "https://example.com")
@@ -180,7 +184,9 @@ class CorsFilterTest extends FunSuite:
 
     result match
       case FilterInResponse.Stop(response) =>
-        assert(!response.asHttp.headers.contains(Header.AccessControlMaxAge.name))
+        assert(
+          !response.asHttp.headers.contains(Header.AccessControlMaxAge.name)
+        )
       case _ => fail("Expected Stop response")
 
   test("CORS filter with includePrefixes only applies to matching paths"):
@@ -214,7 +220,7 @@ class CorsFilterTest extends FunSuite:
       case _ => fail("Expected Stop response for non-excluded path")
 
   test("CORS filter without Origin header in preflight returns Forbidden"):
-    val filter = CorsFilter(allowedOrigins = Set("https://example.com"))
+    val filter  = CorsFilter(allowedOrigins = Set("https://example.com"))
     val request = Request.GET("/api/test").copy(method = Method.OPTIONS)
 
     val result = filter.handle(request)
@@ -225,7 +231,7 @@ class CorsFilterTest extends FunSuite:
       case _ => fail("Expected Stop response")
 
   test("CORS filter handles GET request without wrapping when no Origin"):
-    val filter = CorsFilter()
+    val filter  = CorsFilter()
     val request = Request.GET("/api/test")
 
     val result = filter.handle(request)
@@ -237,7 +243,8 @@ class CorsFilterTest extends FunSuite:
           case FilterOutResponse.Continue(wrappedResponse) =>
             // Without origin, no CORS headers should be added
             assert(
-              !wrappedResponse.asHttp.headers.contains(Header.AccessControlAllowOrigin.name)
+              !wrappedResponse.asHttp.headers
+                .contains(Header.AccessControlAllowOrigin.name)
             )
           case _ => fail("Expected Continue response")
       case _ => fail("Expected Wrap response")

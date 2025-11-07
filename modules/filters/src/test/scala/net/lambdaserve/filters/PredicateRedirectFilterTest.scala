@@ -31,14 +31,12 @@ class PredicateRedirectFilterTest extends FunSuite:
       case _ => fail("Expected Continue response")
 
   test("PredicateRedirectFilter with query parameter check"):
-    val filter = PredicateRedirectFilter(
-      req => req.query.contains("admin"),
-      "/login"
-    )
+    val filter =
+      PredicateRedirectFilter(req => req.query.contains("admin"), "/login")
     val requestWithParam = Request.GET("/page").withQueryParam("admin", "true")
     val requestWithoutParam = Request.GET("/page")
 
-    val resultWithParam = filter.handle(requestWithParam)
+    val resultWithParam    = filter.handle(requestWithParam)
     val resultWithoutParam = filter.handle(requestWithoutParam)
 
     resultWithParam match
@@ -60,7 +58,7 @@ class PredicateRedirectFilterTest extends FunSuite:
       .withHeader("X-Custom-Header", "value")
     val requestWithoutHeader = Request.GET("/api/test")
 
-    val resultWithHeader = filter.handle(requestWithHeader)
+    val resultWithHeader    = filter.handle(requestWithHeader)
     val resultWithoutHeader = filter.handle(requestWithoutHeader)
 
     resultWithHeader match
@@ -70,7 +68,10 @@ class PredicateRedirectFilterTest extends FunSuite:
     resultWithoutHeader match
       case FilterInResponse.Stop(response) =>
         assertEquals(response.asHttp.status, Status.SeeOther)
-        assertEquals(response.asHttp.headers.get("Location"), Some(Seq("/error")))
+        assertEquals(
+          response.asHttp.headers.get("Location"),
+          Some(Seq("/error"))
+        )
       case _ => fail("Expected redirect for request without header")
 
   test("PredicateRedirectFilter can check method"):
@@ -79,10 +80,10 @@ class PredicateRedirectFilterTest extends FunSuite:
       "/method-not-allowed"
     )
     val postRequest = Request.POST("test", "/api/resource")
-    val getRequest = Request.GET("/api/resource")
+    val getRequest  = Request.GET("/api/resource")
 
     val postResult = filter.handle(postRequest)
-    val getResult = filter.handle(getRequest)
+    val getResult  = filter.handle(getRequest)
 
     postResult match
       case FilterInResponse.Stop(response) =>

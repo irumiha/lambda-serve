@@ -6,8 +6,8 @@ import org.eclipse.jetty.http.HttpFields
 import scala.jdk.CollectionConverters.*
 
 extension (fields: HttpFields)
-  def toMultiMap: MultiMap = 
+  def toMultiMap: MultiMap =
     val pairs = fields.asScala.flatMap { f =>
       f.getValueList.asScala.map(v => f.getName -> v)
     }
-    MultiMap(pairs.toSeq: _*)
+    MultiMap(pairs.toSeq*)

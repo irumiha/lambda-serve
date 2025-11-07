@@ -17,7 +17,7 @@ object Cookies:
       .asScala
       .toMap
 
-  def fromJettyCookie(cookie: HttpCookie): (String, Cookie) =
+  private def fromJettyCookie(cookie: HttpCookie): (String, Cookie) =
     cookie.getName -> Cookie(
       name = cookie.getName,
       value = cookie.getValue,

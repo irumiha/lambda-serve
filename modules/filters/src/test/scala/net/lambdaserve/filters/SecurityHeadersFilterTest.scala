@@ -6,7 +6,7 @@ import net.lambdaserve.http.{Request, HttpResponse}
 class SecurityHeadersFilterTest extends FunSuite:
 
   test("SecurityHeadersFilter adds default security headers"):
-    val filter = SecurityHeadersFilter()
+    val filter  = SecurityHeadersFilter()
     val request = Request.GET("/test")
 
     val result = filter.handle(request)
@@ -36,7 +36,7 @@ class SecurityHeadersFilterTest extends FunSuite:
       case _ => fail("Expected Wrap response")
 
   test("SecurityHeadersFilter with custom X-Frame-Options"):
-    val filter = SecurityHeadersFilter(xFrameOptions = "SAMEORIGIN")
+    val filter  = SecurityHeadersFilter(xFrameOptions = "SAMEORIGIN")
     val request = Request.GET("/test")
 
     val result = filter.handle(request)
@@ -54,9 +54,8 @@ class SecurityHeadersFilterTest extends FunSuite:
       case _ => fail("Expected Wrap response")
 
   test("SecurityHeadersFilter adds HSTS when configured"):
-    val filter = SecurityHeadersFilter(
-      strictTransportSecurity =
-        Some("max-age=31536000; includeSubDomains; preload")
+    val filter = SecurityHeadersFilter(strictTransportSecurity =
+      Some("max-age=31536000; includeSubDomains; preload")
     )
     val request = Request.GET("/test")
 
@@ -75,8 +74,8 @@ class SecurityHeadersFilterTest extends FunSuite:
       case _ => fail("Expected Wrap response")
 
   test("SecurityHeadersFilter adds CSP when configured"):
-    val csp = "default-src 'self'; script-src 'self' 'unsafe-inline'"
-    val filter = SecurityHeadersFilter(contentSecurityPolicy = Some(csp))
+    val csp     = "default-src 'self'; script-src 'self' 'unsafe-inline'"
+    val filter  = SecurityHeadersFilter(contentSecurityPolicy = Some(csp))
     val request = Request.GET("/test")
 
     val result = filter.handle(request)
@@ -94,7 +93,7 @@ class SecurityHeadersFilterTest extends FunSuite:
       case _ => fail("Expected Wrap response")
 
   test("SecurityHeadersFilter does not add HSTS when not configured"):
-    val filter = SecurityHeadersFilter(strictTransportSecurity = None)
+    val filter  = SecurityHeadersFilter(strictTransportSecurity = None)
     val request = Request.GET("/test")
 
     val result = filter.handle(request)
@@ -105,7 +104,8 @@ class SecurityHeadersFilterTest extends FunSuite:
         responseWrapper(mockResponse) match
           case FilterOutResponse.Continue(wrappedResponse) =>
             assert(
-              !wrappedResponse.asHttp.headers.contains("Strict-Transport-Security")
+              !wrappedResponse.asHttp.headers
+                .contains("Strict-Transport-Security")
             )
           case _ => fail("Expected Continue response")
       case _ => fail("Expected Wrap response")

@@ -6,7 +6,7 @@ import net.lambdaserve.http.{Request, Status}
 class RateLimitFilterTest extends FunSuite:
 
   test("RateLimitFilter allows requests within limit"):
-    val filter = RateLimitFilter(maxRequests = 5, windowMs = 60000)
+    val filter  = RateLimitFilter(maxRequests = 5, windowMs = 60000)
     val request = Request.GET("/test").withHeader("X-Forwarded-For", "1.2.3.4")
 
     // Make 5 requests (at the limit)
@@ -17,7 +17,7 @@ class RateLimitFilterTest extends FunSuite:
         case _ => fail("Expected Wrap response for request within limit")
 
   test("RateLimitFilter blocks requests exceeding limit"):
-    val filter = RateLimitFilter(maxRequests = 2, windowMs = 60000)
+    val filter  = RateLimitFilter(maxRequests = 2, windowMs = 60000)
     val request = Request.GET("/test").withHeader("X-Forwarded-For", "1.2.3.4")
 
     // First 2 requests should pass
@@ -25,7 +25,7 @@ class RateLimitFilterTest extends FunSuite:
       val result = filter.handle(request)
       result match
         case FilterInResponse.Wrap(_, _) => // Expected
-        case _ => fail("Expected Wrap response")
+        case _                           => fail("Expected Wrap response")
 
     // Third request should be blocked
     val blockedResult = filter.handle(request)
@@ -47,7 +47,8 @@ class RateLimitFilterTest extends FunSuite:
     val filter = RateLimitFilter(
       maxRequests = 2,
       windowMs = 60000,
-      keyExtractor = req => req.headers.get("API-Key").headOption.getOrElse("anonymous")
+      keyExtractor =
+        req => req.headers.get("API-Key").headOption.getOrElse("anonymous")
     )
 
     val request1 = Request.GET("/test").withHeader("API-Key", "key-123")
@@ -57,11 +58,11 @@ class RateLimitFilterTest extends FunSuite:
     for _ <- 1 to 2 do
       filter.handle(request1) match
         case FilterInResponse.Wrap(_, _) => // Expected
-        case _ => fail("Expected Wrap response")
+        case _                           => fail("Expected Wrap response")
 
       filter.handle(request2) match
         case FilterInResponse.Wrap(_, _) => // Expected
-        case _ => fail("Expected Wrap response")
+        case _                           => fail("Expected Wrap response")
 
     // Both should be at their limits now
     filter.handle(request1) match
@@ -75,7 +76,7 @@ class RateLimitFilterTest extends FunSuite:
       case _ => fail("Expected Stop response")
 
   test("RateLimitFilter adds rate limit headers to response"):
-    val filter = RateLimitFilter(maxRequests = 5, windowMs = 60000)
+    val filter  = RateLimitFilter(maxRequests = 5, windowMs = 60000)
     val request = Request.GET("/test").withHeader("X-Forwarded-For", "1.2.3.4")
 
     val result = filter.handle(request)
@@ -91,7 +92,9 @@ class RateLimitFilterTest extends FunSuite:
               Some(Seq("5"))
             )
             // After first request, should have 4 remaining
-            assert(wrappedResponse.asHttp.headers.contains("X-RateLimit-Remaining"))
+            assert(
+              wrappedResponse.asHttp.headers.contains("X-RateLimit-Remaining")
+            )
           case _ => fail("Expected Continue response")
       case _ => fail("Expected Wrap response")
 
@@ -125,19 +128,19 @@ class RateLimitFilterTest extends FunSuite:
     for _ <- 1 to 2 do
       filter.handle(request1) match
         case FilterInResponse.Wrap(_, _) => // Expected
-        case _ => fail("Expected Wrap response")
+        case _                           => fail("Expected Wrap response")
 
       filter.handle(request2) match
         case FilterInResponse.Wrap(_, _) => // Expected
-        case _ => fail("Expected Wrap response")
+        case _                           => fail("Expected Wrap response")
 
     // Both IPs should now be at their limit
     filter.handle(request1) match
       case FilterInResponse.Stop(_) => // Expected
-      case _ => fail("Expected Stop response")
+      case _                        => fail("Expected Stop response")
 
     filter.handle(request2) match
       case FilterInResponse.Stop(_) => // Expected
-      case _ => fail("Expected Stop response")
+      case _                        => fail("Expected Stop response")
 
 end RateLimitFilterTest

@@ -5,7 +5,7 @@ import net.lambdaserve.Router
 import net.lambdaserve.http.{Method, Request, HttpResponse}
 
 import java.net.http.HttpRequest.BodyPublishers
-import java.net.http.{HttpClient, HttpRequest, HttpResponse => JHttpResponse}
+import java.net.http.{HttpClient, HttpRequest, HttpResponse as JHttpResponse}
 import java.net.{ServerSocket, URI}
 import java.nio.charset.StandardCharsets
 import scala.util.Using
@@ -124,20 +124,14 @@ class HttpHandlerIntegrationTest extends FunSuite:
     val receivedRequest = receivedRequests.head
     assert(!receivedRequest.form.isEmpty)
 
-    assertEquals(
-      receivedRequest.form.get("username"),
-      IndexedSeq("testuser")
-    )
+    assertEquals(receivedRequest.form.get("username"), IndexedSeq("testuser"))
 
     assertEquals(
       receivedRequest.form.get("email"),
       IndexedSeq("test@example.com")
     )
     assertEquals(receivedRequest.form.get("age"), IndexedSeq("25"))
-    assertEquals(
-      receivedRequest.form.get("tags"),
-      IndexedSeq("scala", "web")
-    )
+    assertEquals(receivedRequest.form.get("tags"), IndexedSeq("scala", "web"))
 
     // Should not have multipart or raw content
     assert(receivedRequest.multipartForm.isEmpty)

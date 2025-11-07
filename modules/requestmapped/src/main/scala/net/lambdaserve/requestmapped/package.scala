@@ -25,12 +25,12 @@ object Combined:
     )
 
 def mapped[T](handler: T => HttpResponse)(using
-                                          m: Combined[T]
+  m: Combined[T]
 ): Request => HttpResponse =
   request => handler(m.mapValues(request))
 
 def mapped[T](handler: (T, Request) => HttpResponse)(using
-                                                     m: Combined[T]
+  m: Combined[T]
 ): Request => HttpResponse =
   request => handler(m.mapValues(request), request)
 
@@ -45,17 +45,17 @@ def mapped[T1, T2](
   request => handler(m1.mapValues(request), m2.mapValues(request), request)
 
 def mapped[T1, T2, T3](handler: (T1, T2, T3) => HttpResponse)(using
-                                                              m1: Combined[T1],
-                                                              m2: Combined[T2],
-                                                              m3: Combined[T3]
+  m1: Combined[T1],
+  m2: Combined[T2],
+  m3: Combined[T3]
 ): Request => HttpResponse =
   request =>
     handler(m1.mapValues(request), m2.mapValues(request), m3.mapValues(request))
 
 def mapped[T1, T2, T3](handler: (T1, T2, T3, Request) => HttpResponse)(using
-                                                                       m1: Combined[T1],
-                                                                       m2: Combined[T2],
-                                                                       m3: Combined[T3]
+  m1: Combined[T1],
+  m2: Combined[T2],
+  m3: Combined[T3]
 ): Request => HttpResponse =
   request =>
     handler(
@@ -66,10 +66,10 @@ def mapped[T1, T2, T3](handler: (T1, T2, T3, Request) => HttpResponse)(using
     )
 
 def mapped[T1, T2, T3, T4](handler: (T1, T2, T3, T4) => HttpResponse)(using
-                                                                      m1: Combined[T1],
-                                                                      m2: Combined[T2],
-                                                                      m3: Combined[T3],
-                                                                      m4: Combined[T4]
+  m1: Combined[T1],
+  m2: Combined[T2],
+  m3: Combined[T3],
+  m4: Combined[T4]
 ): Request => HttpResponse =
   request =>
     handler(
@@ -79,11 +79,13 @@ def mapped[T1, T2, T3, T4](handler: (T1, T2, T3, T4) => HttpResponse)(using
       m4.mapValues(request)
     )
 
-def mapped[T1, T2, T3, T4](handler: (T1, T2, T3, T4, Request) => HttpResponse)(using
-                                                                               m1: Combined[T1],
-                                                                               m2: Combined[T2],
-                                                                               m3: Combined[T3],
-                                                                               m4: Combined[T4]
+def mapped[T1, T2, T3, T4](
+  handler: (T1, T2, T3, T4, Request) => HttpResponse
+)(using
+  m1: Combined[T1],
+  m2: Combined[T2],
+  m3: Combined[T3],
+  m4: Combined[T4]
 ): Request => HttpResponse =
   request =>
     handler(

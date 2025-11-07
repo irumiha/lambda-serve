@@ -29,13 +29,14 @@ class HttpResponseTest extends FunSuite:
     )
 
   test("Response.Ok with headers"):
-    val response = HttpResponse.Ok(
-      "Hello",
-      Map("X-Custom-Header" -> Seq("custom-value"))
-    )
+    val response =
+      HttpResponse.Ok("Hello", Map("X-Custom-Header" -> Seq("custom-value")))
 
     assertEquals(response.status, Status.OK)
-    assertEquals(response.headers.get("X-Custom-Header"), Some(Seq("custom-value")))
+    assertEquals(
+      response.headers.get("X-Custom-Header"),
+      Some(Seq("custom-value"))
+    )
 
   test("Response.NotFound creates 404 response"):
     val response = HttpResponse.NotFound
@@ -57,7 +58,10 @@ class HttpResponseTest extends FunSuite:
     val response = HttpResponse.Found("/new-location")
 
     assertEquals(response.status, Status.Found)
-    assertEquals(response.headers.get(Header.Location.name), Some(Seq("/new-location")))
+    assertEquals(
+      response.headers.get(Header.Location.name),
+      Some(Seq("/new-location"))
+    )
 
   test("Response.SeeOther creates 303 redirect"):
     val response = HttpResponse.SeeOther("/other-location")
@@ -74,9 +78,13 @@ class HttpResponseTest extends FunSuite:
     assertEquals(response.headers.get("X-Custom"), Some(Seq("value")))
 
   test("Response addHeader with multiple values"):
-    val response = HttpResponse.Ok("test").addHeader("X-Custom", Seq("value1", "value2"))
+    val response =
+      HttpResponse.Ok("test").addHeader("X-Custom", Seq("value1", "value2"))
 
-    assertEquals(response.headers.get("X-Custom"), Some(Seq("value1", "value2")))
+    assertEquals(
+      response.headers.get("X-Custom"),
+      Some(Seq("value1", "value2"))
+    )
 
   test("Response addHeader merges with existing headers"):
     val response = HttpResponse
@@ -88,7 +96,7 @@ class HttpResponseTest extends FunSuite:
     assertEquals(response.headers.get("X-Header-2"), Some(Seq("value2")))
 
   test("Response withCookie adds cookie"):
-    val cookie = Cookie("session_id", "abc123")
+    val cookie   = Cookie("session_id", "abc123")
     val response = HttpResponse.Ok("test").withCookie(cookie)
 
     assertEquals(response.cookies.get("session_id"), Some(cookie))
@@ -126,13 +134,16 @@ class HttpResponseTest extends FunSuite:
 
     val deletedCookie = response.cookies.get("session_id")
     assert(deletedCookie.isDefined)
-    assertEquals(deletedCookie.get.path, Some("/app")) // Preserves original path
+    assertEquals(
+      deletedCookie.get.path,
+      Some("/app")
+    ) // Preserves original path
     assertEquals(deletedCookie.get.expires, Some(Instant.EPOCH))
     assertEquals(deletedCookie.get.maxAge, Some(0L))
 
   test("Response can have error"):
     val exception = new RuntimeException("Test error")
-    val response = HttpResponse.Ok("test").copy(error = Some(exception))
+    val response  = HttpResponse.Ok("test").copy(error = Some(exception))
 
     assert(response.error.isDefined)
     assertEquals(response.error.get.getMessage, "Test error")
@@ -153,7 +164,7 @@ class HttpResponseTest extends FunSuite:
 
   test("Response preserves all fields when adding headers"):
     val originalCookie = Cookie("test", "value")
-    val originalError = new RuntimeException("error")
+    val originalError  = new RuntimeException("error")
     val response = HttpResponse
       .Ok("test")
       .copy(

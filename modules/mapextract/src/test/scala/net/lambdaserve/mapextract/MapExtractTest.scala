@@ -73,15 +73,12 @@ class MapExtractTest extends FunSuite:
     assert(mapped.pet == List(Pet("Max", "Dog"), Pet("Milly", "Cat")))
 
   test("MapExtract should handle HTTP GET query parameters"):
-    case class SearchQuery(
-      query: String,
-      page: Int,
-      limit: Int
-    ) derives MapExtract
+    case class SearchQuery(query: String, page: Int, limit: Int)
+        derives MapExtract
 
     val params = Map(
       "query" -> IndexedSeq("scala"),
-      "page" -> IndexedSeq("1"),
+      "page"  -> IndexedSeq("1"),
       "limit" -> IndexedSeq("10")
     )
 
@@ -92,19 +89,17 @@ class MapExtractTest extends FunSuite:
     assert(result.limit == 10)
 
   test("MapExtract should handle form submission with nested objects"):
-    case class Address(street: String, city: String, zip: String) derives MapExtract
-    case class ContactForm(
-      name: String,
-      email: String,
-      address: Address
-    ) derives MapExtract
+    case class Address(street: String, city: String, zip: String)
+        derives MapExtract
+    case class ContactForm(name: String, email: String, address: Address)
+        derives MapExtract
 
     val formData = Map(
-      "name" -> IndexedSeq("John Doe"),
-      "email" -> IndexedSeq("john@example.com"),
+      "name"           -> IndexedSeq("John Doe"),
+      "email"          -> IndexedSeq("john@example.com"),
       "address.street" -> IndexedSeq("123 Main St"),
-      "address.city" -> IndexedSeq("Springfield"),
-      "address.zip" -> IndexedSeq("12345")
+      "address.city"   -> IndexedSeq("Springfield"),
+      "address.zip"    -> IndexedSeq("12345")
     )
 
     val form: ContactForm = summon[MapExtract[ContactForm]].projectMap(formData)
@@ -116,32 +111,26 @@ class MapExtractTest extends FunSuite:
     assert(form.address.zip == "12345")
 
   test("MapExtract should handle optional fields with Some value"):
-    case class SearchWithFilter(
-      term: String,
-      filter: Option[String]
-    ) derives MapExtract
+    case class SearchWithFilter(term: String, filter: Option[String])
+        derives MapExtract
 
-    val params = Map(
-      "term" -> IndexedSeq("scala"),
-      "filter" -> IndexedSeq("recent")
-    )
+    val params =
+      Map("term" -> IndexedSeq("scala"), "filter" -> IndexedSeq("recent"))
 
-    val result: SearchWithFilter = summon[MapExtract[SearchWithFilter]].projectMap(params)
+    val result: SearchWithFilter =
+      summon[MapExtract[SearchWithFilter]].projectMap(params)
 
     assert(result.term == "scala")
     assert(result.filter == Some("recent"))
 
   test("MapExtract should handle optional fields with None value"):
-    case class SearchWithFilter(
-      term: String,
-      filter: Option[String]
-    ) derives MapExtract
+    case class SearchWithFilter(term: String, filter: Option[String])
+        derives MapExtract
 
-    val params = Map(
-      "term" -> IndexedSeq("scala")
-    )
+    val params = Map("term" -> IndexedSeq("scala"))
 
-    val result: SearchWithFilter = summon[MapExtract[SearchWithFilter]].projectMap(params)
+    val result: SearchWithFilter =
+      summon[MapExtract[SearchWithFilter]].projectMap(params)
 
     assert(result.term == "scala")
     assert(result.filter == None)
@@ -157,11 +146,11 @@ class MapExtractTest extends FunSuite:
     ) derives MapExtract
 
     val params = Map(
-      "shortVal" -> IndexedSeq("100"),
-      "intVal" -> IndexedSeq("1000"),
-      "longVal" -> IndexedSeq("100000"),
-      "floatVal" -> IndexedSeq("3.14"),
-      "doubleVal" -> IndexedSeq("2.718281828"),
+      "shortVal"      -> IndexedSeq("100"),
+      "intVal"        -> IndexedSeq("1000"),
+      "longVal"       -> IndexedSeq("100000"),
+      "floatVal"      -> IndexedSeq("3.14"),
+      "doubleVal"     -> IndexedSeq("2.718281828"),
       "bigDecimalVal" -> IndexedSeq("999.999")
     )
 
@@ -175,13 +164,11 @@ class MapExtractTest extends FunSuite:
     assert(result.bigDecimalVal == BigDecimal("999.999"))
 
   test("MapExtract should handle boolean values"):
-    case class Preferences(
-      newsletter: Boolean,
-      notifications: Boolean
-    ) derives MapExtract
+    case class Preferences(newsletter: Boolean, notifications: Boolean)
+        derives MapExtract
 
     val params = Map(
-      "newsletter" -> IndexedSeq("true"),
+      "newsletter"    -> IndexedSeq("true"),
       "notifications" -> IndexedSeq("false")
     )
 
@@ -197,7 +184,7 @@ class MapExtractTest extends FunSuite:
 
     val uuid = UUID.randomUUID()
     val params = Map(
-      "id" -> IndexedSeq(uuid.toString),
+      "id"   -> IndexedSeq(uuid.toString),
       "name" -> IndexedSeq("test-entity")
     )
 
@@ -209,9 +196,7 @@ class MapExtractTest extends FunSuite:
   test("MapExtract should handle Vector collections"):
     case class VectorForm(tags: Vector[String]) derives MapExtract
 
-    val params = Map(
-      "tags" -> IndexedSeq("scala", "http", "server")
-    )
+    val params = Map("tags" -> IndexedSeq("scala", "http", "server"))
 
     val result: VectorForm = summon[MapExtract[VectorForm]].projectMap(params)
 
@@ -220,9 +205,7 @@ class MapExtractTest extends FunSuite:
   test("MapExtract should handle Seq collections"):
     case class SeqForm(items: Seq[Int]) derives MapExtract
 
-    val params = Map(
-      "items" -> IndexedSeq("1", "2", "3", "4", "5")
-    )
+    val params = Map("items" -> IndexedSeq("1", "2", "3", "4", "5"))
 
     val result: SeqForm = summon[MapExtract[SeqForm]].projectMap(params)
 
@@ -235,7 +218,7 @@ class MapExtractTest extends FunSuite:
     ) derives MapExtract
 
     val params = Map(
-      "user_name" -> IndexedSeq("Jane"),
+      "user_name"  -> IndexedSeq("Jane"),
       "user_email" -> IndexedSeq("jane@example.com")
     )
 
@@ -250,8 +233,8 @@ class MapExtractTest extends FunSuite:
     case class Event(title: String, location: Location) derives MapExtract
 
     val params = Map(
-      "title" -> IndexedSeq("Conference"),
-      "location.name" -> IndexedSeq("Convention Center"),
+      "title"               -> IndexedSeq("Conference"),
+      "location.name"       -> IndexedSeq("Convention Center"),
       "location.coords.lat" -> IndexedSeq("40.7128"),
       "location.coords.lon" -> IndexedSeq("-74.0060")
     )
@@ -267,13 +250,11 @@ class MapExtractTest extends FunSuite:
     case class Item(name: String) derives MapExtract
     case class EmptyList(items: List[Item]) derives MapExtract
 
-    val params = Map(
-      "items.name" -> IndexedSeq()
-    )
-  
+    val params = Map("items.name" -> IndexedSeq())
+
     val result: EmptyList = summon[MapExtract[EmptyList]].projectMap(params)
     assert(result.items.isEmpty)
-  
+
   test("MapExtract should handle mixed scalar and collection fields"):
     case class Survey(
       respondentId: String,
@@ -284,9 +265,9 @@ class MapExtractTest extends FunSuite:
 
     val params = Map(
       "respondentId" -> IndexedSeq("R123"),
-      "age" -> IndexedSeq("25"),
-      "answers" -> IndexedSeq("yes", "no", "maybe"),
-      "completed" -> IndexedSeq("true")
+      "age"          -> IndexedSeq("25"),
+      "answers"      -> IndexedSeq("yes", "no", "maybe"),
+      "completed"    -> IndexedSeq("true")
     )
 
     val result: Survey = summon[MapExtract[Survey]].projectMap(params)
@@ -312,7 +293,8 @@ class MapExtractTest extends FunSuite:
     val map1 = Map("a" -> IndexedSeq("valueA"))
     val map2 = Map("b" -> IndexedSeq("valueB"))
 
-    val result: TwoFields = summon[MapExtract[TwoFields]].projectMaps(Seq(map1, map2))
+    val result: TwoFields =
+      summon[MapExtract[TwoFields]].projectMaps(Seq(map1, map2))
 
     assert(result.a == "valueA")
     assert(result.b == "valueB")
@@ -329,9 +311,9 @@ class MapExtractTest extends FunSuite:
     ) derives MapExtract
 
     val params = Map(
-      "date" -> IndexedSeq("2023-12-25"),
-      "dateTime" -> IndexedSeq("2023-12-25T10:15:30"),
-      "instant" -> IndexedSeq("2023-12-25T10:15:30Z"),
+      "date"          -> IndexedSeq("2023-12-25"),
+      "dateTime"      -> IndexedSeq("2023-12-25T10:15:30"),
+      "instant"       -> IndexedSeq("2023-12-25T10:15:30Z"),
       "zonedDateTime" -> IndexedSeq("2023-12-25T10:15:30+01:00[Europe/Paris]")
     )
 
@@ -340,54 +322,48 @@ class MapExtractTest extends FunSuite:
     assert(result.date == LocalDate.parse("2023-12-25"))
     assert(result.dateTime == LocalDateTime.parse("2023-12-25T10:15:30"))
     assert(result.instant == Instant.parse("2023-12-25T10:15:30Z"))
-    assert(result.zonedDateTime == ZonedDateTime.parse("2023-12-25T10:15:30+01:00[Europe/Paris]"))
+    assert(
+      result.zonedDateTime == ZonedDateTime
+        .parse("2023-12-25T10:15:30+01:00[Europe/Paris]")
+    )
 
   test("MapExtract should handle optional nested objects when present"):
     case class Address(city: String) derives MapExtract
-    case class PersonWithOptionalAddress(
-      name: String,
-      address: Option[Address]
-    ) derives MapExtract
+    case class PersonWithOptionalAddress(name: String, address: Option[Address])
+        derives MapExtract
 
-    val params = Map(
-      "name" -> IndexedSeq("John"),
-      "address.city" -> IndexedSeq("NYC")
-    )
+    val params =
+      Map("name" -> IndexedSeq("John"), "address.city" -> IndexedSeq("NYC"))
 
-    val result: PersonWithOptionalAddress = summon[MapExtract[PersonWithOptionalAddress]].projectMap(params)
+    val result: PersonWithOptionalAddress =
+      summon[MapExtract[PersonWithOptionalAddress]].projectMap(params)
 
     assert(result.name == "John")
     assert(result.address == Some(Address("NYC")))
 
   test("MapExtract should handle optional nested objects when absent"):
     case class Address(city: String) derives MapExtract
-    case class PersonWithOptionalAddress(
-      name: String,
-      address: Option[Address]
-    ) derives MapExtract
+    case class PersonWithOptionalAddress(name: String, address: Option[Address])
+        derives MapExtract
 
-    val params = Map(
-      "name" -> IndexedSeq("John")
-    )
+    val params = Map("name" -> IndexedSeq("John"))
 
-    val result: PersonWithOptionalAddress = summon[MapExtract[PersonWithOptionalAddress]].projectMap(params)
+    val result: PersonWithOptionalAddress =
+      summon[MapExtract[PersonWithOptionalAddress]].projectMap(params)
 
     assert(result.name == "John")
     assert(result.address == None)
 
   test("MapExtract should handle indexed collection notation"):
     case class Pet(name: String, age: Int) derives MapExtract
-    case class PetOwner(
-      ownerName: String,
-      pet: List[Pet]
-    ) derives MapExtract
+    case class PetOwner(ownerName: String, pet: List[Pet]) derives MapExtract
 
     val params = Map(
-      "ownerName" -> IndexedSeq("John"),
+      "ownerName"   -> IndexedSeq("John"),
       "pet[0].name" -> IndexedSeq("Max"),
-      "pet[0].age" -> IndexedSeq("3"),
+      "pet[0].age"  -> IndexedSeq("3"),
       "pet[1].name" -> IndexedSeq("Minnie"),
-      "pet[1].age" -> IndexedSeq("5")
+      "pet[1].age"  -> IndexedSeq("5")
     )
 
     val result: PetOwner = summon[MapExtract[PetOwner]].projectMap(params)
@@ -419,11 +395,11 @@ class MapExtractTest extends FunSuite:
     case class Person(name: String, addresses: List[Address]) derives MapExtract
 
     val params = Map(
-      "name" -> IndexedSeq("Alice"),
+      "name"                -> IndexedSeq("Alice"),
       "addresses[0].street" -> IndexedSeq("123 Main St"),
-      "addresses[0].city" -> IndexedSeq("Springfield"),
+      "addresses[0].city"   -> IndexedSeq("Springfield"),
       "addresses[1].street" -> IndexedSeq("456 Oak Ave"),
-      "addresses[1].city" -> IndexedSeq("Portland")
+      "addresses[1].city"   -> IndexedSeq("Portland")
     )
 
     val result: Person = summon[MapExtract[Person]].projectMap(params)
@@ -433,12 +409,12 @@ class MapExtractTest extends FunSuite:
     assert(result.addresses(0) == Address("123 Main St", "Springfield"))
     assert(result.addresses(1) == Address("456 Oak Ave", "Portland"))
 
-  test("MapExtract should handle indexed notation with simple scalar collections"):
+  test(
+    "MapExtract should handle indexed notation with simple scalar collections"
+  ):
     case class ScalarForm(values: List[Int]) derives MapExtract
 
-    val params = Map(
-      "values" -> IndexedSeq("1", "2", "3")
-    )
+    val params = Map("values" -> IndexedSeq("1", "2", "3"))
 
     val result: ScalarForm = summon[MapExtract[ScalarForm]].projectMap(params)
 
